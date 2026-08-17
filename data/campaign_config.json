@@ -1,0 +1,33 @@
+{
+  "trabajo": {
+    "google_sheet_id": "YOUR_SHEET_ID",
+    "google_sheet_range": "Hoja1!A1:C20",
+    "trello_board_id": "YOUR_BOARD_ID",
+    "email_subject": "Trabajo",
+    "email_template": "El trabajo del día es: \nObjetivo Diario: {objetivo_diario}\nObjetivo Semanal: {objetivo_semanal}\nObjetivo Mensual: {objetivo_mensual}\n\nTareas en Proceso:\n{trello_cards}"
+  },
+  "posicionamiento": {
+    "domains": [
+      "gsrabogados.com.ar",
+      "oteguiobras.com",
+      "zingueriazarza.com",
+      "decotay.com.ar",
+      "tay.com.ar",
+      "mottobasic.com",
+      "selvaggiesteban.dev",
+      "lanuscomputacion.com",
+      "selvaggiconsultores.com",
+      "ingenieriaproyectos.com.ar",
+      "identidadmarketing.com",
+      "mueblescavah.com.ar",
+      "muebles-cavah.com.ar",
+      "smartalk.cl"
+    ],
+    "email_subject": "Posicionamiento web",
+    "email_template": "Auditorías SEO:\n{seo_audits}"
+  },
+  "contable": {
+    "email_subject": "Ejercicio contable 2026",
+    "email_template": "Objetivo diario {objetivo_diario}\nObjetivo semanal {objetivo_semanal}\nObjetivo mensual {objetivo_mensual}\nFacturación mensual {facturacion_mensual}"
+  }
+}
