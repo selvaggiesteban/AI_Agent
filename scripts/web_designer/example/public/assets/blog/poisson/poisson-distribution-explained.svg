@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" font-family="'Segoe UI', Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="λ1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#0891b2"/>
+    </linearGradient>
+    <linearGradient id="λ2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="λ3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="520" fill="url(#bg)" rx="16"/>
+  <rect x="1" y="1" width="898" height="518" fill="none" stroke="#334155" stroke-width="1" rx="16"/>
+
+  <!-- Title -->
+  <text x="450" y="42" text-anchor="middle" fill="#f8fafc" font-size="20" font-weight="bold">Distribución de Poisson — λt Predice Bugs, Tareas y Riesgos</text>
+
+  <!-- Subtitle -->
+  <text x="450" y="64" text-anchor="middle" fill="#94a3b8" font-size="13">La probabilidad de que ocurran k eventos en un intervalo de tiempo, con una tasa media λ conocida</text>
+
+  <!-- Formula -->
+  <text x="450" y="92" text-anchor="middle" fill="#38bdf8" font-size="15" font-style="italic">P(k eventos en t días) = (e^(-λt) · (λt)^k) / k!</text>
+
+  <!-- Chart area -->
+  <!-- Y-axis -->
+  <line x1="100" y1="110" x2="100" y2="370" stroke="#475569" stroke-width="1.5"/>
+  <!-- X-axis -->
+  <line x1="100" y1="370" x2="830" y2="370" stroke="#475569" stroke-width="1.5"/>
+
+  <!-- Y-axis labels -->
+  <text x="92" y="370" text-anchor="end" fill="#64748b" font-size="11">0</text>
+  <text x="92" y="280" text-anchor="end" fill="#64748b" font-size="11">0.15</text>
+  <text x="92" y="190" text-anchor="end" fill="#64748b" font-size="11">0.30</text>
+  <text x="92" y="118" text-anchor="end" fill="#64748b" font-size="11">0.45</text>
+
+  <!-- X-axis labels -->
+  <text x="100" y="390" text-anchor="middle" fill="#64748b" font-size="11">0</text>
+  <text x="210" y="390" text-anchor="middle" fill="#64748b" font-size="11">2</text>
+  <text x="320" y="390" text-anchor="middle" fill="#64748b" font-size="11">4</text>
+  <text x="430" y="390" text-anchor="middle" fill="#64748b" font-size="11">6</text>
+  <text x="540" y="390" text-anchor="middle" fill="#64748b" font-size="11">8</text>
+  <text x="650" y="390" text-anchor="middle" fill="#64748b" font-size="11">10</text>
+  <text x="760" y="390" text-anchor="middle" fill="#64748b" font-size="11">12</text>
+  <text x="830" y="390" text-anchor="middle" fill="#64748b" font-size="11">k</text>
+
+  <!-- λ = 1 bars (Cyan - low bugs) -->
+  <g fill="url(#λ1)" opacity="0.85">
+    <rect x="110" y="295" width="30" height="75" rx="3"/>
+    <rect x="145" y="330" width="30" height="40" rx="3"/>
+    <rect x="180" y="352" width="30" height="18" rx="3"/>
+    <rect x="215" y="362" width="30" height="8" rx="3"/>
+    <rect x="250" y="367" width="30" height="3" rx="2"/>
+  </g>
+
+  <!-- λ = 4 bars (Amber - moderate) -->
+  <g fill="url(#λ2)" opacity="0.85">
+    <rect x="130" y="120" width="30" height="250" rx="3"/>
+    <rect x="165" y="140" width="30" height="230" rx="3"/>
+    <rect x="200" y="165" width="30" height="205" rx="3"/>
+    <rect x="235" y="200" width="30" height="170" rx="3"/>
+    <rect x="270" y="240" width="30" height="130" rx="3"/>
+    <rect x="305" y="275" width="30" height="95" rx="3"/>
+    <rect x="340" y="305" width="30" height="65" rx="3"/>
+    <rect x="375" y="325" width="30" height="45" rx="3"/>
+    <rect x="410" y="340" width="30" height="30" rx="3"/>
+    <rect x="445" y="350" width="30" height="20" rx="3"/>
+    <rect x="480" y="358" width="30" height="12" rx="3"/>
+    <rect x="515" y="364" width="30" height="6" rx="2"/>
+  </g>
+
+  <!-- λ = 8 bars (Red - high load) -->
+  <g fill="url(#λ3)" opacity="0.85">
+    <rect x="180" y="160" width="25" height="210" rx="3"/>
+    <rect x="209" y="150" width="25" height="220" rx="3"/>
+    <rect x="238" y="148" width="25" height="222" rx="3"/>
+    <rect x="267" y="155" width="25" height="215" rx="3"/>
+    <rect x="296" y="168" width="25" height="202" rx="3"/>
+    <rect x="325" y="182" width="25" height="188" rx="3"/>
+    <rect x="354" y="198" width="25" height="172" rx="3"/>
+    <rect x="383" y="215" width="25" height="155" rx="3"/>
+    <rect x="412" y="230" width="25" height="140" rx="3"/>
+    <rect x="441" y="248" width="25" height="122" rx="3"/>
+    <rect x="470" y="262" width="25" height="108" rx="3"/>
+    <rect x="499" y="278" width="25" height="92" rx="3"/>
+    <rect x="528" y="292" width="25" height="78" rx="3"/>
+    <rect x="557" y="305" width="25" height="65" rx="3"/>
+    <rect x="586" y="318" width="25" height="52" rx="3"/>
+    <rect x="615" y="328" width="25" height="42" rx="3"/>
+    <rect x="644" y="338" width="25" height="32" rx="3"/>
+    <rect x="673" y="347" width="25" height="23" rx="3"/>
+    <rect x="702" y="353" width="25" height="17" rx="3"/>
+    <rect x="731" y="358" width="25" height="12" rx="3"/>
+    <rect x="760" y="363" width="25" height="7" rx="2"/>
+    <rect x="789" y="366" width="25" height="4" rx="2"/>
+  </g>
+
+  <!-- Legend -->
+  <rect x="100" y="415" width="20" height="14" rx="3" fill="url(#λ1)"/>
+  <text x="126" y="427" fill="#94a3b8" font-size="12">λt = 1 (Baja carga — proyecto estable)</text>
+
+  <rect x="370" y="415" width="20" height="14" rx="3" fill="url(#λ2)"/>
+  <text x="396" y="427" fill="#94a3b8" font-size="12">λt = 4 (Carga media — proyecto activo)</text>
+
+  <rect x="100" y="440" width="20" height="14" rx="3" fill="url(#λ3)"/>
+  <text x="126" y="452" fill="#94a3b8" font-size="12">λt = 8 (Alta carga — proyecto intensivo)</text>
+
+  <!-- Explanation boxes -->
+  <rect x="370" y="440" width="14" height="14" rx="3" fill="#38bdf8"/>
+  <text x="390" y="452" fill="#94a3b8" font-size="12">λ = tasa promedio de eventos por día | t = días del período | k = número de eventos esperados</text>
+
+  <!-- Bottom insight -->
+  <rect x="100" y="478" width="730" height="28" rx="8" fill="#1e3a5f" opacity="0.8"/>
+  <text x="465" y="497" text-anchor="middle" fill="#7dd3fc" font-size="12">💡 poisson-products simula λ(t) con crecimiento, ciclos semanales y fatiga para predecir bugs y ayudarte a cumplir deadlines</text>
+</svg>

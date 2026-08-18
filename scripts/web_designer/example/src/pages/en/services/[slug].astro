@@ -1,0 +1,50 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ContactForm from '../../../components/ContactForm.astro';
+import Section from '../../../components/Section.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import { getLocaleFromUrl, t } from '../../../i18n/utils';
+
+export const prerender = true;
+export async function getStaticPaths() {
+  const servicios = await getCollection('servicios');
+  const enServicios = servicios.filter(s => s.id.startsWith('en/'));
+  return enServicios.map(servicio => ({
+    params: { slug: servicio.id.replace('en/', '') },
+    props: { servicio },
+  }));
+}
+
+const { servicio } = Astro.props;
+import { render } from 'astro:content';
+const { Content } = await render(servicio);
+const locale = getLocaleFromUrl(Astro.url);
+const lang = locale as 'es' | 'en';
+---
+
+<BaseLayout isService={true} title={servicio.data.title} description={servicio.data.description}>
+  <Section>
+    <div class="w-full mx-auto py-[50px] text-center">
+      <div class="flex justify-center mb-6">
+        <Breadcrumbs path={[
+          { label: t(lang, 'breadcrumbs.home'), href: locale === 'es' ? '/es/' : '/en/' },
+          { label: t(lang, 'breadcrumbs.servicios'), href: locale === 'es' ? '/es/services' : '/en/services' },
+          { label: servicio.data.title }
+        ]} />
+      </div>
+      <h1 class="font-bold text-[44px] md:text-[72px] leading-tight mb-4">{servicio.data.title}</h1>
+      <p class="text-xl text-ink/60 italic max-w-3xl mx-auto">{servicio.data.description}</p>
+    </div>
+  </Section>
+  <Section>
+    <div class="w-full mx-auto">
+      <div class="prose prose-ink max-w-none">
+        <Content />
+      </div>
+    </div>
+  </Section>
+  <Section variant="canvas">
+    <ContactForm />
+  </Section>
+</BaseLayout>

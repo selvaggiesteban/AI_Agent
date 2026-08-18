@@ -1,0 +1,23 @@
+# Entornos virtuales
+venv/
+env/
+.venv/
+ENV/
+
+# Caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Datos Sensibles (PROTECCIÓN CRÍTICA)
+data/*
+!data/.gitkeep
+*.xlsx
+*.csv
+*.db
+*.json
+.env
+
+# IDEs
+.vscode/
+.idea/

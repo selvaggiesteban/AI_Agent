@@ -1,0 +1,21 @@
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+env/
+.env
+
+# Generated data files
+data/results.json
+data/debug_html/*.html
+
+# Excel files
+*.xlsx
+
+# OS-specific
+.DS_Store
+Thumbs.db

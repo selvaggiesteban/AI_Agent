@@ -1,0 +1,190 @@
+{
+  "nav": {
+    "inicio": "Home",
+    "sobreMi": "About",
+    "servicios": "Services",
+    "blog": "Blog",
+    "contacto": "Contact",
+    "empezar": "Get Started",
+    "empezarAhora": "Get Started Now",
+    "menu": "Menu"
+  },
+  "services": {
+    "softwareAMedida": "Custom Software",
+    "disenoWeb": "Responsive Web Design",
+    "seo": "SEO Positioning",
+    "sem": "SEM Advertising",
+    "emailMarketing": "Email Marketing"
+  },
+  "footer": {
+    "bio": "Computer Engineer specialized in Software Engineering",
+    "ingenieroInformatica": "Computer Engineer — UBA",
+    "ingenieroSoftware": "Software Engineer",
+    "desarrolladorFullStack": "Full-Stack Web Developer",
+    "expertoSEO": "SEO Positioning Specialist",
+    "contacto": "Contact",
+    "email": "Email:",
+    "telefono": "Phone:",
+    "servicios": "Services",
+    "guiasSEO": "SEO & Marketing Guides",
+    "desarrolloIA": "Development & Artificial Intelligence",
+    "privacidad": "Privacy",
+    "cookies": "Cookies"
+  },
+  "cookie": {
+    "title": "Cookie Usage",
+    "message": "I use technical cookies to make my website work and analytics to understand how you interact with it. I will only enable analytics if you give your consent.",
+    "readMore": "Read full policy.",
+    "accept": "Accept all",
+    "reject": "Reject non-essential"
+  },
+  "contact": {
+    "heading": "Let's talk about your project?",
+    "subtitle": "Fill out the form and I'll get back to you as soon as possible.",
+    "nombre": "Name",
+    "email": "Email",
+    "mensaje": "Message",
+    "privacyPrefix": "I have read and accept the",
+    "privacyLink": "Privacy Policy",
+    "privacySuffix": "and the processing of my personal data.",
+    "submit": "Send message",
+    "captchaWait": "Please wait for the security captcha to complete.",
+    "sending": "Sending...",
+    "errorSend": "Could not send the message.",
+    "errorConnection": "Connection error. Please try again."
+  },
+  "whatsapp": {
+    "message": "Hi! I'd like to get more information.",
+    "ariaLabel": "Contact via WhatsApp"
+  },
+  "author": {
+    "bio": "Computer Engineer specialized in Software Engineering",
+    "description": "With over 10 years of experience, I build responsive and scalable web applications, helping businesses stand out in the digital world with products that load instantly and are optimized for search engines (SEO).",
+    "cta": "Let's talk about your project"
+  },
+  "reviews": {
+    "heading": "Client Reviews",
+    "subtitle": "What those who trust my engineering excellence have to say.",
+    "prev": "Previous",
+    "next": "Next",
+    "readMore": "Read more on Google"
+  },
+  "recommended": {
+    "heading": "Recommended for you",
+    "badge": "Article",
+    "placeholder": "Recommended reading",
+    "prev": "Previous",
+    "next": "Next",
+    "leerMas": "Read more"
+  },
+  "recent": {
+    "heading": "Recent Publications",
+    "description": "Sharing code, algorithms, and advances in Software Engineering and AI.",
+    "viewCode": "View source code →",
+    "githubRepo": "GitHub Repository",
+    "repos": {
+      "30_days_coding": "30-day programming challenge with algorithms, data structures, and problem solving.",
+      "spec-driven": "Methodology and tools for building robust applications from strict specifications.",
+      "hands-on-ai": "Practical implementations of Artificial Intelligence models, LLM agents, and prompt engineering."
+    }
+  },
+  "skills": {
+    "heading": "Cutting-Edge Technologies",
+    "subtitle": "Code optimized for maximum performance.",
+    "categories": {
+      "frontend": "Frontend Development",
+      "backend": "Backend Development",
+      "apis": "APIs & Integrations",
+      "databases": "Databases",
+      "infra": "Deployment & Infrastructure",
+      "ai": "Artificial Intelligence & Automations",
+      "productivity": "Productivity",
+      "cms": "Content Management",
+      "seo": "SEO & Analytics"
+    }
+  },
+  "toc": {
+    "heading": "Table of Contents",
+    "filterWords": ["table of contents", "table of content"]
+  },
+  "home": {
+    "title": "Computer Engineer specialized in Software Engineering",
+    "description": "Professional Computer Engineering from Buenos Aires Argentina - Computer Engineer UBA",
+    "role": "Computer Engineer",
+    "empezarAhora": "Get Started Now",
+    "verServicios": "View Services"
+  },
+  "about": {
+    "title": "Esteban Selvaggi Computer Engineer UBA",
+    "description": "Learn more about Esteban Selvaggi, a software engineer specialized in full-stack development with 10 years of experience.",
+    "heading": "About Me",
+    "bio1": "I am passionate about software engineering and web design, focused on creating exceptional digital experiences that combine careful aesthetics with outstanding performance.",
+    "bio2": "With over 10 years of experience, I build responsive and scalable web applications, helping businesses and professionals stand out in the digital world with products that load instantly and are optimized for search engines and high conversion rates.",
+    "experiencia": "Work Experience",
+    "educacion": "Education",
+    "copyLink": "Copy Link",
+    "print": "Print",
+    "shareEmail": "Share by Email",
+    "shareWhatsApp": "Share via WhatsApp",
+    "shareTelegram": "Share via Telegram",
+    "linkCopied": "Link copied to clipboard;",
+    "email": "Email:",
+    "telefono": "Phone:",
+    "linkedin": "LinkedIn:",
+    "github": "GitHub:",
+    "actualidad": "present"
+  },
+  "contactPage": {
+    "title": "Contact",
+    "description": "Get in touch with us to discuss your next web project.",
+    "heading": "Let's talk.",
+    "subtitle": "Have a project in mind or just want to say hello? Fill out the form and I'll get back to you as soon as possible."
+  },
+  "thankYou": {
+    "title": "Thank You!",
+    "description": "Thank you for getting in touch with us.",
+    "heading": "Message Sent!",
+    "message": "I have received your message and will get back to you shortly.",
+    "volver": "Back to Home"
+  },
+  "blog": {
+    "title": "Engineering & SEO Blog",
+    "description": "Technical articles on software engineering, artificial intelligence automation, and advanced web positioning strategies (SEO/SEM).",
+    "heading": "Blog",
+    "subtitle": "Reflections, tutorials, and strategies on software engineering, AI, and web positioning.",
+    "destacado": "Featured",
+    "leerArticulo": "Read article",
+    "leerMas": "Read more"
+  },
+  "servicesPage": {
+    "title": "Services",
+    "description": "Explore the web design and development solutions we offer.",
+    "heading": "IT Consulting Services & Software Supply",
+    "verServicio": "View service",
+    "viewService": "View service"
+  },
+  "login": {
+    "title": "Restricted Access",
+    "heading": "Restricted Access",
+    "description": "Log in to continue.",
+    "subtitle": "Enter the master password to access the CRM.",
+    "password": "Password",
+    "submit": "Log in",
+    "errorPassword": "Incorrect password.",
+    "errorConnection": "Connection error"
+  },
+  "share": {
+    "whatsapp": "Share via WhatsApp",
+    "twitter": "Share on X (Twitter)",
+    "x": "Share on X (Twitter)",
+    "linkedin": "Share on LinkedIn",
+    "telegram": "Share via Telegram",
+    "copyLink": "Copy link",
+    "copied": "Copied!"
+  },
+  "breadcrumbs": {
+    "home": "Home",
+    "blog": "Blog",
+    "servicios": "Services"
+  }
+}

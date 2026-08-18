@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Section from '../../../components/Section.astro';   
+import ContactForm from '../../../components/ContactForm.astro';
+
+const title = "Contact";
+const description = "Get in touch with us to discuss your next web project.";
+---
+
+<BaseLayout {title} {description} locale="en">
+  <Section variant="white" class="reveal">
+    <div class="max-w-4xl mx-auto text-center flex flex-col items-center">
+      <h1 class="display-lg mb-md">Let's talk.</h1>
+      <p class="mb-xl text-lg opacity-70 max-w-2xl text-center">
+        Have a project in mind or just want to say hello? Fill out the form and I'll get back to you as soon as possible.
+      </p>
+
+      <ContactForm />
+    </div>
+  </Section>
+</BaseLayout>

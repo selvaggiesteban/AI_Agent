@@ -1,0 +1,239 @@
+{
+  "nombre": "Garcete Suarez Ronco Abogados",
+  "descripcion": "Estudio jurídico penal. Litigios complejos en fueros ordinario y federal.",
+  "colores": {
+    "primario": "#1D1412",
+    "secundario": "#F6E6D4",
+    "acento": "#301E14",
+    "fondo": "#F6E6D4",
+    "texto": "#1D1412",
+    "fondo_oscuro": "#1D1412",
+    "texto_claro": "#F6E6D4"
+  },
+  "tipografia": {
+    "titulares": "Trust 3A",
+    "titulares_stilo": "Light/Regular, serif elegante y clásica, estilo libros de derecho clásicos",
+    "cuerpo": "Bricollage Grotesque",
+    "cuerpo_stilo": "Light, sans-serif moderna, genera contraste con la principal"
+  },
+  "escala_tipografica": {
+    "modular_ratio": 1.333,
+    "base_percent": 0.05,
+    "line_height": 1.3,
+    "niveles": {
+      "title": {"ratio": 1.777, "description": "Titulares principales"},
+      "subtitle": {"ratio": 1.333, "description": "Subtítulos, bajadas"},
+      "body": {"ratio": 1.0, "description": "Texto de cuerpo"},
+      "caption": {"ratio": 0.75, "description": "Notas al pie, créditos"},
+      "detail": {"ratio": 0.5625, "description": "Números de slide, datos menores"}
+    }
+  },
+  "logo": "Monograma con iniciales de ambos apellidos + logotipo completo 'GARCETE SUÁREZ RONCO' separado por bullet en forma de estrella + bajada 'ABOGADOS'",
+  "tono": "profesional, serio, académico, directo, confiable, elegante, sin humor",
+  "estilo": "diseño austero, eje central que genera estabilidad y seriedad, pocos elementos con jerarquías bien marcadas, serif oscuras sobre fondo cálido, mucho espacio en blanco, tipografía elegante",
+  "estructura": "Eje central ordenador. Monograma o logotipo en parte superior o inferior. Jerarquías claras. Pocos elementos.",
+  "imagen": {
+    "temperatura": "cálida",
+    "retratos": "Seguridad, seriedad y cercanía. A color, levemente desaturados, evitar tonos fuertes.",
+    "contexto": "Libros de derecho, objetos de diseño de oficina, materiales de buena calidad. Jugar con foco/fuera de foco y cierto grano.",
+    "prohibido": "Fotos stock de gente sonriente, apretones de manos, colores que desentonen"
+  },
+  "prohibido": [
+    "rotar el logo",
+    "cambiar distribución de elementos",
+    "estirar forzado",
+    "cambiar el kerning",
+    "reemplazar tipografía del isologotipo",
+    "aplicar sombra paralela",
+    "usar en outline",
+    "usar logo como máscara para imágenes",
+    "aplicar color fuera de la identidad",
+    "colores neón o vivos",
+    "emojis o iconos informales",
+    "textos coloquiales o humorísticos",
+    "gradientes coloridos"
+  ],
+  "especialidades": [
+    {
+      "nombre": "Derecho Penal Ordinario",
+      "descripcion": "Soluciones legales inmediatas ante causas penales complejas del día a día. Tu tranquilidad y defensa en manos de expertos.",
+      "imagen": "derecho-penal-general.webp"
+    },
+    {
+      "nombre": "Derecho Penal Federal",
+      "descripcion": "Estrategias efectivas frente a los delitos e investigaciones más complejas del fuero federal. Experiencia y solidez a tu servicio.",
+      "imagen": "derecho-penal-federal.webp"
+    },
+    {
+      "nombre": "Derecho Penal Económico y de Empresa",
+      "descripcion": "Blindaje legal corporativo. Te defendemos ante delitos fiscales, financieros y regulatorios que pongan en riesgo tu empresa.",
+      "imagen": "derecho-penal-economico-y-de-empresa.webp"
+    },
+    {
+      "nombre": "Ejecución Penal",
+      "descripcion": "Garantizamos el cumplimiento justo de las penas, solicitudes de libertad condicional, salidas transitorias y regímenes de reinserción.",
+      "imagen": "ejecucion-penal.webp"
+    }
+  ],
+  "abogados": [
+    {
+      "nombre": "Matías Alejandro Garcete Suárez",
+      "cargo": "Egresado de la Universidad de Buenos Aires",
+      "bio": "Ha volcado su trayectoria al ejercicio de la abogacía penal con un enfoque marcadamente estratégico y de litigación integral en casos de alta complejidad. Su práctica profesional se caracteriza por el diseño analítico de soluciones jurídicas adaptadas a escenarios críticos, proveyendo una rigurosa contención tanto técnica como corporativa en la salvaguarda de los derechos e intereses de sus asistidos.",
+      "linkedin": "https://www.linkedin.com/in/dr-mat%C3%ADas-a-garcete-su%C3%A1rez-8b878756/"
+    },
+    {
+      "nombre": "Benjamín Ronco",
+      "cargo": "Especialista en defensa penal de alta complejidad",
+      "bio": "Centra su práctica profesional en la defensa penal de alta complejidad y la consultoría estratégica, combinando la rigurosidad de la dogmática jurídica con la dinámica del litigio penal federal. Su enfoque se define por el estudio pormenorizado de cada caso, proveyendo una dirección legal de excelencia orientada a la protección integral de individuos y organizaciones corporativas.",
+      "linkedin": "https://www.linkedin.com/in/benjaminronco/"
+    }
+  ],
+  "estructura_interdisciplinaria": "La complejidad de las causas penales contemporáneas exige un análisis que trasciende lo estrictamente jurídico. Garcete Suárez • Ronco complementa su práctica con un cuerpo de consultores y profesionales interdisciplinarios asociados integrando peritos contables, especialistas en auditoría forense, analistas informáticos y consultores técnicos. Esta estructura permite blindar la estrategia de defensa desde todas las aristas científicas posibles.",
+  "website": "https://gsrabogados.com.ar",
+  "contacto": {
+    "email": "info@gsrabogados.com.ar",
+    "telefono": "(+54) 9 11 6183-0362",
+    "direccion": "Cerrito 1054, C1059, Cdad. Autónoma de Buenos Aires"
+  },
+  "hero": {
+    "principal": "Cada caso es único.",
+    "bajada": "Lo defendemos como tal."
+  },
+  "frases_clave": [
+    "Cada caso es único. Lo defendemos como tal.",
+    "Sólida formación académica con destacada trayectoria en litigios complejos.",
+    "Asistencia técnica personalizada e inmediata.",
+    "Protegemos tu patrimonio, tu reputación y tu libertad.",
+    "Blindaje legal corporativo.",
+    "La complejidad de las causas penales contemporáneas exige un análisis que trasciende lo estrictamente jurídico."
+  ],
+  "textos": {
+    "hero": {
+      "principal": "Cada caso es único.",
+      "bajada": "Lo defendemos como tal."
+    },
+    "carrusel_instagram": [
+      {"slide": 1, "titulo": "Estudio Jurídico Penal", "subtitulo": "Buenos Aires"},
+      {"slide": 2, "titulo": "Formación académica sólida", "cuerpo": "Litigios complejos en fueros ordinario y federal."},
+      {"slide": 3, "titulo": "Asistencia personalizada", "cuerpo": "Técnica e inmediata en cada etapa del proceso."},
+      {"slide": 4, "titulo": "Protegemos tu patrimonio", "cuerpo": "Tu reputación y tu libertad son nuestra prioridad."},
+      {"slide": 5, "titulo": "Cada caso es único", "cuerpo": "Lo defendemos como tal."}
+    ],
+    "historia_instagram": [
+      {"slide": 1, "titulo": "¿Necesitás defensa penal?", "cuerpo": "Cada caso es único. Lo defendemos como tal."},
+      {"slide": 2, "titulo": "Experiencia comprobada", "cuerpo": "Litigios complejos en fueros ordinario y federal."},
+      {"slide": 3, "titulo": "Contactanos", "cuerpo": "Cerrito 1054, CABA · info@gsrabogados.com.ar"}
+    ],
+    "post_instagram": {
+      "titulo": "Cada caso es único.",
+      "subtitulo": "Lo defendemos como tal.",
+      "cuerpo": "Estudio jurídico penal en Buenos Aires. Litigios complejos en fueros ordinario y federal.",
+      "cta": "Conversemos"
+    },
+    "carrusel_linkedin": [
+      {"slide": 1, "titulo": "Garcete Suárez • Ronco", "subtitulo": "Abogados Penalistas"},
+      {"slide": 2, "titulo": "Áreas de práctica", "cuerpo": "Penal Ordinario · Federal · Económico · Ejecución Penal"},
+      {"slide": 3, "titulo": "Estructura interdisciplinaria", "cuerpo": "Peritos contables, auditoría forense, analistas informáticos."},
+      {"slide": 4, "titulo": "Formación académica", "cuerpo": "Sólida trayectoria en litigios de alta complejidad."},
+      {"slide": 5, "titulo": "Consultanos", "cuerpo": "Cerrito 1054, CABA · info@gsrabogados.com.ar"}
+    ],
+    "post_linkedin": {
+      "titulo": "La complejidad de las causas penales contemporáneas",
+      "dato_clave": "Exige un análisis que trasciende lo estrictamente jurídico.",
+      "cuerpo": "Complementamos nuestra práctica con peritos contables, especialistas en auditoría forense y consultores técnicos.",
+      "cta": "Conozca nuestro enfoque"
+    },
+    "thumbnail_youtube": {
+      "titulo_corto": "Defensa Penal",
+      "subtitulo": "Compleja"
+    },
+    "banner_youtube": {
+      "canal": "Garcete Suárez Ronco Abogados",
+      "descripcion": "Estudio jurídico penal · Buenos Aires",
+      "social_links": ["info@gsrabogados.com.ar", "@gsrabogados"]
+    },
+    "facebook_ad": {
+      "headline": "Defensa penal en Buenos Aires",
+      "subheadline": "Cada caso es único. Lo defendemos como tal.",
+      "cta": "Conversemos"
+    },
+    "facebook_post": {
+      "titulo": "Estudio jurídico penal",
+      "cuerpo": "Sólida formación académica con destacada trayectoria en litigios complejos. Asistencia técnica personalizada e inmediata.",
+      "cta": "Contactanos"
+    },
+    "google_ads": {
+      "headline": "Abogado Penalista Buenos Aires",
+      "descripcion": "Defensa penal ordinaria, federal y económica. Consulte gratis.",
+      "cta": "Solicitar consulta"
+    },
+    "twitter": {
+      "texto": "Cada caso es único. Lo defendemos como tal. Estudio jurídico penal en Buenos Aires. Litigios complejos en fueros ordinario y federal."
+    },
+    "tiktok_cover": {
+      "titulo": "Defensa Penal",
+      "subtitulo": "Compleja"
+    },
+    "pinterest_pin": {
+      "titulo": "Estudio Jurídico Penal Buenos Aires",
+      "cuerpo": "Formación académica sólida. Litigios complejos. Asistencia personalizada.",
+      "cta": "Conversemos"
+    },
+    "flyer_a4": {
+      "titulo": "Garcete Suárez • Ronco",
+      "subtitulo": "Abogados",
+      "cuerpo": "Estudio jurídico penal en Buenos Aires. Combinamos una sólida formación académica con una destacada trayectoria en litigios complejos dentro de los fueros ordinario y federal.",
+      "detalles": [
+        "Derecho Penal Ordinario",
+        "Derecho Penal Federal",
+        "Derecho Penal Económico y de Empresa",
+        "Ejecución Penal",
+        "Cerrito 1054, C1059, CABA",
+        "info@gsrabogados.com.ar",
+        "(+54) 9 11 6183-0362"
+      ],
+      "cta": "Conversemos"
+    }
+  },
+  "fotos": {
+    "directorio_raiz": "data/inputs/estudiogsr.com.ar/Book GSR",
+    "abogados": {
+      "matias": {
+        "carpeta": "MATIAS",
+        "total_jpg": 31,
+        "total_png": 2,
+        "total": 33,
+        "rangos": {"min": 64, "max": 147},
+        "formatos": ["jpg", "png"],
+        "linkedin": "https://www.linkedin.com/in/dr-mat%C3%ADas-a-garcete-su%C3%A1rez-8b878756/"
+      },
+      "benjamin": {
+        "carpeta": "BENJAMIN",
+        "total_jpg": 79,
+        "total_png": 1,
+        "total_heic": 5,
+        "total": 85,
+        "rangos": {"min": 1, "max": 165},
+        "formatos": ["jpg", "png", "heic"],
+        "linkedin": "https://www.linkedin.com/in/benjaminronco/"
+      }
+    },
+    "imagenes_sitio": {
+      "directorio": "https://gsrabogados.com.ar/wp-content/uploads/2026/",
+      "hero": "garcete-suarez-ronco-abogados-scaled.webp",
+      "matias_perfil": "matias-garcete-suarez-ronco-abogado-683x1024.webp",
+      "benjamin_perfil": "benjamin-ronco-abogado-683x1024.jpg",
+      "equipo": "equipo-interdisciplinario-garcete-suarez-ronco-abogados-scaled.webp",
+      "estudio": "estudio-juridico-penal-garcete-suarez-ronco-168.webp",
+      "brandbook": "GSR_BRANBBOOK-e1781723161892.webp",
+      "areas": ["derecho-penal-general.webp", "derecho-penal-federal.webp", "derecho-penal-economico-y-de-empresa.webp", "ejecucion-penal.webp"]
+    },
+    "uso_recomendado": {
+      "carrusel": "Foto real del abogado en slide de apertura o cierre, fondo generado por IA",
+      "stories": "Foto de perfil o detalle para slide de impacto",
+      "thumbnails": "Rostro del abogado + fondo generado por IA",
+      "flyer": "Foto formal centrada, fondo neutro o generado"
+    }
+  }
+}

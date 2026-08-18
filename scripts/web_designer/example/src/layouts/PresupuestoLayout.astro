@@ -1,0 +1,38 @@
+---
+import SEO from '../components/seo/SEO.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import { getLocaleFromUrl } from '../i18n/utils';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  locale?: 'es' | 'en';
+}
+
+const { title, description, locale: propLocale } = Astro.props;
+const locale = propLocale || getLocaleFromUrl(Astro.url);
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <!-- Block indexing of budgets -->
+    <meta name="robots" content="noindex, nofollow" />
+    <SEO {title} {description} />
+  </head>
+  <body class="bg-surface">
+    <Navbar />
+
+    <main class="max-w-7xl mx-auto px-lg md:px-xxl pb-20">
+      <slot />
+    </main>
+
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,164 @@
+---
+import PresupuestoLayout from '../../layouts/PresupuestoLayout.astro';
+import { env } from 'cloudflare:workers';
+
+const { id } = Astro.params;
+
+const db = (env as any)?.DB as D1Database | undefined;
+if (!db || !id) return Astro.redirect('/presupuestos/');
+
+// Load presupuesto + cliente
+const row = await db
+  .prepare(`SELECT p.*, c.nombre as cliente_nombre, c.empresa as cliente_empresa,
+            c.cuit as cliente_cuit, c.iva as cliente_iva, c.domicilio as cliente_domicilio
+            FROM presupuestos p JOIN clientes c ON p.cliente_id = c.id WHERE p.id = ?`)
+  .bind(id)
+  .first() as any;
+
+if (!row) return Astro.redirect('/presupuestos/');
+
+// Load items
+const itemsResult = await db
+  .prepare('SELECT * FROM items WHERE presupuesto_id = ? ORDER BY id')
+  .bind(id)
+  .all();
+const items = itemsResult.results as any[];
+
+// Format currency
+const fmt = (n: number) => `$${Number(n).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
+
+// Generate MercadoPago payment link
+const urlPresupuesto = `https://selvaggiesteban.dev/presupuestos/${id}`;
+let payLink = '#';
+try {
+  const MP_ACCESS_TOKEN = (env as any)?.MP_ACCESS_TOKEN;
+  if (MP_ACCESS_TOKEN) {
+    const mpRes = await fetch('https://api.mercadopago.com/checkout/preferences', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${MP_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        items: [{ title: row.proyecto, quantity: 1, unit_price: row.monto_total, currency_id: 'ARS' }],
+        external_reference: id,
+        back_urls: { success: 'https://selvaggiesteban.dev/', failure: 'https://selvaggiesteban.dev/', pending: 'https://selvaggiesteban.dev/' },
+        auto_return: 'approved',
+        notification_url: 'https://selvaggiesteban.dev/api/webhook-mp',
+      }),
+    });
+    const mpData = await mpRes.json() as any;
+    payLink = mpData.init_point || '#';
+  }
+} catch {}
+
+const miRazonSocial = 'SELVAGGI ESTEBAN';
+const miDomicilio = 'La Rioja 1935 - Villa Industriales, Buenos Aires';
+const miCuit = '20433102593';
+const postTitle = encodeURIComponent(row.proyecto);
+const postUrl = encodeURIComponent(urlPresupuesto);
+---
+
+<PresupuestoLayout title={`Presupuesto: ${row.proyecto}`} description={`Propuesta para ${row.cliente_nombre}`}>
+
+  <!-- Share Buttons -->
+  <div class="flex justify-end gap-3 mb-6">
+    <button onclick="navigator.clipboard.writeText(window.location.href); alert('Enlace copiado al portapapeles');" class="p-2 bg-surface-soft border border-hairline rounded-full hover:bg-ink hover:text-white transition-colors text-ink" title="Copiar Enlace">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+    </button>
+    <button onclick="window.print()" class="p-2 bg-surface-soft border border-hairline rounded-full hover:bg-ink hover:text-white transition-colors text-ink hidden sm:inline-block" title="Imprimir">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+    </button>
+    <a href={`https://api.whatsapp.com/send?text=Hola,%20aquí%20tienes%20el%20presupuesto:%20${postUrl}`} target="_blank" class="p-2 bg-surface-soft border border-hairline rounded-full hover:bg-[#25D366] hover:text-white transition-colors text-ink" title="Compartir por WhatsApp">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"/><path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1"/></svg>
+    </a>
+    <a href={`https://t.me/share/url?url=${postUrl}&text=${postTitle}`} target="_blank" class="p-2 bg-surface-soft border border-hairline rounded-full hover:bg-[#0088cc] hover:text-white transition-colors text-ink" title="Compartir por Telegram">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"/></svg>
+    </a>
+  </div>
+
+  <div class="mb-8">
+    <!-- Encabezado -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 border-b border-hairline-soft pb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-ink mb-6">Presupuesto</h1>
+        <div class="text-sm text-ink/80 space-y-1">
+          <p><span class="font-bold">Razón Social:</span> {miRazonSocial}</p>
+          <p><span class="font-bold">CUIT:</span> {miCuit}</p>
+          <p><span class="font-bold">Domicilio comercial:</span> {miDomicilio}</p>
+        </div>
+      </div>
+      <div class="md:text-right text-sm text-ink/80 space-y-1 bg-surface-soft p-5 rounded-[9px] border border-hairline">
+        <p><span class="font-bold">Fecha de emisión:</span> {row.fecha_emision}</p>
+        <p><span class="font-bold text-primary">Válido hasta:</span> {row.fecha_vto}</p>
+        <div class="my-4 border-t border-hairline-soft"></div>
+        <p><span class="font-bold">Apellido y nombre / Razón social:</span> {row.cliente_nombre}{row.cliente_empresa ? ` (${row.cliente_empresa})` : ''}</p>
+        {row.cliente_cuit && <p><span class="font-bold">CUIT:</span> {row.cliente_cuit}</p>}
+        {row.cliente_iva && <p><span class="font-bold">Condición IVA:</span> {row.cliente_iva}</p>}
+        {row.cliente_domicilio && <p><span class="font-bold">Domicilio:</span> {row.cliente_domicilio}</p>}
+        <p><span class="font-bold">Condición de venta:</span> {row.condicion_venta}</p>
+      </div>
+    </div>
+
+    <!-- Tabla de Items -->
+    <div class="overflow-x-auto mb-8 border border-hairline rounded-[9px]">
+      <table class="w-full text-left text-sm whitespace-nowrap">
+        <thead class="bg-surface-soft border-b border-hairline text-ink/70 uppercase text-xs tracking-wider">
+          <tr>
+            <th class="p-4 font-bold">Código</th>
+            <th class="p-4 font-bold">Producto / Servicio</th>
+            <th class="p-4 font-bold text-right">Cantidad</th>
+            <th class="p-4 font-bold text-center">U. Medida</th>
+            <th class="p-4 font-bold text-right">Precio Unit.</th>
+            <th class="p-4 font-bold text-right">% Bonif</th>
+            <th class="p-4 font-bold text-right">Imp. Bonif.</th>
+            <th class="p-4 font-bold text-right">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-hairline">
+          {items.map((item, i) => {
+            const subtotal = item.cantidad * item.precio_unitario;
+            const bonif = subtotal * (item.bonificacion / 100);
+            return (
+              <tr class="hover:bg-surface-soft/50 transition-colors">
+                <td class="p-4 font-mono text-xs text-ink/60">{item.codigo || `ITEM-${String(i+1).padStart(2,'0')}`}</td>
+                <td class="p-4 font-bold text-ink whitespace-normal min-w-[200px]">{item.descripcion}</td>
+                <td class="p-4 text-right">{item.cantidad}</td>
+                <td class="p-4 text-center">{item.unidad}</td>
+                <td class="p-4 text-right">{fmt(item.precio_unitario)}</td>
+                <td class="p-4 text-right">{item.bonificacion}%</td>
+                <td class="p-4 text-right">{fmt(bonif)}</td>
+                <td class="p-4 text-right font-bold">{fmt(subtotal - bonif)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Totales -->
+    <div class="flex justify-end mb-12">
+      <div class="w-full md:w-2/5 bg-surface-soft rounded-[9px] p-6 border border-hairline space-y-3">
+        <div class="flex justify-between items-center text-xl font-bold text-primary pt-2">
+          <span>Importe Total:</span>
+          <span>{fmt(row.monto_total)}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cierre y Pago -->
+    <div class="text-center pt-8 border-t border-hairline-soft">
+      <h3 class="text-lg font-bold mb-4">¿Todo listo para comenzar?</h3>
+      <p class="text-ink/60 mb-6 text-sm mx-auto">Al realizar el pago total o la seña inicial según la condición de venta acordada, confirmas la aceptación del presupuesto y damos inicio formal al proyecto.</p>
+      {payLink !== '#' ? (
+        <a href={payLink} target="_blank" class="inline-flex items-center justify-center gap-3 bg-[#009EE3] hover:bg-[#0088cc] text-white rounded-[9px] px-8 py-4 font-semibold text-lg transition-colors shadow-md mx-auto w-full sm:w-auto">
+          <img src="/assets/mp/mercadopago.svg" alt="Mercado Pago" class="h-6 object-contain" />
+          Pagar con Mercado Pago
+        </a>
+      ) : (
+        <p class="text-sm text-ink/40 font-mono">Enlace de pago no disponible.</p>
+      )}
+    </div>
+  </div>
+
+</PresupuestoLayout>

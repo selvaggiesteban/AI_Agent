@@ -1,0 +1,8 @@
+requests
+httpx
+BeautifulSoup4
+PyYAML
+fake-useragent
+asyncio
+selenium
+openpyxl

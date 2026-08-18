@@ -1,0 +1,11 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#ffffff"/>
+  <rect x="0" y="0" width="1200" height="4" fill="#000000"/>
+  <text x="80" y="240" font-family="system-ui, sans-serif" font-size="72" font-weight="700" fill="#000000" letter-spacing="-2">selvaggiesteban.dev</text>
+  <text x="80" y="310" font-family="system-ui, sans-serif" font-size="36" font-weight="400" fill="#000000">Desarrollo web · Diseño · SEO</text>
+  <rect x="80" y="360" width="80" height="4" fill="#000000"/>
+  <text x="80" y="430" font-family="system-ui, sans-serif" font-size="20" font-weight="400" fill="#666666">Esteban Selvaggi · Ingeniero en Informática</text>
+  <text x="80" y="465" font-family="system-ui, sans-serif" font-size="20" font-weight="400" fill="#666666">Soluciones digitales profesionales</text>
+  <rect x="80" y="540" width="200" height="50" rx="25" fill="#000000"/>
+  <text x="180" y="572" font-family="system-ui, sans-serif" font-size="18" font-weight="600" fill="#ffffff" text-anchor="middle">selvaggiesteban.dev</text>
+</svg>

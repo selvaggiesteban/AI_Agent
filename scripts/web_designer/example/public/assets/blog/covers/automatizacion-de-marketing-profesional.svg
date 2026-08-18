@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="'Segoe UI', Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#db2777"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#db2777"/>
+    </linearGradient>
+    <filter id="blur1" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="80"/>
+    </filter>
+    <filter id="blur2" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="40"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Decorative blobs -->
+  <circle cx="200" cy="180" r="200" fill="#ec4899" opacity="0.1" filter="url(#blur1)"/>
+  <circle cx="1000" cy="450" r="180" fill="#db2777" opacity="0.1" filter="url(#blur1)"/>
+  <circle cx="600" cy="500" r="120" fill="#ec4899" opacity="0.06" filter="url(#blur2)"/>
+
+  <!-- Grid dots -->
+  <g fill="#334155" opacity="0.2">
+    <circle cx="100" cy="50" r="1"/> <circle cx="100" cy="130" r="1"/> <circle cx="100" cy="210" r="1"/> <circle cx="100" cy="290" r="1"/> <circle cx="100" cy="370" r="1"/> <circle cx="100" cy="450" r="1"/> <circle cx="100" cy="530" r="1"/> <circle cx="100" cy="610" r="1"/> <circle cx="180" cy="50" r="1"/> <circle cx="180" cy="130" r="1"/> <circle cx="180" cy="210" r="1"/> <circle cx="180" cy="290" r="1"/> <circle cx="180" cy="370" r="1"/> <circle cx="180" cy="450" r="1"/> <circle cx="180" cy="530" r="1"/> <circle cx="180" cy="610" r="1"/> <circle cx="260" cy="50" r="1"/> <circle cx="260" cy="130" r="1"/> <circle cx="260" cy="210" r="1"/> <circle cx="260" cy="290" r="1"/> <circle cx="260" cy="370" r="1"/> <circle cx="260" cy="450" r="1"/> <circle cx="260" cy="530" r="1"/> <circle cx="260" cy="610" r="1"/> <circle cx="340" cy="50" r="1"/> <circle cx="340" cy="130" r="1"/> <circle cx="340" cy="210" r="1"/> <circle cx="340" cy="290" r="1"/> <circle cx="340" cy="370" r="1"/> <circle cx="340" cy="450" r="1"/> <circle cx="340" cy="530" r="1"/> <circle cx="340" cy="610" r="1"/> <circle cx="420" cy="50" r="1"/> <circle cx="420" cy="130" r="1"/> <circle cx="420" cy="210" r="1"/> <circle cx="420" cy="290" r="1"/> <circle cx="420" cy="370" r="1"/> <circle cx="420" cy="450" r="1"/> <circle cx="420" cy="530" r="1"/> <circle cx="420" cy="610" r="1"/> <circle cx="500" cy="50" r="1"/> <circle cx="500" cy="130" r="1"/> <circle cx="500" cy="210" r="1"/> <circle cx="500" cy="290" r="1"/> <circle cx="500" cy="370" r="1"/> <circle cx="500" cy="450" r="1"/> <circle cx="500" cy="530" r="1"/> <circle cx="500" cy="610" r="1"/> <circle cx="580" cy="50" r="1"/> <circle cx="580" cy="130" r="1"/> <circle cx="580" cy="210" r="1"/> <circle cx="580" cy="290" r="1"/> <circle cx="580" cy="370" r="1"/> <circle cx="580" cy="450" r="1"/> <circle cx="580" cy="530" r="1"/> <circle cx="580" cy="610" r="1"/> <circle cx="660" cy="50" r="1"/> <circle cx="660" cy="130" r="1"/> <circle cx="660" cy="210" r="1"/> <circle cx="660" cy="290" r="1"/> <circle cx="660" cy="370" r="1"/> <circle cx="660" cy="450" r="1"/> <circle cx="660" cy="530" r="1"/> <circle cx="660" cy="610" r="1"/> <circle cx="740" cy="50" r="1"/> <circle cx="740" cy="130" r="1"/> <circle cx="740" cy="210" r="1"/> <circle cx="740" cy="290" r="1"/> <circle cx="740" cy="370" r="1"/> <circle cx="740" cy="450" r="1"/> <circle cx="740" cy="530" r="1"/> <circle cx="740" cy="610" r="1"/> <circle cx="820" cy="50" r="1"/> <circle cx="820" cy="130" r="1"/> <circle cx="820" cy="210" r="1"/> <circle cx="820" cy="290" r="1"/> <circle cx="820" cy="370" r="1"/> <circle cx="820" cy="450" r="1"/> <circle cx="820" cy="530" r="1"/> <circle cx="820" cy="610" r="1"/> <circle cx="900" cy="50" r="1"/> <circle cx="900" cy="130" r="1"/> <circle cx="900" cy="210" r="1"/> <circle cx="900" cy="290" r="1"/> <circle cx="900" cy="370" r="1"/> <circle cx="900" cy="450" r="1"/> <circle cx="900" cy="530" r="1"/> <circle cx="900" cy="610" r="1"/> <circle cx="980" cy="50" r="1"/> <circle cx="980" cy="130" r="1"/> <circle cx="980" cy="210" r="1"/> <circle cx="980" cy="290" r="1"/> <circle cx="980" cy="370" r="1"/> <circle cx="980" cy="450" r="1"/> <circle cx="980" cy="530" r="1"/> <circle cx="980" cy="610" r="1"/> <circle cx="1060" cy="50" r="1"/> <circle cx="1060" cy="130" r="1"/> <circle cx="1060" cy="210" r="1"/> <circle cx="1060" cy="290" r="1"/> <circle cx="1060" cy="370" r="1"/> <circle cx="1060" cy="450" r="1"/> <circle cx="1060" cy="530" r="1"/> <circle cx="1060" cy="610" r="1"/> <circle cx="1140" cy="50" r="1"/> <circle cx="1140" cy="130" r="1"/> <circle cx="1140" cy="210" r="1"/> <circle cx="1140" cy="290" r="1"/> <circle cx="1140" cy="370" r="1"/> <circle cx="1140" cy="450" r="1"/> <circle cx="1140" cy="530" r="1"/> <circle cx="1140" cy="610" r="1"/></g>
+
+  <!-- Icon -->
+  <g transform="translate(536, 100)" stroke="#ec4899" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6">
+    <svg width="128" height="128" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+  </g>
+
+  <!-- Title -->
+  
+  <text x="600" y="258" text-anchor="middle" fill="#f8fafc" font-size="38" font-weight="bold">AutomatizaciÃ³n</text>
+  <text x="600" y="302" text-anchor="middle" fill="#f8fafc" font-size="38" font-weight="bold">Marketing</text>
+
+  <!-- Accent line -->
+  <rect x="480" y="360" width="240" height="4" rx="2" fill="url(#accent)"/>
+
+  <!-- Bottom tag -->
+  <text x="600" y="598" text-anchor="middle" fill="#475569" font-size="14" font-family="monospace">selvaggiesteban.dev/blog/automatizacion-de-marketing-profesional</text>
+</svg>

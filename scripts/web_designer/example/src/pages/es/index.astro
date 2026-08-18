@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Section from '../../components/Section.astro';
+import Button from '../../components/Button.astro';
+import ProjectCarousel from '../../components/ProjectCarousel.astro';
+import SkillsSection from '../../components/SkillsSection.astro';
+import ReviewsCarousel from '../../components/ReviewsCarousel.astro';
+import RecentPosts from '../../components/RecentPosts.astro';
+import RecommendedPosts from '../../components/RecommendedPosts.astro';
+import { getLocaleFromUrl, t } from '../../i18n/utils';
+
+const locale = getLocaleFromUrl(Astro.url);
+const lang = locale as 'es' | 'en';
+const title = t(lang, 'home.title');
+const description = t(lang, 'home.description');
+const p = (path: string) => locale === 'es' ? `/es${path}` : `/en${path}`;
+---
+
+<BaseLayout {title} {description}>
+  <!-- Hero Section -->
+  <Section variant="white" class="pt-24 pb-16 reveal">
+    <div class="max-w-4xl mx-auto text-center flex flex-col items-center">
+      <h1 class="font-bold text-[56px] md:text-[86px] leading-tight" style="margin-bottom: 50px;">
+        Esteban Selvaggi<br><span class="text-primary/60">Ingeniero en Informática</span>
+      </h1>
+      <div class="flex flex-wrap justify-center gap-md">
+        <Button href={p('/contact')}>Empezar ahora</Button>
+        <Button href={p('/services')} variant="secondary">Ver servicios</Button>
+      </div>
+    </div>
+  </Section>
+
+  <!-- Project Carousel (Full Width) -->
+  <Section variant="white" class="reveal !py-0" fullWidth={true}>
+    <ProjectCarousel />
+  </Section>
+
+  <!-- Skills Section -->
+  <div class="reveal">
+    <SkillsSection />
+  </div>
+
+  <!-- Reviews Section -->
+  <div class="reveal">
+    <ReviewsCarousel />
+  </div>
+
+  <!-- Recent Posts Section -->
+  <RecentPosts />
+
+  <!-- Recommended Section (NVIDIA Style) -->
+  <RecommendedPosts />
+</BaseLayout>

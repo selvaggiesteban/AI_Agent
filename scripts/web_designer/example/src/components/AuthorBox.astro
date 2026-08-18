@@ -1,0 +1,29 @@
+---
+import { getLocaleFromUrl, t } from '../i18n/utils';
+
+const locale = getLocaleFromUrl(Astro.url);
+const lang = locale as 'es' | 'en';
+const contactHref = locale === 'es' ? '/es/contact' : '/en/contact';
+---
+
+<div class="mt-16 pt-8 border-t border-hairline flex flex-col md:flex-row gap-6 items-center md:items-start text-center md:text-left bg-surface-soft p-6 rounded-2xl">
+  <div class="w-20 h-20 rounded-full overflow-hidden flex-shrink-0  shadow-sm bg-white">
+    <img 
+      src="/assets/avatar.jpg" 
+      alt="Esteban Selvaggi" 
+      class="w-full h-full object-cover"
+      onerror="this.src='/assets/reviews/usberto-ayma-ayma.webp'"
+    />
+  </div>
+  <div class="flex-grow">
+    <h3 class="text-xl font-bold text-ink mb-1">Esteban Selvaggi</h3>
+    <p class="text-sm font-medium text-primary mb-3">{t(lang, 'author.bio')}</p>
+    <p class="text-sm text-ink/70 leading-relaxed mb-4">
+      {t(lang, 'author.description')}
+    </p>
+    <a href={contactHref} class="text-sm font-bold text-primary hover:underline flex items-center gap-1 justify-center md:justify-start">
+      {t(lang, 'author.cta')}
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    </a>
+  </div>
+</div>

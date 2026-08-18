@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Section from '../../../components/Section.astro';
+
+const title = "¡Gracias!";
+const description = "Gracias por ponerte en contacto con nosotros.";
+---
+
+<BaseLayout {title} {description} noindex={true}>
+  <Section variant="lilac">
+    <div class="text-center py-xl">
+      <h1 class="display-lg mb-md">¡Mensaje enviado!</h1>
+      <p class="text-xl opacity-70 mb-xl">
+        He recibido tu mensaje y me pondré en contacto contigo a la brevedad.
+      </p>
+      <a href="/es/" class="btn-primary">Volver al inicio</a>
+    </div>
+  </Section>
+</BaseLayout>

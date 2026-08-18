@@ -1,0 +1,62 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+
+const title = "Acceso Restringido";
+const description = "Inicia sesión para continuar.";
+
+// Si ya tiene sesión, redirigir al panel
+if (Astro.cookies.has('admin_session')) {
+  return Astro.redirect('/presupuestos');
+}
+---
+
+<BaseLayout {title} {description}>
+  <div class="min-h-[60vh] flex items-center justify-center px-4">
+    <div class="w-full max-w-md bg-white p-8 rounded-[9px] border border-hairline shadow-sm text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-6 text-primary"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <h1 class="text-2xl font-bold text-ink mb-2">Acceso Restringido</h1>
+      <p class="text-ink/60 text-sm mb-8">Ingresa la contraseña maestra para acceder al CRM.</p>
+
+      <form id="login-form" class="space-y-6 text-left">
+        <div class="space-y-2">
+          <label for="password" class="font-mono text-xs uppercase tracking-widest text-ink/40">Contraseña</label>
+          <input type="password" id="password" name="password" required class="w-full p-4 bg-surface-soft border border-hairline rounded-[9px] focus:border-primary outline-none transition-colors" placeholder="••••••••" />
+        </div>
+        
+        <Button type="submit" class="w-full py-4">Ingresar al sistema</Button>
+        <p id="login-error" class="text-red-500 text-sm mt-4 hidden text-center">Contraseña incorrecta.</p>
+      </form>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const form = document.getElementById('login-form');
+  const error = document.getElementById('login-error');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    error?.classList.add('hidden');
+    
+    const password = (document.getElementById('password') as HTMLInputElement).value;
+
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+
+      if (res.ok) {
+        window.location.href = '/presupuestos';
+      } else {
+        error?.classList.remove('hidden');
+      }
+    } catch (err) {
+      console.error(err);
+      error?.classList.remove('hidden');
+      if(error) error.textContent = 'Error de conexión';
+    }
+  });
+</script>

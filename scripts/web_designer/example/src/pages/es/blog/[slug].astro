@@ -1,0 +1,80 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Section from '../../../components/Section.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import AuthorBox from '../../../components/AuthorBox.astro';
+import TableOfContents from '../../../components/TableOfContents.astro';
+import { getLocaleFromUrl, t } from '../../../i18n/utils';
+
+export const prerender = true;
+export async function getStaticPaths() {
+  const posts = (await getCollection('blog')).filter(p => !p.id.startsWith('en/'));
+  return posts.map(post => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const locale = getLocaleFromUrl(Astro.url);
+const lang = locale as 'es' | 'en';
+const { post } = Astro.props;
+import { render } from 'astro:content';
+const { Content, headings } = await render(post);
+
+const blogBase = locale === 'es' ? '/es/blog' : '/en/blog';
+const homeHref = locale === 'es' ? '/es' : '/en';
+const postSlug = post.id.replace(/^(en|es)\//, '');
+const postUrl = encodeURIComponent(`https://selvaggiesteban.dev${blogBase}/${postSlug}`);
+const postTitle = encodeURIComponent(post.data.title);
+const shareWhatsAppTitle = t(lang, 'share.whatsapp');
+const shareXTitle = t(lang, 'share.x');
+const shareLinkedinTitle = t(lang, 'share.linkedin');
+const shareTelegramTitle = t(lang, 'share.telegram');
+const copyLinkTitle = t(lang, 'share.copyLink');
+---
+
+<BaseLayout articleSchema={true} pubDate={post.data.pubDate ? new Date(post.data.pubDate).toISOString() : new Date().toISOString()} title={post.data.title} description={post.data.description}>
+  <Section>
+    <article class="max-w-7xl mx-auto">
+      <Breadcrumbs path={[{ label: t(lang, 'breadcrumbs.home'), href: homeHref }, { label: t(lang, 'breadcrumbs.blog'), href: blogBase }, { label: post.data.title }]} />
+      {post.data.heroImage && (
+        <div class="mb-10 rounded-2xl overflow-hidden border border-hairline">
+          <img src={post.data.heroImage} alt={post.data.title} class="w-full h-auto" loading="eager" />
+        </div>
+      )}
+      <header class="mb-xl">
+        <div class="flex items-center justify-between flex-wrap gap-4 mb-4">
+          <span class="font-mono text-xs uppercase tracking-widest text-ink/40">
+            {post.data.pubDate.toLocaleDateString(locale === 'es' ? 'es-AR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </span>
+          <div class="flex gap-2">
+            <a href={`https://api.whatsapp.com/send?text=${postTitle}%3A%20${postUrl}`} target="_blank" class="p-2 bg-surface-soft border border-hairline rounded-full hover:bg-[#25D366] hover:text-white transition-colors text-ink" title={shareWhatsAppTitle}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"/><path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1"/></svg>
+            </a>
+            <a href={`https://twitter.com/intent/tweet?text=${postTitle}&url=${postUrl}`} target="_blank" class="p-2 bg-surface-soft border border-hairline rounded-full hover:bg-black hover:text-white transition-colors text-ink" title={shareXTitle}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16z"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/></svg>
+            </a>
+            <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${postUrl}`} target="_blank" class="p-2 bg-surface-soft border border-hairline rounded-full hover:bg-[#0077B5] hover:text-white transition-colors text-ink" title={shareLinkedinTitle}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+            </a>
+            <a href={`https://t.me/share/url?url=${postUrl}&text=${postTitle}`} target="_blank" class="p-2 bg-surface-soft border border-hairline rounded-full hover:bg-[#0088cc] hover:text-white transition-colors text-ink" title={shareTelegramTitle}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"/></svg>
+            </a>
+            <button onclick="navigator.clipboard.writeText(window.location.href); this.title='¡Copiado!';" class="p-2 bg-surface-soft border border-hairline rounded-full hover:bg-ink hover:text-white transition-colors text-ink" title={copyLinkTitle}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+            </button>
+          </div>
+        </div>
+        <h1 class="display-lg">{post.data.title}</h1>
+      </header>
+      
+      <TableOfContents headings={headings} />
+
+      <div class="prose prose-ink max-w-none">
+        <Content />
+      </div>
+      <AuthorBox />
+    </article>
+  </Section>
+</BaseLayout>

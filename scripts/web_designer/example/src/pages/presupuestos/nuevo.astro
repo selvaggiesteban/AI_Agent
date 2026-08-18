@@ -1,0 +1,212 @@
+---
+import PresupuestoLayout from '../../layouts/PresupuestoLayout.astro';
+---
+
+<PresupuestoLayout title="Nuevo Presupuesto | CRM Interno" description="Generador de presupuestos.">
+
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-ink mb-2">Nuevo Presupuesto</h1>
+    <p class="text-ink/60">Completa los datos para generar el documento y obtener la URL.</p>
+  </div>
+
+  <form id="nuevo-form" class="space-y-8">
+
+    <!-- Datos del proyecto -->
+    <div class="bg-white rounded-[9px] border border-hairline p-6">
+      <h2 class="text-lg font-bold mb-4 text-ink border-b border-hairline pb-3">Proyecto</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="font-mono text-xs uppercase tracking-widest text-ink/40 block mb-1">Título del proyecto *</label>
+          <input type="text" name="proyecto" required placeholder="Ej: Desarrollo de Sitio Web Institucional" class="w-full p-3 bg-surface-soft border border-hairline rounded-[9px] focus:border-primary outline-none text-sm" />
+        </div>
+        <div>
+          <label class="font-mono text-xs uppercase tracking-widest text-ink/40 block mb-1">Condición de venta</label>
+          <input type="text" name="condicionVenta" value="Transferencia / MercadoPago (Contado)" class="w-full p-3 bg-surface-soft border border-hairline rounded-[9px] focus:border-primary outline-none text-sm" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Datos del cliente -->
+    <div class="bg-white rounded-[9px] border border-hairline p-6">
+      <h2 class="text-lg font-bold mb-4 text-ink border-b border-hairline pb-3">Cliente</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="font-mono text-xs uppercase tracking-widest text-ink/40 block mb-1">Nombre *</label>
+          <input type="text" name="clienteNombre" required class="w-full p-3 bg-surface-soft border border-hairline rounded-[9px] focus:border-primary outline-none text-sm" />
+        </div>
+        <div>
+          <label class="font-mono text-xs uppercase tracking-widest text-ink/40 block mb-1">Empresa</label>
+          <input type="text" name="clienteEmpresa" class="w-full p-3 bg-surface-soft border border-hairline rounded-[9px] focus:border-primary outline-none text-sm" />
+        </div>
+        <div>
+          <label class="font-mono text-xs uppercase tracking-widest text-ink/40 block mb-1">CUIT</label>
+          <input type="text" name="clienteCuit" class="w-full p-3 bg-surface-soft border border-hairline rounded-[9px] focus:border-primary outline-none text-sm" />
+        </div>
+        <div>
+          <label class="font-mono text-xs uppercase tracking-widest text-ink/40 block mb-1">Condición IVA</label>
+          <input type="text" name="clienteIva" placeholder="Ej: Responsable Inscripto" class="w-full p-3 bg-surface-soft border border-hairline rounded-[9px] focus:border-primary outline-none text-sm" />
+        </div>
+        <div class="md:col-span-2">
+          <label class="font-mono text-xs uppercase tracking-widest text-ink/40 block mb-1">Domicilio</label>
+          <input type="text" name="clienteDomicilio" class="w-full p-3 bg-surface-soft border border-hairline rounded-[9px] focus:border-primary outline-none text-sm" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Items -->
+    <div class="bg-white rounded-[9px] border border-hairline p-6">
+      <h2 class="text-lg font-bold mb-4 text-ink border-b border-hairline pb-3">Servicios / Items</h2>
+      <div id="items-container" class="space-y-4 mb-4"></div>
+      <button type="button" id="add-item" class="flex items-center gap-2 text-primary font-bold text-sm hover:underline">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        Agregar ítem
+      </button>
+    </div>
+
+    <!-- Total -->
+    <div class="bg-surface-soft rounded-[9px] border border-hairline p-4 flex justify-between items-center">
+      <span class="font-bold text-ink">Total estimado:</span>
+      <span id="total-display" class="text-2xl font-bold text-primary">$0 ARS</span>
+    </div>
+
+    <div class="flex gap-4">
+      <button type="submit" class="flex-1 bg-ink text-white font-bold py-4 rounded-[9px] hover:bg-ink/80 transition-colors flex items-center justify-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+        Generar Presupuesto
+      </button>
+      <a href="/presupuestos/" class="px-6 py-4 border border-hairline rounded-[9px] text-ink hover:bg-surface-soft transition-colors font-medium text-sm flex items-center">
+        Cancelar
+      </a>
+    </div>
+
+    <div id="form-status" class="hidden text-sm p-4 rounded-[9px]"></div>
+  </form>
+
+</PresupuestoLayout>
+
+<script>
+  // Item template
+  let itemCount = 0;
+
+  function addItem(prefill: any = {}) {
+    itemCount++;
+    const idx = itemCount;
+    const container = document.getElementById('items-container')!;
+    const div = document.createElement('div');
+    div.className = 'grid grid-cols-12 gap-2 items-start bg-surface-soft p-3 rounded-[9px] border border-hairline';
+    div.dataset.item = String(idx);
+    div.innerHTML = `
+      <div class="col-span-12 md:col-span-5">
+        <label class="font-mono text-[10px] uppercase text-ink/40 block mb-1">Descripción *</label>
+        <input type="text" class="item-desc w-full p-2 bg-white border border-hairline rounded-[5px] text-sm focus:border-primary outline-none" value="${prefill.descripcion || ''}" required />
+      </div>
+      <div class="col-span-4 md:col-span-2">
+        <label class="font-mono text-[10px] uppercase text-ink/40 block mb-1">Cantidad</label>
+        <input type="number" class="item-cant w-full p-2 bg-white border border-hairline rounded-[5px] text-sm focus:border-primary outline-none" value="${prefill.cantidad || 1}" min="1" />
+      </div>
+      <div class="col-span-4 md:col-span-2">
+        <label class="font-mono text-[10px] uppercase text-ink/40 block mb-1">Precio unit. (ARS)</label>
+        <input type="number" class="item-precio w-full p-2 bg-white border border-hairline rounded-[5px] text-sm focus:border-primary outline-none" value="${prefill.precioUnitario || ''}" min="0" />
+      </div>
+      <div class="col-span-3 md:col-span-2">
+        <label class="font-mono text-[10px] uppercase text-ink/40 block mb-1">% Bonif.</label>
+        <input type="number" class="item-bonif w-full p-2 bg-white border border-hairline rounded-[5px] text-sm focus:border-primary outline-none" value="${prefill.bonificacion || 0}" min="0" max="100" />
+      </div>
+      <div class="col-span-1 flex items-end justify-end pb-1">
+        <button type="button" class="remove-item text-red-400 hover:text-red-600 transition-colors" title="Eliminar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+        </button>
+      </div>
+    `;
+    container.appendChild(div);
+    // Remove item
+    div.querySelector('.remove-item')!.addEventListener('click', () => {
+      div.remove();
+      updateTotal();
+    });
+    // Update total on change
+    div.querySelectorAll('input').forEach(i => i.addEventListener('input', updateTotal));
+    updateTotal();
+  }
+
+  function updateTotal() {
+    const items = document.querySelectorAll('[data-item]');
+    let total = 0;
+    items.forEach(item => {
+      const cant = parseFloat((item.querySelector('.item-cant') as HTMLInputElement)?.value || '1');
+      const precio = parseFloat((item.querySelector('.item-precio') as HTMLInputElement)?.value || '0');
+      const bonif = parseFloat((item.querySelector('.item-bonif') as HTMLInputElement)?.value || '0');
+      const subtotal = cant * precio;
+      total += subtotal - (subtotal * bonif / 100);
+    });
+    const display = document.getElementById('total-display')!;
+    display.textContent = `$${total.toLocaleString('es-AR')} ARS`;
+  }
+
+  function getItems() {
+    const items: any[] = [];
+    document.querySelectorAll('[data-item]').forEach(item => {
+      items.push({
+        descripcion: (item.querySelector('.item-desc') as HTMLInputElement)?.value || '',
+        cantidad: parseInt((item.querySelector('.item-cant') as HTMLInputElement)?.value || '1'),
+        precioUnitario: parseInt((item.querySelector('.item-precio') as HTMLInputElement)?.value || '0'),
+        bonificacion: parseInt((item.querySelector('.item-bonif') as HTMLInputElement)?.value || '0'),
+        unidad: 'unid',
+      });
+    });
+    return items;
+  }
+
+  // Init with one empty item
+  document.addEventListener('DOMContentLoaded', () => {
+    addItem();
+    document.getElementById('add-item')!.addEventListener('click', () => addItem());
+
+    document.getElementById('nuevo-form')!.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      const status = document.getElementById('form-status')!;
+      const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+      btn.disabled = true;
+      btn.textContent = 'Generando...';
+
+      const payload = {
+        proyecto: (form.querySelector('[name="proyecto"]') as HTMLInputElement).value,
+        condicionVenta: (form.querySelector('[name="condicionVenta"]') as HTMLInputElement).value,
+        cliente: {
+          nombre: (form.querySelector('[name="clienteNombre"]') as HTMLInputElement).value,
+          empresa: (form.querySelector('[name="clienteEmpresa"]') as HTMLInputElement).value,
+          cuit: (form.querySelector('[name="clienteCuit"]') as HTMLInputElement).value,
+          iva: (form.querySelector('[name="clienteIva"]') as HTMLInputElement).value,
+          domicilio: (form.querySelector('[name="clienteDomicilio"]') as HTMLInputElement).value,
+        },
+        items: getItems(),
+      };
+
+      try {
+        const res = await fetch('/api/presupuesto-create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json() as any;
+
+        if (res.ok) {
+          status.className = 'p-4 rounded-[9px] bg-green-50 border border-green-200 text-green-800';
+          status.innerHTML = `✓ Presupuesto generado. <a href="${data.url}" target="_blank" class="font-bold underline">${window.location.origin}${data.url}</a>`;
+          status.classList.remove('hidden');
+        } else {
+          throw new Error(data.error || 'Error desconocido');
+        }
+      } catch (err: any) {
+        status.className = 'p-4 rounded-[9px] bg-red-50 border border-red-200 text-red-800';
+        status.textContent = `Error: ${err.message}`;
+        status.classList.remove('hidden');
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg> Generar Presupuesto`;
+    });
+  });
+</script>

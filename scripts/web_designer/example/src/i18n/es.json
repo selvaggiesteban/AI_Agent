@@ -1,0 +1,190 @@
+{
+  "nav": {
+    "inicio": "Inicio",
+    "sobreMi": "Sobre mí",
+    "servicios": "Servicios",
+    "blog": "Blog",
+    "contacto": "Contacto",
+    "empezar": "Empezar",
+    "empezarAhora": "Empezar ahora",
+    "menu": "Menú"
+  },
+  "services": {
+    "softwareAMedida": "Software a medida",
+    "disenoWeb": "Diseño web responsive",
+    "seo": "Posicionamiento SEO",
+    "sem": "Posicionamiento SEM",
+    "emailMarketing": "E-mail marketing"
+  },
+  "footer": {
+    "bio": "Ingeniero en Informática especializado en Ingeniería en Software",
+    "ingenieroInformatica": "Ingeniero en Informática UBA",
+    "ingenieroSoftware": "Ingeniero en software",
+    "desarrolladorFullStack": "Desarrollador Web Full-Stack",
+    "expertoSEO": "Experto en posicionamiento SEO",
+    "contacto": "Contacto",
+    "email": "E-mail:",
+    "telefono": "Teléfono:",
+    "servicios": "Servicios",
+    "guiasSEO": "Guías SEO & Marketing",
+    "desarrolloIA": "Desarrollo & Inteligencia Artificial",
+    "privacidad": "Privacidad",
+    "cookies": "Cookies"
+  },
+  "cookie": {
+    "title": "Uso de Cookies",
+    "message": "Uso cookies técnicas para que mi web funcione y analíticas para entender cómo interactúas con ella. Solo activaré las analíticas si me das tu consentimiento.",
+    "readMore": "Leer política completa.",
+    "accept": "Aceptar todas",
+    "reject": "Rechazar no esenciales"
+  },
+  "contact": {
+    "heading": "¿Hablamos sobre tu proyecto?",
+    "subtitle": "Completa el formulario y me pondré en contacto contigo lo antes posible.",
+    "nombre": "Nombre",
+    "email": "Email",
+    "mensaje": "Mensaje",
+    "privacyPrefix": "He leído y acepto la",
+    "privacyLink": "Política de Privacidad",
+    "privacySuffix": "y el tratamiento de mis datos personales.",
+    "submit": "Enviar mensaje",
+    "captchaWait": "Por favor, espera a que el captcha de seguridad se complete.",
+    "sending": "Enviando...",
+    "errorSend": "No se pudo enviar el mensaje.",
+    "errorConnection": "Error de conexión. Inténtalo de nuevo."
+  },
+  "whatsapp": {
+    "message": "Hola! Me gustaría recibir más información.",
+    "ariaLabel": "Contactar por WhatsApp"
+  },
+  "author": {
+    "bio": "Ingeniero informático especializado en ingeniería de software",
+    "description": "Con más de 10 años de trayectoria, construyo aplicaciones web responsive y escalables, ayudando a negocios a destacar en el mundo digital con productos que cargan instantáneamente y están optimizados para motores de búsqueda (SEO).",
+    "cta": "Hablemos sobre tu proyecto"
+  },
+  "reviews": {
+    "heading": "Reseñas de clientes",
+    "subtitle": "Lo que dicen quienes ya confían en mi ingeniería de excelencia.",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "readMore": "Leer más en Google"
+  },
+  "recommended": {
+    "heading": "Recomendado para usted",
+    "badge": "Artículo",
+    "placeholder": "Lectura recomendada",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "leerMas": "Leer más"
+  },
+  "recent": {
+    "heading": "Publicaciones recientes",
+    "description": "Compartiendo código, algoritmos y avances sobre ingeniería en software e IA.",
+    "viewCode": "Ver código fuente →",
+    "githubRepo": "Repositorio en GitHub",
+    "repos": {
+      "30_days_coding": "Desafío de programación de 30 días con algoritmos, estructuras de datos y resolución de problemas.",
+      "spec-driven": "Metodología y herramientas para construir aplicaciones robustas a partir de especificaciones estrictas.",
+      "hands-on-ai": "Implementaciones prácticas de modelos de Inteligencia Artificial, agentes LLM e ingeniería de prompts."
+    }
+  },
+  "skills": {
+    "heading": "Tecnologías de vanguardia",
+    "subtitle": "Código optimizado para el máximo rendimiento.",
+    "categories": {
+      "frontend": "Desarrollo frontend",
+      "backend": "Desarrollo backend",
+      "apis": "APIs e integraciones",
+      "databases": "Bases de datos",
+      "infra": "Despliegue e infraestructura",
+      "ai": "Inteligencia artificial y automatizaciones",
+      "productivity": "Productividad",
+      "cms": "Gestión de contenido",
+      "seo": "SEO y analítica"
+    }
+  },
+  "toc": {
+    "heading": "Índice de Contenidos",
+    "filterWords": ["tabla de contenido", "índice de contenido"]
+  },
+  "home": {
+    "title": "Ingeniero en Informática especializado en Ingeniería en Software",
+    "description": "Ingeniería en Informática profesional desde Buenos Aires Argentina - Ingeniero en Informática UBA",
+    "role": "Ingeniero en Informática",
+    "empezarAhora": "Empezar ahora",
+    "verServicios": "Ver servicios"
+  },
+  "about": {
+    "title": "Esteban Selvaggi Ingeniero en Informática UBA",
+    "description": "Conoce más sobre Esteban Selvaggi, ingeniero en software especializado en desarrollo full-stack, con 10 años de experiencia.",
+    "heading": "Sobre mí",
+    "bio1": "Soy un apasionado de la ingeniería de software y el diseño web, enfocado en crear experiencias digitales excepcionales que combinan una estética cuidada y un rendimiento sobresaliente.",
+    "bio2": "Con más de 10 años de trayectoria, construyo aplicaciones web responsive y escalables, ayudando a negocios y profesionales a destacar en el mundo digital con productos que cargan instantáneamente y están optimizados para motores de búsqueda y altas tasas de conversión.",
+    "experiencia": "Experiencia Laboral",
+    "educacion": "Educación",
+    "copyLink": "Copiar Enlace",
+    "print": "Imprimir",
+    "shareEmail": "Compartir por Email",
+    "shareWhatsApp": "Compartir por WhatsApp",
+    "shareTelegram": "Compartir por Telegram",
+    "linkCopied": "Enlace copiado al portapapeles;",
+    "email": "E-mail:",
+    "telefono": "Teléfono:",
+    "linkedin": "LinkedIn:",
+    "github": "GitHub:",
+    "actualidad": "actualidad"
+  },
+  "contactPage": {
+    "title": "Contacto",
+    "description": "Ponte en contacto con nosotros para discutir tu próximo proyecto web.",
+    "heading": "Hablemos.",
+    "subtitle": "¿Tienes un proyecto en mente o simplemente quieres saludar? Completa el formulario y te responderé lo antes posible."
+  },
+  "thankYou": {
+    "title": "¡Gracias!",
+    "description": "Gracias por ponerte en contacto con nosotros.",
+    "heading": "¡Mensaje enviado!",
+    "message": "He recibido tu mensaje y me pondré en contacto contigo a la brevedad.",
+    "volver": "Volver al inicio"
+  },
+  "blog": {
+    "title": "Blog de Ingeniería y SEO",
+    "description": "Artículos técnicos sobre ingeniería de software, automatización con inteligencia artificial y estrategias avanzadas de posicionamiento web (SEO/SEM).",
+    "heading": "Blog",
+    "subtitle": "Reflexiones, tutoriales y estrategias sobre ingeniería en software, IA y posicionamiento web.",
+    "featured": "Destacado",
+    "readArticle": "Leer artículo",
+    "readMore": "Leer más"
+  },
+  "servicesPage": {
+    "title": "Servicios",
+    "description": "Explora las soluciones de diseño y desarrollo web que ofrecemos.",
+    "heading": "Servicios de consultores en informática y suministros de programas de informática",
+    "verServicio": "Ver servicio",
+    "viewService": "Ver servicio"
+  },
+  "login": {
+    "title": "Acceso Restringido",
+    "heading": "Acceso Restringido",
+    "description": "Inicia sesión para continuar.",
+    "subtitle": "Ingresa la contraseña maestra para acceder al CRM.",
+    "password": "Contraseña",
+    "submit": "Ingresar al sistema",
+    "errorPassword": "Contraseña incorrecta.",
+    "errorConnection": "Error de conexión"
+  },
+  "share": {
+    "whatsapp": "Compartir por WhatsApp",
+    "twitter": "Compartir en X (Twitter)",
+    "x": "Compartir en X (Twitter)",
+    "linkedin": "Compartir en LinkedIn",
+    "telegram": "Compartir por Telegram",
+    "copyLink": "Copiar enlace",
+    "copied": "¡Copiado!"
+  },
+  "breadcrumbs": {
+    "home": "Inicio",
+    "blog": "Blog",
+    "servicios": "Servicios"
+  }
+}

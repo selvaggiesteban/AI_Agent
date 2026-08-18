@@ -1,0 +1,21 @@
+---
+import { getLocaleFromUrl, getOppositeLocale, getLocalizedUrl } from '../i18n/utils';
+
+const currentUrl = Astro.url;
+const currentLocale = getLocaleFromUrl(currentUrl);
+const oppositeLocale = getOppositeLocale(currentLocale);
+const targetUrl = getLocalizedUrl(currentUrl, oppositeLocale);
+---
+
+<a
+  href={targetUrl}
+  class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-widest border border-hairline rounded-full hover:bg-ink hover:text-white transition-colors text-ink"
+  aria-label={oppositeLocale === 'en' ? 'Switch to English' : 'Cambiar a Español'}
+>
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <path d="M2 12h20"/>
+    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+  </svg>
+  {oppositeLocale === 'en' ? 'EN' : 'ES'}
+</a>

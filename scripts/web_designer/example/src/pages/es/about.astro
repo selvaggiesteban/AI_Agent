@@ -1,0 +1,199 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Section from '../../components/Section.astro';
+import Button from '../../components/Button.astro';
+import { getLocaleFromUrl, t } from '../../i18n/utils';
+
+const locale = getLocaleFromUrl(Astro.url);
+const lang = locale as 'es' | 'en';
+const title = t(lang, 'about.title');
+const description = t(lang, 'about.description');
+---
+
+<BaseLayout {title} {description} isProfile={true}>
+  <Section variant="white" class="pt-24 pb-16 reveal">
+    <div class="w-full mx-auto">
+      
+      <!-- Header: 2 columnas -->
+      <div class="border-b border-hairline pb-8 mb-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        <!-- Columna izquierda: identidad -->
+        <div>
+          <h1 class="display-lg mb-1">Esteban Selvaggi</h1>
+          <p class="text-2xl text-primary font-medium">Ingeniería en Informática</p>
+        </div>
+
+        <!-- Columna derecha: share + contacto -->
+        <div class="flex flex-col gap-5 md:items-end">
+          <!-- Íconos compartir -->
+          <div class="flex gap-2">
+            <button onclick="navigator.clipboard.writeText(window.location.href); alert('Enlace copiado al portapapeles');" class="p-2 bg-surface-soft border border-hairline rounded-full hover:bg-ink hover:text-white transition-colors text-ink cursor-pointer" title="Copiar Enlace">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+            </button>
+            <button onclick="window.print()" class="p-2 bg-surface-soft border border-hairline rounded-full hover:bg-ink hover:text-white transition-colors text-ink cursor-pointer" title="Imprimir">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+            </button>
+            <a href="mailto:?subject=Sobre%20mí%20-%20Esteban%20Selvaggi&body=https://selvaggiesteban.dev/sobre-mi" class="p-2 bg-surface-soft border border-hairline rounded-full hover:bg-ink hover:text-white transition-colors text-ink" title="Compartir por Email">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </a>
+            <a href="https://api.whatsapp.com/send?text=Sobre%20m%C3%AD%20-%20Esteban%20Selvaggi:%20https://selvaggiesteban.dev/sobre-mi" target="_blank" class="p-2 bg-surface-soft border border-hairline rounded-full hover:bg-[#25D366] hover:text-white transition-colors text-ink" title="Compartir por WhatsApp">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"/><path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1"/></svg>
+            </a>
+            <a href="https://t.me/share/url?url=https://selvaggiesteban.dev/sobre-mi&text=Sobre%20m%C3%AD%20-%20Esteban%20Selvaggi" target="_blank" class="p-2 bg-surface-soft border border-hairline rounded-full hover:bg-[#0088cc] hover:text-white transition-colors text-ink" title="Compartir por Telegram">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"/></svg>
+            </a>
+          </div>
+
+          <!-- Datos de contacto con texto -->
+          <div class="text-sm text-ink/70 flex flex-col gap-2 md:items-end">
+            <a href="mailto:selvaggiesteban@gmail.com" class="hover:text-primary transition-colors font-medium">
+              <span class="text-ink/40 font-mono text-xs uppercase tracking-widest mr-1">E-mail:</span>selvaggiesteban@gmail.com
+            </a>
+            <a href="tel:+5491153323937" class="hover:text-primary transition-colors font-medium">
+              <span class="text-ink/40 font-mono text-xs uppercase tracking-widest mr-1">Teléfono:</span>(+54) 9 11 5332-3937
+            </a>
+            <a href="https://linkedin.com/in/selvaggiesteban" target="_blank" class="hover:text-primary transition-colors font-medium">
+              <span class="text-ink/40 font-mono text-xs uppercase tracking-widest mr-1">LinkedIn:</span>/selvaggiesteban
+            </a>
+            <a href="https://github.com/selvaggiesteban" target="_blank" class="hover:text-primary transition-colors font-medium">
+              <span class="text-ink/40 font-mono text-xs uppercase tracking-widest mr-1">GitHub:</span>/selvaggiesteban
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Perfil -->
+      <div class="mb-10">
+        <h2 class="text-xl font-bold uppercase tracking-widest text-ink/40 mb-4 border-b border-hairline-soft pb-2">Sobre mí</h2>
+        <div class="text-ink/80 space-y-4 leading-relaxed text-sm">
+          <p>Soy un apasionado de la ingeniería de software y el diseño web, enfocado en crear experiencias digitales excepcionales que combinan una estética cuidada y un rendimiento sobresaliente.</p>
+          <p>Con más de 10 años de trayectoria, construyo aplicaciones web responsive y escalables, ayudando a negocios y profesionales a destacar en el mundo digital con productos que cargan instantáneamente y están optimizados para motores de búsqueda y altas tasas de conversión.</p>
+        </div>
+      </div>
+
+      <!-- Experiencia con IA -->
+      <div class="mb-10">
+        <h2 class="text-xl font-bold uppercase tracking-widest text-ink/40 mb-4 border-b border-hairline-soft pb-2">Experiencia con Inteligencia Artificial</h2>
+        <div class="text-ink/80 leading-relaxed text-sm">
+          <p>Integración y automatización con OpenAI (ChatGPT), Google Gemini, Anthropic Claude y modelos locales vía Ollama, RAG (Retrieval Augmented Generation), embeddings y generación de contenido estructurado, asistentes virtuales personalizados y chatbots inteligentes. Uso de n8n para orquestación de flujos de trabajo con IA.</p>
+        </div>
+      </div>
+
+      <!-- Experiencia con APIs -->
+      <div class="mb-10">
+        <h2 class="text-xl font-bold uppercase tracking-widest text-ink/40 mb-4 border-b border-hairline-soft pb-2">Experiencia con APIs e Integraciones</h2>
+        <div class="text-ink/80 leading-relaxed text-sm">
+          <p>Integración de pasarelas de pago (Mercado Pago, Stripe), APIs de mensajería (WhatsApp Business API, Telegram Bot API), pasarelas de email transaccional (Resend, SMTP), Google APIs (Maps, reCAPTCHA/Turnstile, Search Console, Analytics, Tag Manager, Looker Studio, PageSpeed, Gemini), REST APIs y GraphQL, sincronización con plataformas e-commerce, web scraping con n8n y APIs abiertas.</p>
+        </div>
+      </div>
+
+      <!-- Lenguajes -->
+      <div class="mb-10">
+        <h2 class="text-xl font-bold uppercase tracking-widest text-ink/40 mb-4 border-b border-hairline-soft pb-2">Lenguajes de Programación y Familiaridad</h2>
+        <div class="text-ink/80 leading-relaxed text-sm space-y-1">
+          <p><span class="font-semibold text-ink">Frontend:</span> React, Vue.js, Next.js, TypeScript, JavaScript, HTML5, CSS3, Sass, Vite, Bootstrap, Astro, Tailwind CSS</p>
+          <p><span class="font-semibold text-ink">Backend:</span> PHP, Laravel, CodeIgniter, Composer, Python, Firebase</p>
+          <p><span class="font-semibold text-ink">APIs:</span> REST API, GraphQL, Stripe, Mercado Pago, WhatsApp API, Resend</p>
+          <p><span class="font-semibold text-ink">Bases de Datos:</span> MySQL, SQLite, PostgreSQL, MongoDB</p>
+          <p><span class="font-semibold text-ink">Infraestructura:</span> AWS, Azure, Google Cloud, Cloudflare, Docker, GitHub, GitHub Actions, Nginx, Plesk, VPS Linux, Node.js</p>
+          <p><span class="font-semibold text-ink">IA:</span> OpenAI, Gemini, Claude, Ollama, n8n</p>
+          <p><span class="font-semibold text-ink">Productividad:</span> VS Code, Trello, Monday, ClickUp</p>
+          <p><span class="font-semibold text-ink">CMS / E-commerce:</span> WordPress, Elementor, WooCommerce, PrestaShop, Tienda Nube, Shopify</p>
+          <p><span class="font-semibold text-ink">SEO y Analítica:</span> Google Analytics, Search Console, Tag Manager, PageSpeed, Looker Studio</p>
+        </div>
+      </div>
+
+      <!-- Portafolio -->
+      <div class="mb-10">
+        <h2 class="text-xl font-bold uppercase tracking-widest text-ink/40 mb-4 border-b border-hairline-soft pb-2">Portafolio y Sitios Web Construidos</h2>
+        <div class="text-ink/80 leading-relaxed text-sm">
+          <p>Diseño, desarrollo, mantenimiento y posicionamiento de sitios web para más de 30 clientes en diversas industrias, incluyendo: Lanús Computación, Esloogan, Vestigio Studio, Octonove Agency, TVMAS Magazine, Te Promocionamos, Nice Comunicación, DMG, entre otros. Más de 100 sitios web construidos con tecnologías modernas (Astro, React, WordPress, Laravel).</p>
+        </div>
+      </div>
+
+      <!-- Experiencia -->
+        <div class="mb-10">
+          <h2 class="text-xl font-bold uppercase tracking-widest text-ink/40 mb-4 border-b border-hairline-soft pb-2">Experiencia Laboral</h2>
+          <div class="space-y-6">
+            <div>
+              <h3 class="font-bold text-lg text-ink">Desarrollador Web Full-Stack - <a href="https://esloogan.com" target="_blank" class="underline hover:text-primary transition-colors">Esloogan</a></h3>
+              <p class="text-sm text-ink/60 mt-1">Madrid, Comunidad de Madrid, España (En remoto) · ene. 2025 - <span class="inline-block bg-semantic-success/10 text-semantic-success text-xs font-medium px-2 py-0.5 rounded-full leading-none">actualidad</span></p>
+              <p class="text-sm text-ink/80 mt-2 leading-relaxed">Encargado del diseño, mantenimiento y posicionamiento de sitios web.</p>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-ink">Emprendedor - <a href="https://lanuscomputacion.com" target="_blank" class="underline hover:text-primary transition-colors">Lanús Computación</a></h3>
+              <p class="text-sm text-ink/60 mt-1">Lanús, Provincia de Buenos Aires, Argentina (Presencial) · ene. 2014 - <span class="inline-block bg-semantic-success/10 text-semantic-success text-xs font-medium px-2 py-0.5 rounded-full leading-none">actualidad</span></p>
+              <p class="text-sm text-ink/80 mt-2 leading-relaxed">Encargado del diseño, instalación y mantenimiento de sistemas informáticos.</p>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-ink">Especialista en posicionamiento web - <a href="https://octonove.com/" target="_blank" class="underline hover:text-primary transition-colors">Octonove Agency</a></h3>
+              <p class="text-sm text-ink/60 mt-1">Cartagena, Región de Murcia, España (En remoto) · sept. 2023 - abr. 2026</p>
+              <p class="text-sm text-ink/80 mt-2 leading-relaxed">Encargado del posicionamiento de sitios web.</p>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-ink">Desarrollador Web Full-Stack - <a href="https://tvmasmagazine.com/" target="_blank" class="underline hover:text-primary transition-colors">TVMAS Magazine</a></h3>
+              <p class="text-sm text-ink/60 mt-1">Miami 33129 (En remoto) · mar. 2022 - abr. 2026</p>
+              <p class="text-sm text-ink/80 mt-2 leading-relaxed">Encargado de campañas de e-mail marketing.</p>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-ink">Personal docente - <a href="https://educacionit.com/" target="_blank" class="underline hover:text-primary transition-colors">EducacionIT</a></h3>
+              <p class="text-sm text-ink/60 mt-1">Provincia de Buenos Aires, Argentina (En remoto) · ene. 2025 - oct. 2025</p>
+              <p class="text-sm text-ink/80 mt-2 leading-relaxed">Encargado de cursos de WordPress online.</p>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-ink">Desarrollador Web Full-Stack - <a href="https://nice.com.ar" target="_blank" class="underline hover:text-primary transition-colors">Nice comunicación</a></h3>
+              <p class="text-sm text-ink/60 mt-1">Provincia de Buenos Aires, Argentina (En remoto) · jul. 2023 - ene. 2025</p>
+              <p class="text-sm text-ink/80 mt-2 leading-relaxed">Encargado del diseño, mantenimiento y posicionamiento de sitios web.</p>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-ink">Desarrollador Web Full-Stack - <a href="https://tepromocionamos.com/" target="_blank" class="underline hover:text-primary transition-colors">Te Promocionamos</a></h3>
+              <p class="text-sm text-ink/60 mt-1">Provincia de Buenos Aires, Argentina (En remoto) · sept. 2023 - dic. 2024</p>
+              <p class="text-sm text-ink/80 mt-2 leading-relaxed">Encargado del diseño, mantenimiento y posicionamiento de sitios web.</p>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-ink">Desarrollador Web Full-Stack - <a href="https://vestigiostudio.com/" target="_blank" class="underline hover:text-primary transition-colors">Vestigio Studio</a></h3>
+              <p class="text-sm text-ink/60 mt-1">Provincia de Buenos Aires, Argentina · oct. 2023 - may. 2024</p>
+              <p class="text-sm text-ink/80 mt-2 leading-relaxed">Encargado del diseño, mantenimiento y posicionamiento de sitios web.</p>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-ink">Desarrollador Web Full-Stack - <a href="https://www.estudiodmg.com.ar" target="_blank" class="underline hover:text-primary transition-colors">Estudio de Diseño DMG srl</a></h3>
+              <p class="text-sm text-ink/60 mt-1">Lomas de Zamora, Provincia de Buenos Aires, Argentina (Presencial) · ene. 2023 - nov. 2023</p>
+              <p class="text-sm text-ink/80 mt-2 leading-relaxed">Encargado del diseño, mantenimiento y posicionamiento de sitios web.</p>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-ink">Personal docente - <a href="https://www.linkedin.com/company/escuela-santa-teresa" target="_blank" class="underline hover:text-primary transition-colors">Escuela Santa Teresa</a></h3>
+              <p class="text-sm text-ink/60 mt-1">Provincia de Buenos Aires, Argentina (Presencial) · feb. 2022 - feb. 2023</p>
+              <p class="text-sm text-ink/80 mt-2 leading-relaxed">Encargado de la gestión y evaluación de proyectos de incorporación tecnológica en educación inicial, primaria y secundaria.</p>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-ink">Técnico mecánico - <a href="https://mako.com.ar/" target="_blank" class="underline hover:text-primary transition-colors">Mecanizados Mako</a></h3>
+              <p class="text-sm text-ink/60 mt-1">Provincia de Buenos Aires, Argentina (Presencial) · may. 2017 - ene. 2021</p>
+              <p class="text-sm text-ink/80 mt-2 leading-relaxed">Encargado de la programación de centro CNC y procesos de mecanizado y fabricación de piezas mecánicas.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Educación -->
+      <div class="mb-10">
+        <h2 class="text-xl font-bold uppercase tracking-widest text-ink/40 mb-4 border-b border-hairline-soft pb-2">Educación</h2>
+        <div class="space-y-4">
+          <div>
+            <h3 class="font-bold text-lg text-ink">Grado en Ingeniería en Informática - Universidad de Buenos Aires</h3>
+              <p class="text-sm text-ink/60 mt-1">Ago 2025 - Dic 2031</p>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg text-ink">Desarrollo Web Full Stack - Henry</h3>
+              <p class="text-sm text-ink/60 mt-1">Ene 2023 - Dic 2025</p>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg text-ink">Operador avanzado de PC - Escuela Santa Teresa</h3>
+              <p class="text-sm text-ink/60 mt-1">Mar 2012 - Dic 2018</p>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg text-ink">Bachiller en Economía y Gestión de las Organizaciones - Escuela Santa Teresa</h3>
+              <p class="text-sm text-ink/60 mt-1">Mar 2012 - Dic 2018</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

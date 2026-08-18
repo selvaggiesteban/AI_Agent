@@ -1,0 +1,30 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Section from '../../../components/Section.astro';
+import { getLocaleFromUrl, t } from '../../../i18n/utils';
+
+const locale = getLocaleFromUrl(Astro.url);
+const lang = locale as 'es' | 'en';
+const allServicios = await getCollection('servicios');
+const servicios = allServicios.filter(s => !s.id.startsWith('en/'));
+const servicesPrefix = locale === 'es' ? '/es/services' : '/en/services';
+
+const title = t(lang, 'servicesPage.title');
+const description = t(lang, 'servicesPage.description');
+---
+
+<BaseLayout {title} {description}>
+  <Section>
+    <h1 class="font-bold text-[44px] md:text-[72px] leading-tight text-center">{t(lang, 'servicesPage.heading')}</h1>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-lg">
+      {servicios.map(servicio => (
+        <article class="group relative p-lg bg-surface-soft rounded-lg border border-transparent transition-all">
+          <a href={`${servicesPrefix}/${servicio.id}`} class="absolute inset-0 z-10"><span class="sr-only">{t(lang, 'servicesPage.viewService')}</span></a>
+          <h2 class="text-xl font-bold mb-sm text-center group-hover:text-primary">{servicio.data.title}</h2>
+          <p class="text-ink/60">{servicio.data.description}</p>
+        </article>
+      ))}
+    </div>
+  </Section>
+</BaseLayout>

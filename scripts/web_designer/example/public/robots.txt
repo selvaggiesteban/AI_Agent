@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /presupuestos/
+Disallow: /api/
+Disallow: /login
+
+Sitemap: https://selvaggiesteban.dev/sitemap-index.xml

@@ -1,0 +1,59 @@
+---
+import { getLocaleFromUrl, t } from '../i18n/utils';
+
+const locale = getLocaleFromUrl(Astro.url);
+const lang = locale as 'es' | 'en';
+const cookiePolicyHref = locale === 'es' ? '/es/cookie-policy' : '/en/cookie-policy';
+---
+
+<div id="cookie-banner" class="fixed bottom-4 left-4 z-50 w-[300px] sm:w-[400px] bg-white border border-hairline shadow-2xl rounded-2xl p-6 transform translate-y-[150%] opacity-0 transition-all duration-700 ease-out">
+  <div class="flex flex-col gap-4">
+    <div>
+      <h3 class="text-lg font-bold text-ink mb-2">{t(lang, 'cookie.title')}</h3>
+      <p class="text-sm text-ink/70 leading-relaxed">
+        {t(lang, 'cookie.message')}
+        <a href={cookiePolicyHref} class="text-primary hover:underline font-medium">{t(lang, 'cookie.readMore')}</a>
+      </p>
+    </div>
+    <div class="flex flex-col sm:flex-row gap-3">
+      <button id="accept-cookies" class="w-full sm:w-auto bg-primary text-white font-medium px-4 py-2.5 rounded-lg hover:bg-ink transition-colors text-sm text-center">
+        {t(lang, 'cookie.accept')}
+      </button>
+      <button id="reject-cookies" class="w-full sm:w-auto bg-surface-soft text-ink font-medium px-4 py-2.5 rounded-lg hover:bg-gray-200 transition-colors text-sm text-center border border-hairline">
+        {t(lang, 'cookie.reject')}
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function loadGoogleAnalytics() {
+    const trackingId = 'G-T2129094YT';
+    if (document.getElementById('ga-script')) return;
+    const script = document.createElement('script');
+    script.id = 'ga-script';
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${trackingId}`;
+    script.async = true;
+    document.head.appendChild(script);
+    script.onload = () => {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', trackingId, { 'anonymize_ip': true, 'cookie_flags': 'SameSite=None;Secure' });
+    };
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const banner = document.getElementById('cookie-banner');
+    const acceptBtn = document.getElementById('accept-cookies');
+    const rejectBtn = document.getElementById('reject-cookies');
+    const cookieConsent = localStorage.getItem('cookie_consent');
+    if (!banner) return;
+    if (cookieConsent === 'accepted') { loadGoogleAnalytics(); return; }
+    if (cookieConsent === 'rejected') { return; }
+    setTimeout(() => { banner.classList.remove('translate-y-[150%]', 'opacity-0'); }, 1000);
+    const hideBanner = () => { banner.classList.add('translate-y-[150%]', 'opacity-0'); setTimeout(() => banner.remove(), 700); };
+    if (acceptBtn) { acceptBtn.addEventListener('click', () => { localStorage.setItem('cookie_consent', 'accepted'); loadGoogleAnalytics(); hideBanner(); }); }
+    if (rejectBtn) { rejectBtn.addEventListener('click', () => { localStorage.setItem('cookie_consent', 'rejected'); hideBanner(); }); }
+  });
+</script>
