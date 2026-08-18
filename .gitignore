@@ -26,6 +26,9 @@ core/free-claude-code/
 docs/
 estudiogsr-astro/
 
+# Node modules
+node_modules/
+
 # IDEs
 .vscode/
 .idea/

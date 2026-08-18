@@ -108,11 +108,21 @@ class GmailIntegration:
         self.sender_email = sender_email
         self.app_password = app_password
 
-    def send_email(self, to_email: str, subject: str, body_html: str):
-        """Sends a direct email via SMTP."""
+    def send_email(self, to_email: str, subject: str, body_html: str, attachments: Optional[List[str]] = None):
+        """
+        Sends a direct email via SMTP with optional attachments.
+
+        Args:
+            to_email: Recipient address.
+            subject: Email subject.
+            body_html: HTML content.
+            attachments: List of absolute file paths to attach.
+        """
         import smtplib
         from email.mime.text import MIMEText
         from email.mime.multipart import MIMEMultipart
+        from email.mime.base import MIMEBase
+        from email import encoders
 
         try:
             msg = MIMEMultipart()
@@ -120,6 +130,28 @@ class GmailIntegration:
             msg['To'] = to_email
             msg['Subject'] = subject
             msg.attach(MIMEText(body_html, 'html'))
+
+            if attachments:
+                for file_path in attachments:
+                    if not os.path.exists(file_path):
+                        logger.warning(f"Attachment not found: {file_path}")
+                        continue
+
+                    filename = os.path.basename(file_path)
+                    try:
+                        with open(file_path, "rb") as attachment:
+                            part = MIMEBase("application", "octet-stream")
+                            part.set_payload(attachment.read())
+
+                        encoders.encode_base64(part)
+                        part.add_header(
+                            "Content-Disposition",
+                            f"attachment; filename={filename}",
+                        )
+                        msg.attach(part)
+                        logger.info(f"Attached file: {filename}")
+                    except Exception as e:
+                        logger.error(f"Failed to attach file {file_path}: {e}")
 
             server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
             server.login(self.sender_email, self.app_password)
@@ -131,11 +163,15 @@ class GmailIntegration:
             logger.error(f"Error sending email to {to_email}: {e}")
             return False
 
-    def create_draft(self, subject: str, body_html: str, recipients: List[str]):
-        """Creates a Gmail draft using IMAP APPEND (similar to scripts/campaign_manager/drafts.py)."""
+    def create_draft(self, subject: str, body_html: str, recipients: List[str], attachments: Optional[List[str]] = None):
+        """
+        Creates a Gmail draft using IMAP APPEND with optional attachments.
+        """
         import imaplib
         from email.mime.text import MIMEText
         from email.mime.multipart import MIMEMultipart
+        from email.mime.base import MIMEBase
+        from email import encoders
         from email.utils import formatdate
 
         try:
@@ -146,6 +182,22 @@ class GmailIntegration:
             msg["Date"] = formatdate(localtime=True)
             msg["Bcc"] = ", ".join(recipients)
             msg.attach(MIMEText(body_html, "html", "utf-8"))
+
+            if attachments:
+                for file_path in attachments:
+                    if not os.path.exists(file_path):
+                        continue
+                    filename = os.path.basename(file_path)
+                    try:
+                        with open(file_path, "rb") as attachment:
+                            part = MIMEBase("application", "octet-stream")
+                            part.set_payload(attachment.read())
+                        encoders.encode_base64(part)
+                        part.add_header("Content-Disposition", f"attachment; filename={filename}")
+                        msg.attach(part)
+                    except Exception as e:
+                        logger.error(f"Failed to attach file {file_path} to draft: {e}")
+
             raw = msg.as_string()
 
             imap = imaplib.IMAP4_SSL("imap.gmail.com")

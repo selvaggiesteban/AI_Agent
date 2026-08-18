@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import threading
 from datetime import datetime
 from core.logger import logger
 from core.integrations import TelegramIntegration
@@ -113,9 +114,41 @@ def run_all_campaigns(conventions=None):
 
     logger.info("=== AI Agent Execution Finished ===")
 
+def execute_action(action, chat_id, tg, conventions):
+    """
+    Helper to execute an action and notify the user via Telegram.
+    Runs in a separate thread to avoid blocking the listener.
+    """
+    def wrapper():
+        try:
+            if action == "RUN_TRABAJO":
+                tg.send_message(chat_id, "🚀 Executing 'Trabajo' campaign...")
+                run_trabajo_// campaign()
+                tg.send_message(chat_id, "✅ 'Trabajo' campaign completed.")
+            elif action == "RUN_POSICIONAMIENTO":
+                tg.send_message(chat_id, "🚀 Executing 'Posicionamiento web' campaign...")
+                run_posicionamiento_campaign(conventions=conventions)
+                tg.send_message(chat_id, "✅ 'Posicionamiento web' campaign completed.")
+            elif action == "RUN_CONTABLE":
+                tg.send_message(chat_id, "🚀 Executing 'Ejercicio contable 2026' campaign...")
+                run_contable_campaign()
+                tg.send_message(chat_id, "✅ 'Ejercicio contable' campaign completed.")
+            elif action == "RUN_ALL":
+                tg.send_message(chat_id, "🚀 Executing ALL campaigns...")
+                run_all_campaigns(conventions=conventions)
+                tg.send_message(chat_id, "✅ All campaigns completed.")
+            else:
+                tg.send_message(chat_id, "❓ Sorry, I couldn't decode that instruction. Try 'Run all campaigns' or 'Run SEO audits'.")
+        except Exception as e:
+            logger.exception(f"Error executing action {action}: {e}")
+            tg.send_message(chat_id, f"❌ An error occurred during execution: {str(e)}")
+
+    threading.Thread(target=wrapper, daemon=True).start()
+
 def listen_telegram():
     """
     Polls Telegram for new messages, decodes them, and executes instructions.
+    Optimized for 24/7 operation.
     """
     token = os.environ.get("TELEGRAM_BOT_TOKEN")
     if not token:
@@ -126,40 +159,26 @@ def listen_telegram():
     conventions = load_conventions()
     offset = None
 
-    logger.info("Telegram listener started. Waiting for instructions...")
+    logger.info("Telegram listener started (24/7 Mode). Waiting for instructions...")
 
     while True:
-        updates = tg.get_updates(offset=offset)
-        if "result" in updates:
-            for update in updates["result"]:
-                offset = update["update_id"] + 1
-                if "message" in update and "text" in update["message"]:
-                    chat_id = update["message"]["chat"]["id"]
-                    text = update["message"]["text"]
+        try:
+            updates = tg.get_updates(offset=offset)
+            if "result" in updates:
+                for update in updates["result"]:
+                    offset = update["update_id"] + 1
+                    if "message" in update and "text" in update["message"]:
+                        chat_id = update["message"]["chat"]["id"]
+                        text = update["message"]["text"]
 
-                    logger.info(f"Received message from {chat_id}: {text}")
-                    action = decode_instruction(text, conventions)
+                        logger.info(f"Received message from {chat_id}: {text}")
+                        action = decode_instruction(text, conventions)
+                        execute_action(action, chat_id, tg, conventions)
 
-                    if action == "RUN_TRABAJO":
-                        tg.send_message(chat_id, "🚀 Executing 'Trabajo' campaign...")
-                        run_trabajo_campaign()
-                        tg.send_message(chat_id, "✅ 'Trabajo' campaign completed.")
-                    elif action == "RUN_POSICIONAMIENTO":
-                        tg.send_message(chat_id, "🚀 Executing 'Posicionamiento web' campaign...")
-                        run_posicionamiento_campaign(conventions=conventions)
-                        tg.send_message(chat_id, "✅ 'Posicionamiento web' campaign completed.")
-                    elif action == "RUN_CONTABLE":
-                        tg.send_message(chat_id, "🚀 Executing 'Ejercicio contable 2026' campaign...")
-                        run_contable_campaign()
-                        tg.send_message(chat_id, "✅ 'Ejercicio contable' campaign completed.")
-                    elif action == "RUN_ALL":
-                        tg.send_message(chat_id, "🚀 Executing ALL campaigns...")
-                        run_all_campaigns(conventions=conventions)
-                        tg.send_message(chat_id, "✅ All campaigns completed.")
-                    else:
-                        tg.send_message(chat_id, "❓ Sorry, I couldn't decode that instruction. Try 'Run all campaigns' or 'Run SEO audits'.")
-
-        time.sleep(10) # Poll every 10 seconds
+            time.sleep(10) # Poll every 10 seconds
+        except Exception as e:
+            logger.error(f"Unexpected error in Telegram listener loop: {e}")
+            time.sleep(30) # Backoff on error
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
@@ -169,7 +188,9 @@ if __name__ == "__main__":
         elif sys.argv[1] == "--listen":
             listen_telegram()
     else:
+        # Default behavior: check schedule and then enter listen mode
         if should_run_now():
             run_all_campaigns()
-        else:
-            logger.info("Currently not in a scheduled execution window. Skipping.")
+
+        # Always enter listen mode to support 24/7 operation
+        listen_telegram()
