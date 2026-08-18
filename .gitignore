@@ -21,10 +21,16 @@ data/
 # Project specific exclusions
 .claude/
 core/free-claude-code/
+*.pickle
 
 # Excluded projects and docs
 docs/
 estudiogsr-astro/
+deploy.php
+
+# Build artifacts
+**/dist/
+**/build/
 
 # Node modules
 node_modules/
