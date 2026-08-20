@@ -45,6 +45,16 @@ El agente posee la capacidad de leer y escribir en una vasta gama de fuentes de 
 - **Analítica**: Google Search Console, Google Analytics 4, YouTube.
 - **Comunicación**: Telegram, WhatsApp, Instagram, Facebook, X (Twitter), LinkedIn.
 
+### 🚀 5. Servicios Especializados de IA (Catálogo Expandido)
+El agente integra un ecosistema de campañas avanzadas para la generación de activos digitales y consultoría técnica:
+- **Chatbot WordPress**: Diseño y plan de implementación de asistentes inteligentes para sitios WP.
+- **Auditoría SEO Profunda**: Análisis técnico exhaustivo con priorización de impacto y sugerencias de corrección.
+- **Optimización de Páginas WordPress**: Auditoría de UX/UI y CRO (Conversion Rate Optimization) para landing pages.
+- **Creador de Anuncios con IA**: Generación de copys de alta conversión para Facebook, Instagram y Google Ads.
+- **Optimización de Catálogos E-commerce**: Estructuración de títulos y descripciones optimizadas para tiendas online.
+- **Roadmap de Automatizaciones con IA**: Identificación de flujos manuales y diseño de arquitecturas de automatización RPA/LLM.
+- **E-mail Marketing con IA**: Orquestación de secuencias de correos personalizados y persuasivos.
+
 ---
 
 ## 🌐 Ecosistema Integrado
@@ -236,6 +246,8 @@ Alcance:
 - Campaña Trabajo con fecha de inicio 14 de agosto 2026, título Trabajo, asunto Trabajo, mensaje: %fecha del envío del mensaje%. El trabajo del día es: Objetivo Diario: %objetivo diairo% Objetivo semanal: %objetivo semanal% Objetivo mensual: %objetivo mensual% Tareas en Proceso: %tarjetas de Trello en lista En Proceso%.
 - Campaña Posicionamiento web con fecha de inicio 14 de agosto 2026, titulo Posicionamiento web, asunto Posicionamiento web, mensaje Auditorías SEO: %auditoria SEO cliente 1% %auditoria SEO cliente 2% etc.
 - Campaña Ejercicio contable 2026 con fecha de inicio 14 de agosto 2026, título Ejercicio contable 2026, asunto Ejercicio contable 2026, mensaje Objetivo diario %objetivo diario% Objetivo semanal %objetivo semanal% Objetivo mensual %objetivo mensual% Facturación mensual %facturacion mensual% 
+- Campañas Especializadas de IA: Implementación de Chatbot WP, Auditoría SEO Profunda, Optimización de Páginas WP, Creador de Anuncios con IA, Catálogo de Tienda Online, Automatizaciones con IA y E-mail Marketing con IA.
+- Generación de Entregables Profesionales: Capacidad de adjuntar reportes detallados en formato HTML (con indicadores visuales de progreso) y archivos de datos en formato CSV.
 
 Incluir 
 - AGENTS.md 
