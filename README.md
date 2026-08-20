@@ -263,28 +263,4 @@ Incluir
 - data
 - logs
 
-## 🚀 Mantenimiento de oteguiobras.com
-
-Para asegurar la estabilidad del sitio y evitar la pérdida de datos, se han implementado procesos de despliegue y respaldo específicos.
-
-### 🛠️ Proceso de Actualización (`deploy.php`)
-A diferencia del instalador inicial, el script `deploy.php` está diseñado para actualizaciones seguras sin afectar la data del cliente.
-
-**¿Qué modifica en el hosting (`public_html`)?**
-- **Actualiza**: 
-  - El frontend compilado (todos los archivos dentro de `/dist` se copian al root).
-  - El backend de la API (carpeta `/api`).
-- **NO toca (Preserva)**:
-  - La carpeta `/images` (evita borrar las fotos reales de las obras subidas vía FTP).
-  - La carpeta `/cvs` y `/migration`.
-  - Archivos de configuración sensibles como `.env`.
-
-**¿Qué modifica en la base de datos?**
-- **Absolutamente nada**. `deploy.php` no ejecuta scripts SQL ni modifica tablas, asegurando que las configuraciones personalizadas (como Obras Destacadas) y los datos ingresados por el administrador permanezcan intactos.
-
-### 💾 Herramientas de Soporte
-- **`backup.php`**: Realiza una copia de seguridad completa de la base de datos (`.sql`) y de las carpetas críticas (`images`, `api`, `cvs`) en un archivo `.zip` con marca de tiempo.
-- **`Logger.php`**: Registra todas las actividades del sistema en `/logs/activity.log` para auditoría y resolución de errores.
-
-> **⚠️ ADVERTENCIA**: No utilizar `install.php` en sitios ya operativos, ya que este script sobreescribe la base de datos con valores por defecto y reemplaza la carpeta de imágenes del servidor con la versión limitada de GitHub.
 
