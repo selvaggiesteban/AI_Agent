@@ -1,6 +1,7 @@
 import sqlite3
-from pathlib import Path
-DB_PATH = Path(__file__).resolve().parents[2] / "data" / "inputs" / "contacts.db"
+from core.paths import INPUTS_DIR
+
+DB_PATH = INPUTS_DIR / "contacts.db"
 
 def audit_db():
     conn = sqlite3.connect(DB_PATH)

@@ -1,6 +1,6 @@
 import sys
-from pathlib import Path
-sys.path.append(str(Path(__file__).resolve().parent.parent))
+from core.paths import PROJECT_ROOT
+sys.path.append(str(PROJECT_ROOT / "scripts" / "social_media_manager"))
 
 import asyncio
 import os

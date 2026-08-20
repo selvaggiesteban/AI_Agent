@@ -1,7 +1,7 @@
 # AGENTS.md — Inventario de Agentes, Repositorios y MCP Servers
 
 > **Última actualización:** 2026-07-27
-> **Proyecto raíz:** `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development`
+> **Proyecto raíz:** `.`
 
 ---
 
@@ -9,25 +9,25 @@
 
 | Directorio local | Ruta completa | Archivos principales | Rol |
 |---|---|---|---|
-| `scripts/ad_studio/` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\scripts\ad_studio` | `generar_gsr.py`, `gsr_batch_v7.py`, `brand/loader.py`, `brand/prompt_builder.py` | Generador de creatividades publicitarias con IA (Pollinations) + brand manuals |
-| `scripts/campaign_manager/` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\scripts\campaign_manager` | `campaign_ui.py`, `drafts.py` | Dashboard de campañas y creación de borradores Gmail |
-| `scripts/database_manager/` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\scripts\database_manager` | `config.py`, `utils.py`, `audit_db.py`, `contacts_editor.py`, `enrich_*.py`, `import_*.py`, `cleanup_duplicate_emails.py`, `remove_duplicates.py` | Gestión de contacts.db: auditoría, enriquecimiento, importación, dedup |
-| `scripts/e-mail_marketing_manager/` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\scripts\e-mail_marketing_manager` | `e-mail.py`, `generate_5_csvs.py` | Motor SMTP, extracción Gmail CSVs |
-| &emsp;↳ `e-mail_marketing_campaigns/` | `...\scripts\e-mail_marketing_manager\e-mail_marketing_campaigns` | `campaign_engine.py`, `campaign_launcher.py`, `find_unknown_leads.py`, `gmail_report.py`, `imap_bot.py` | Campañas de email y reporting |
-| `scripts/financial_manager/` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\scripts\financial_manager` | `accountly/main.py` | Dashboard contable (ARCA/Santander/MP) |
-| `scripts/graphic_designer/` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\scripts\graphic_designer` | `web-screenshot/web_screenshots.py` | Screenshots web con Selenium |
-| `scripts/inbox_manager/` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\scripts\inbox_manager` | — | (Módulo vacío, pendiente de desarrollo) |
-| `scripts/seo_manager/` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\scripts\seo_manager` | `keywords.py`, `seo-content-generator/seo_content_generator.py` | SEO técnico, keywords y contenido |
-| `scripts/social_media_manager/` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\scripts\social_media_manager` | `facebook.py`, `instagram.py`, `linkedin.py`, `messenger.py`, `telegram.py`, `whatsapp.py` | RPA redes sociales (Playwright) |
-| &emsp;↳ `linkedin/` | `...\scripts\social_media_manager\linkedin` | `linkedin_tools.py`, `linkedin_full_scraper.py`, `linkedin_parser.py` | Herramientas LinkedIn vía MCP |
-| `scripts/web_designer/` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\scripts\web_designer` | `landing-page-generator/landing-page-generator.py` | Generador de landing pages |
-| &emsp;↳ `example/` | `...\scripts\web_designer\example` | Astro + TypeScript (i18n, D1, MercadoPago) | Sitio selvaggiesteban.dev |
-| `scripts/web_scraper/` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\scripts\web_scraper` | `ecommerce.py`, `kompass.py`, `linkedin_ocr_scraper.py`, `research.py` | Scraping e inteligencia de mercado |
-| &emsp;↳ `ecommercer-competitor-research/` | `...\scripts\web_scraper\ecommercer-competitor-research` | — | Análisis competitivo ecommerce |
-| &emsp;↳ `long-tail-keyword-crawler/` | `...\scripts\web_scraper\long-tail-keyword-crawler` | — | Crawler de keywords long-tail |
-| &emsp;↳ `paginasamarillas_web_scraper/` | `...\scripts\web_scraper\paginasamarillas_web_scraper` | — | Scraper Páginas Amarillas |
-| &emsp;↳ `smart-research-assistant/` | `...\scripts\web_scraper\smart-research-assistant` | — | Research con IA + reportes PDF |
-| &emsp;↳ `wordpress-seo-crawler/` | `...\scripts\web_scraper\wordpress-seo-crawler` | — | Crawler SEO WordPress |
+| `scripts/ad_studio/` | `scripts/ad_studio/` | `generar_gsr.py`, `gsr_batch_v7.py`, `brand/loader.py`, `brand/prompt_builder.py` | Generador de creatividades publicitarias con IA (Pollinations) + brand manuals |
+| `scripts/campaign_manager/` | `scripts/campaign_manager/` | `campaign_ui.py`, `drafts.py` | Dashboard de campañas y creación de borradores Gmail |
+| `scripts/database_manager/` | `scripts/database_manager/` | `config.py`, `utils.py`, `audit_db.py`, `contacts_editor.py`, `enrich_*.py`, `import_*.py`, `cleanup_duplicate_emails.py`, `remove_duplicates.py` | Gestión de contacts.db: auditoría, enriquecimiento, importación, dedup |
+| `scripts/e-mail_marketing_manager/` | `scripts/e-mail_marketing_manager/` | `e-mail.py`, `generate_5_csvs.py` | Motor SMTP, extracción Gmail CSVs |
+| &emsp;↳ `e-mail_marketing_campaigns/` | `scripts/e-mail_marketing_manager/e-mail_marketing_campaigns/` | `campaign_engine.py`, `campaign_launcher.py`, `find_unknown_leads.py`, `gmail_report.py`, `imap_bot.py` | Campañas de email y reporting |
+| `scripts/financial_manager/` | `scripts/financial_manager/` | `accountly/main.py` | Dashboard contable (ARCA/Santander/MP) |
+| `scripts/graphic_designer/` | `scripts/graphic_designer/` | `web-screenshot/web_screenshots.py` | Screenshots web con Selenium |
+| `scripts/inbox_manager/` | `scripts/inbox_manager/` | — | (Módulo vacío, pendiente de desarrollo) |
+| `scripts/seo_manager/` | `scripts/seo_manager/` | `keywords.py`, `seo-content-generator/seo_content_generator.py` | SEO técnico, keywords y contenido |
+| `scripts/social_media_manager/` | `scripts/social_media_manager/` | `facebook.py`, `instagram.py`, `linkedin.py`, `messenger.py`, `telegram.py`, `whatsapp.py` | RPA redes sociales (Playwright) |
+| &emsp;↳ `linkedin/` | `scripts/social_media_manager/linkedin/` | `linkedin_tools.py`, `linkedin_full_scraper.py`, `linkedin_parser.py` | Herramientas LinkedIn vía MCP |
+| `scripts/web_designer/` | `scripts/web_designer/` | `landing-page-generator/landing-page-generator.py` | Generador de landing pages |
+| &emsp;↳ `example/` | `scripts/web_designer/example/` | Astro + TypeScript (i18n, D1, MercadoPago) | Sitio selvaggiesteban.dev |
+| `scripts/web_scraper/` | `scripts/web_scraper/` | `ecommerce.py`, `kompass.py`, `linkedin_ocr_scraper.py`, `research.py` | Scraping e inteligencia de mercado |
+| &emsp;↳ `ecommercer-competitor-research/` | `scripts/web_scraper/ecommercer-competitor-research/` | — | Análisis competitivo ecommerce |
+| &emsp;↳ `long-tail-keyword-crawler/` | `scripts/web_scraper/long-tail-keyword-crawler/` | — | Crawler de keywords long-tail |
+| &emsp;↳ `paginasamarillas_web_scraper/` | `scripts/web_scraper/paginasamarillas_web_scraper/` | — | Scraper Páginas Amarillas |
+| &emsp;↳ `smart-research-assistant/` | `scripts/web_scraper/smart-research-assistant/` | — | Research con IA + reportes PDF |
+| &emsp;↳ `wordpress-seo-crawler/` | `scripts/web_scraper/wordpress-seo-crawler/` | — | Crawler SEO WordPress |
 
 **Archivo raíz:** `scripts/check_providers.py` — Verifica disponibilidad de proveedores LLM
 
@@ -37,7 +37,7 @@
 
 | Directorio local | Ruta completa | URL remota (GitHub) | Propósito | Propietario |
 |---|---|---|---|---|
-| `core/free-claude-code` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\core\free-claude-code` | https://github.com/Alishahryar1/free-claude-code | Proxy server para Claude Code CLI / Codex CLI | Alishahryar1 |
+| `core/free-claude-code` | `core/free-claude-code` | https://github.com/Alishahryar1/free-claude-code | Proxy server para Claude Code CLI / Codex CLI | Alishahryar1 |
 
 ---
 
@@ -45,8 +45,8 @@
 
 | Archivo local | Ruta completa | Rol |
 |---|---|---|
-| `skills/ads_strategist.md` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\skills\ads_strategist.md` | Estrategia publicitaria TOFU/MOFU/BOFU |
-| `skills/google-ads-audit.md` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\skills\google-ads-audit.md` | Auditoría de Google Ads |
+| `skills/ads_strategist.md` | `skills/ads_strategist.md` | Estrategia publicitaria TOFU/MOFU/BOFU |
+| `skills/google-ads-audit.md` | `skills/google-ads-audit.md` | Auditoría de Google Ads |
 
 ---
 
@@ -54,11 +54,11 @@
 
 | Archivo | Ruta completa | Función |
 |---|---|---|
-| `core/lead.py` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\core\lead.py` | Pipeline de prospección de leads |
-| `core/services.py` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\core\services.py` | Servicios a clientes (contratos, web, SEO, ads) |
-| `core/telemetry.py` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\core\telemetry.py` | Reportes consolidados de actividad |
-| `core/ai_engine.py` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\core\ai_engine.py` | Motor de IA (LLMRouter: Gemini/OpenAI/Anthropic) |
-| `core/__init__.py` | `C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\core\__init__.py` | Inicialización del paquete |
+| `core/lead.py` | `core/lead.py` | Pipeline de prospección de leads |
+| `core/services.py` | `core/services.py` | Servicios a clientes (contratos, web, SEO, ads) |
+| `core/telemetry.py` | `core/telemetry.py` | Reportes consolidados de actividad |
+| `core/ai_engine.py` | `core/ai_engine.py` | Motor de IA (LLMRouter: Gemini/OpenAI/Anthropic) |
+| `core/__init__.py` | `core/__init__.py` | Inicialización del paquete |
 
 ---
 

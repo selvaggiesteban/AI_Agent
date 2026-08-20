@@ -2,10 +2,14 @@ import sqlite3
 import requests
 import re
 import time
+from pathlib import Path
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 
-DB_PATH = r"C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\data\inputs\contacts.db"
+from core.paths import INPUTS_DIR
+
+# Rutas dinámicas
+DB_PATH = INPUTS_DIR / "contacts.db"
 
 EMAILS = [
     "administracion@bufeterodriguezmerino.com",

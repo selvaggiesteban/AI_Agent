@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import sys
-from pathlib import Path
+from core.paths import PROJECT_ROOT
 import os
 import asyncio
 import random
@@ -23,7 +23,7 @@ from datetime import datetime
 from playwright.async_api import async_playwright
 
 # Add root to sys.path
-sys.path.append(str(Path(__file__).resolve().parent.parent))
+sys.path.append(str(PROJECT_ROOT / "scripts" / "social_media_manager"))
 
 try:
     from core.rpa_bot import BaseBot

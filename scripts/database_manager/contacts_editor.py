@@ -4,9 +4,12 @@ import pandas as pd
 import re
 import sys
 import os
+from pathlib import Path
 from datetime import datetime
 
-sys.path.insert(0, r"C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\scripts\campaign_manager")
+# Configuración de rutas dinámicas
+from core.paths import PROJECT_ROOT, INPUTS_DIR
+sys.path.append(str(PROJECT_ROOT / "scripts" / "campaign_manager"))
 from drafts import load_gmail_accounts, create_full_campaign, group_by_sender, chunk_recipients
 from campaign_ui import (
     get_connection, get_dashboard_stats, get_campaigns_list,
@@ -17,7 +20,7 @@ from campaign_ui import (
 
 st.set_page_config(page_title="Contacts DB", layout="wide")
 
-DB_PATH = r"C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\data\inputs\contacts.db"
+DB_PATH = INPUTS_DIR / "contacts.db"
 
 CAMPAIGN_SEP = " || "
 

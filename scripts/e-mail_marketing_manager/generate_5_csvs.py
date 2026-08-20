@@ -27,14 +27,16 @@ if sys.platform == "win32":
     sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
 # ── Paths ──
-ROOT = Path(__file__).resolve().parent.parent.parent
-load_dotenv(ROOT / ".env")
+from core.paths import PROJECT_ROOT, INPUTS_DIR, OUTPUTS_DIR, LOGS_DIR
+load_dotenv(PROJECT_ROOT / ".env")
 
-OUTPUT_DIR = ROOT / "data" / "outputs" / "gmail_csv"
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+# Fixed GMAIL_CSV_OUTPUT to match core.paths logic if possible,
+# but the script uses a specific subfolder for gmail_csv
+GMAIL_CSV_OUTPUT = OUTPUTS_DIR / "gmail_csv"
+GMAIL_CSV_OUTPUT.mkdir(parents=True, exist_ok=True)
 
-DB_PATH = ROOT / "data" / "inputs" / "contacts.db"
-CAMPAIGN_DB = ROOT / "logs" / "campaigns" / "marketing_memory.db"
+DB_PATH = INPUTS_DIR / "contacts.db"
+CAMPAIGN_DB = LOGS_DIR / "campaigns" / "marketing_memory.db"
 
 # ── Credenciales desde accounts_config.py ──
 from accounts_config import ACCOUNTS as CONFIG_ACCOUNTS
@@ -194,7 +196,7 @@ def csv1_destinatarios():
         except Exception as e:
             print(f"    [-] Error en {email_addr}: {e}", flush=True)
 
-    output = OUTPUT_DIR / "csv1_destinatarios.csv"
+    output = GMAIL_CSV_OUTPUT / "csv1_destinatarios.csv"
     headers = ["Cuenta_Remitente", "Destinatario", "Asunto", "Fecha", "Snippet"]
     with open(output, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=headers)
@@ -261,7 +263,7 @@ def csv2_remitentes():
         except Exception as e:
             print(f"    [-] Error en {email_addr}: {e}", flush=True)
 
-    output = OUTPUT_DIR / "csv2_remitentes.csv"
+    output = GMAIL_CSV_OUTPUT / "csv2_remitentes.csv"
     headers = ["Cuenta_Destinataria", "Remitente_Email", "Remitente_Nombre", "Asunto", "Fecha"]
     with open(output, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=headers)
@@ -393,7 +395,7 @@ def csv3_pendientes_respuesta():
 
     final = list(seen_senders.values())
 
-    output = OUTPUT_DIR / "csv3_pendientes_respuesta.csv"
+    output = GMAIL_CSV_OUTPUT / "csv3_pendientes_respuesta.csv"
     headers = ["Cuenta_Destinataria", "Remitente", "Asunto", "Fecha", "Snippet", "Borrador_Respuesta_IA"]
     with open(output, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=headers)
@@ -548,7 +550,7 @@ def csv4_campanas():
             })
         except: pass
 
-    output = OUTPUT_DIR / "csv4_campanas_email_marketing.csv"
+    output = GMAIL_CSV_OUTPUT / "csv4_campanas_email_marketing.csv"
     headers = ["Fuente", "Campaña", "Asunto", "Cantidad_Destinatarios", "Lista_Contactos", "Mensaje_Preview", "Fecha"]
     with open(output, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=headers)
@@ -689,7 +691,7 @@ def csv5_delivery_status():
 
     final = list(seen.values())
 
-    output = OUTPUT_DIR / "csv5_delivery_status.csv"
+    output = GMAIL_CSV_OUTPUT / "csv5_delivery_status.csv"
     headers = ["Cuenta_Remitente", "Destinatario_Fallido", "Razón", "Detalle", "Código_SMTP", "Asunto_Original", "Fecha_Bounce", "Fragmento"]
     with open(output, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=headers)
@@ -712,7 +714,7 @@ def main():
     print("=" * 60, flush=True)
     print(" GENERADOR DE 5 CSVs DESDE GMAIL", flush=True)
     print(f" Cuentas: {len(ACCOUNTS)}", flush=True)
-    print(f" Output: {OUTPUT_DIR}", flush=True)
+    print(f" Output: {GMAIL_CSV_OUTPUT}", flush=True)
     print(f" IMAP Timeout: 30s | Batch: 50 | Reconnect: 500", flush=True)
     print("=" * 60, flush=True)
 
@@ -730,7 +732,7 @@ def main():
     elapsed = (datetime.now() - start).total_seconds()
     print("\n" + "=" * 60, flush=True)
     print(f" COMPLETADO en {elapsed:.1f}s", flush=True)
-    print(f" Archivos en: {OUTPUT_DIR}", flush=True)
+    print(f" Archivos en: {GMAIL_CSV_OUTPUT}", flush=True)
     print("=" * 60, flush=True)
 
 if __name__ == "__main__":

@@ -16,8 +16,8 @@ from urllib.parse import urljoin, urlparse
 from concurrent.futures import ThreadPoolExecutor
 
 # Add root to sys.path
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-from core.config import DB_PATH, ROOT_DIR, DATA_INPUTS_DIR, DATA_OUTPUTS_DIR
+from core.paths import PROJECT_ROOT, INPUTS_DIR, OUTPUTS_DIR
+sys.path.append(str(PROJECT_ROOT / "scripts" / "seo_manager"))
 
 # =============================================================================
 # 1. KEYWORD GENERATOR (CONCATENATION)

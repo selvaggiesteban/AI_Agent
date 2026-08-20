@@ -18,11 +18,11 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 # Cargar variables de entorno
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-load_dotenv(BASE_DIR / ".env")
+from core.paths import PROJECT_ROOT, INPUTS_DIR, LOGS_DIR
+load_dotenv(PROJECT_ROOT / ".env")
 
 # CONFIGURACIÓN DE RUTAS
-DB_PATH = BASE_DIR / "data" / "inputs" / "contacts.db"
+DB_PATH = INPUTS_DIR / "contacts.db"
 BACKUP_PATH = DB_PATH.with_name("contacts_old.db")
 
 # --- VARIABLES DE CAMPAÑA (Configurables) ---

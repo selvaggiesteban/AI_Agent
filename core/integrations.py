@@ -28,7 +28,9 @@ class GoogleIntegration:
             'https://www.googleapis.com/auth/spreadsheets.readonly',
             'https://www.googleapis.com/auth/spreadsheets',
             'https://www.googleapis.com/auth/gmail.modify',
-            'https://www.googleapis.com/auth/gmail.send'
+            'https://www.googleapis.com/auth/gmail.send',
+            'https://www.googleapis.com/auth/webmasters.readonly',
+            'https://www.googleapis.com/auth/analytics.readonly'
         ]
         self.creds = None
         self._authenticate()
@@ -66,6 +68,70 @@ class GoogleIntegration:
             logger.info(f"Google Sheet {spreadsheet_id} updated.")
         except Exception as e:
             logger.error(f"Error updating Google Sheet: {e}")
+
+    def get_gsc_metrics(self, site_url: str, start_date: str, end_date: str) -> Dict[str, Any]:
+        """
+        Fetches clicks, impressions, and CTR from Google Search Console.
+        Dates should be in 'YYYY-MM-DD' format.
+        """
+        try:
+            service = build('searchconsole', 'v1', credentials=self.creds)
+            request = {
+                'startDate': start_date,
+                'endDate': end_date,
+                'dimensions': ['query'],
+                'rowLimit': 10
+            }
+            result = service.searchanalytics().query(siteUrl=site_url, body=request).execute()
+
+            total_clicks = 0
+            total_impressions = 0
+
+            rows = result.get('rows', [])
+            for row in rows:
+                total_clicks += row['clicks']
+                total_impressions += row['impressions']
+
+            ctr = (total_clicks / total_impressions * 100) if total_impressions > 0 else 0
+
+            return {
+                "clicks": total_clicks,
+                "impressions": total_impressions,
+                "ctr": f"{ctr:.2f}%",
+                "top_queries": [row['keys'][0] for row in rows]
+            }
+        except Exception as e:
+            logger.error(f"Error fetching GSC metrics for {site_url}: {e}")
+            return {"error": str(e)}
+
+    def get_ga4_metrics(self, property_id: str, start_date: str, end_date: str) -> Dict[str, Any]:
+        """
+        Fetches active users and sessions from GA4.
+        Dates should be in 'YYYY-MM-DD' format.
+        """
+        try:
+            # GA4 uses the 'analyticsdata' API
+            service = build('analyticsdata', 'v1beta', credentials=self.creds)
+            request = {
+                'dateRanges': [{'startDate': start_date, 'endDate': end_date}],
+                'metrics': [{'name': 'activeUsers'}, {'name': 'sessions'}]
+            }
+            result = service.properties().runReport(propertyId=f"properties/{property_id}", body=request).execute()
+
+            # Extract metrics from the first row
+            rows = result.get('rows', [])
+            if not rows:
+                return {"activeUsers": 0, "sessions": 0}
+
+            metrics = rows[0]['metricValues']
+            return {
+                "activeUsers": int(metrics[0]['value']),
+                "sessions": int(metrics[1]['value'])
+            }
+        except Exception as e:
+            logger.error(f"Error fetching GA4 metrics for {property_id}: {e}")
+            return {"error": str(e)}
+
 
 class TrelloIntegration:
     """Wrapper for Trello API."""

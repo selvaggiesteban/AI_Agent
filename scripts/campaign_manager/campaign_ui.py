@@ -1,10 +1,12 @@
 import sqlite3
 import pandas as pd
 from datetime import datetime
+from pathlib import Path
 
+from core.paths import INPUTS_DIR
 
-DB_PATH = r"C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\data\inputs\contacts.db"
-
+# Rutas dinámicas
+DB_PATH = INPUTS_DIR / "contacts.db"
 
 def get_connection():
     return sqlite3.connect(DB_PATH, check_same_thread=False)

@@ -4,8 +4,8 @@ import email
 import re
 from config.settings import ACCOUNTS
 
-from pathlib import Path
-db_path = Path(__file__).resolve().parents[3] / "data" / "inputs" / "contacts.db"
+from core.paths import INPUTS_DIR
+db_path = INPUTS_DIR / "contacts.db"
 
 def get_unknown_leads():
     # 1. Obtener todos los emails registrados en la DB (Principal y Otros)

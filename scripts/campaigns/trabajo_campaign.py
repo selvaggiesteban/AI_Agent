@@ -4,12 +4,12 @@ from core.integrations import GoogleIntegration, TrelloIntegration, GmailIntegra
 from core.logger import logger
 from core.ai_engine import llm
 
-def run_trabajo_campaign():
+def run_trabajo_campaign(conventions=""):
     """
     Executes the 'Trabajo' campaign:
     1. Fetches goals from Google Sheets.
     2. Fetches Trello cards in 'En Proceso'.
-    3. Formats and sends the daily report.
+    3. Generates a personalized report using AI and sends it.
     """
     logger.info("Starting 'Trabajo' campaign...")
 
@@ -36,20 +36,38 @@ def run_trabajo_campaign():
         cards = trello.get_board_cards(config["trello_board_id"], "En Proceso")
         cards_text = "\n".join([f"- {c['name']}" for c in cards]) if cards else "No hay tareas en proceso."
 
-        # 3. Format Message
-        message = config["email_template"].format(
-            objetivo_diario=goals["objetivo_diario"],
-            objetivo_semanal=goals["objetivo_semanal"],
-            objetivo_mensual=goals["objetivo_mensual"],
-            trello_cards=cards_text
+        # 3. Generate Personalized Message with AI
+        system_prompt = (
+            f"You are the Professional Assistant for Esteban Selvaggi. "
+            f"Your goal is to generate a daily productivity report that is motivating, professional, and concise. "
+            f"Use a tone that reflects the following project conventions:\n\n{conventions}"
         )
 
-        # 4. Send via Gmail (as a draft for safety, or direct send)
-        # In this context, we use direct send as per typical agent automation
+        prompt = (
+            f"Generate a daily report based on the following data:\n"
+            f"Daily Goal: {goals['objetivo_diario']}\n"
+            f"Weekly Goal: {goals['objetivo_semanal']}\n"
+            f"Monthly Goal: {goals['objetivo_mensual']}\n"
+            f"Tasks in Process: {cards_text}\n\n"
+            f"Return a JSON object with a 'body_html' key containing the formatted report in HTML."
+        )
+
+        try:
+            ai_result = llm.generate_structured(
+                prompt=prompt,
+                system_instruction=system_prompt,
+                model="gemini"
+            )
+            message_html = ai_result.get("body_html", f"<p>{config['email_template'].format(objetivo_diario=goals['objetivo_diario'], objetivo_semanal=goals['objetivo_semanal'], objetivo_mensual=goals['objetivo_mensual'], trello_cards=cards_text)}</p>")
+        except Exception as e:
+            logger.error(f"AI report generation failed: {e}")
+            message_html = f"<p>{config['email_template'].format(objetivo_diario=goals['objetivo_diario'], objetivo_semanal=goals['objetivo_semanal'], objetivo_mensual=goals['objetivo_mensual'], trello_cards=cards_text)}</p>"
+
+        # 4. Send via Gmail
         success = gmail.send_email(
-            to_email=os.environ.get("GMAIL_USER"), # Sending to himself as a report
+            to_email=os.environ.get("GMAIL_USER"),
             subject=config["email_subject"],
-            body_html=f"<p>{message.replace('\\n', '<br>')}</p>"
+            body_html=message_html
         )
 
         if success:

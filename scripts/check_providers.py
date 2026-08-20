@@ -7,7 +7,8 @@ from pathlib import Path
 from dataclasses import dataclass
 
 # Load .env from project root
-env_path = Path(__file__).resolve().parent.parent / "core" / "free-claude-code" / ".env"
+from core.paths import PROJECT_ROOT
+env_path = PROJECT_ROOT / "core" / "free-claude-code" / ".env"
 if env_path.exists():
     from dotenv import dotenv_values
     for k, v in dotenv_values(env_path).items():
@@ -249,7 +250,7 @@ def main():
         print(f"    - {p.name}: {p.status} — {p.error}")
 
     # Save results to file
-    out_path = Path(__file__).resolve().parent.parent / "PROVIDER_STATUS.txt"
+    out_path = PROJECT_ROOT / "PROVIDER_STATUS.txt"
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(f"Provider Status — {time.strftime('%Y-%m-%d %H:%M')}\n")
         f.write("=" * 60 + "\n\n")

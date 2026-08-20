@@ -42,8 +42,8 @@ except ImportError:
     pass
 
 # Add root to sys.path
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-from core.config import DB_PATH, ROOT_DIR, DATA_OUTPUTS_DIR
+from core.paths import PROJECT_ROOT, OUTPUTS_DIR as DATA_OUTPUTS_DIR
+sys.path.append(str(PROJECT_ROOT / "scripts" / "web_scraper"))
 
 # =============================================================================
 # 1. SCRAPER & SEARCH

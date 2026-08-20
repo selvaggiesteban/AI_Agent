@@ -7,13 +7,15 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.utils import formatdate
 from datetime import datetime
+from pathlib import Path
 
+from core.paths import INPUTS_DIR, PROJECT_ROOT
 
-DB_PATH = r"C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\data\inputs\contacts.db"
-ENV_PATH = r"C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\.env"
+# Rutas dinámicas
+DB_PATH = INPUTS_DIR / "contacts.db"
+ENV_PATH = PROJECT_ROOT / ".env"
 IMAP_FOLDER = "[Gmail]/Borradores"
 BATCH_SIZE = 100
-
 
 def load_gmail_accounts():
     """Load Gmail accounts from .env (excluding Hostinger)."""

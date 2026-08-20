@@ -1,6 +1,8 @@
 import sqlite3
+import sys
+from core.paths import INPUTS_DIR
 
-conn = sqlite3.connect('C:\\Users\\Esteban Selvaggi\\Desktop\\subagent-driven_development\\data\\inputs\\contacts.db')
+conn = sqlite3.connect(str(INPUTS_DIR / "contacts.db"))
 c = conn.cursor()
 
 c.execute('SELECT DISTINCT date FROM campaign ORDER BY date DESC')

@@ -1,6 +1,10 @@
 """Quick test: count results per MCP tool call."""
 import asyncio, json, sys
-sys.path.insert(0, r'C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\scripts\social_media_manager\linkedin')
+from pathlib import Path
+
+# Normalización de rutas para portabilidad
+from core.paths import PROJECT_ROOT
+sys.path.append(str(PROJECT_ROOT / "scripts" / "social_media_manager" / "linkedin"))
 
 async def main():
     from linkedin_full_scraper import MCPClient

@@ -8,7 +8,7 @@ desde datos de Google Business Profile.
 
 import csv
 import re
-from pathlib import Path
+from core.paths import PROJECT_ROOT
 import json
 from unicodedata import normalize
 import shutil
@@ -869,7 +869,7 @@ def generar_whatsapp_notes(workflow_json_string, numero_telefono):
     return "\n\n".join(notas_generadas)
 
 def main():
-    base_path = Path(__file__).parent
+    base_path = PROJECT_ROOT / "scripts" / "web_designer" / "landing-page-generator"
     template_path = base_path / 'template.html'
     
     # 1. DEFINIR ESTRUCTURA DEL CSV DE CONTACTOS (Hardcoded)

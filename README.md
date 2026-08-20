@@ -30,8 +30,7 @@ Sincronización total entre la definición de objetivos y su ejecución:
 ### 🌐 2. Posicionamiento Digital y SEO ("Posicionamiento Web")
 Vigilancia y auditoría automatizada de un portafolio web profesional:
 - **Fuentes de Datos**: Integra **Google Search Console (GSC)** y **Google Analytics 4 (GA4)**.
-- **Auditorías Automatizadas**: Realiza auditorías técnicas de SEO para un portafolio de 14 dominios, incluyendo:
-  - `gsrabogados.com.ar`, `oteguiobras.com`, `zingueriazarza.com`, `decotay.com.ar`, `tay.com.ar`, `mottobasic.com`, `selvaggiesteban.dev`, `lanuscomputacion.com`, `selvaggiconsultores.com`, `ingenieriaproyectos.com.ar`, `identidadmarketing.com`, `mueblescavah.com.ar`, `muebles-cavah.com.ar`, `smartalk.cl`.
+- **Auditorías Automatizadas**: Realiza auditorías técnicas de SEO para un portafolio de dominios profesionales.
 - **Entrega**: Consolida todos los hallazgos en un informe de auditoría profesional enviado por correo electrónico.
 
 ### 💰 3. Supervisión Financiera ("Ejercicio Contable 2026")
@@ -235,23 +234,45 @@ Alcance:
 - Leer / Escribir e-mails de y para selvaggiesteban@gmail.com con plantillas predefindas lunes, miércoles y viernes a las 9 y 17 h. 
 - Leer / Escribir fuentes de datos: Google Search Console, Google Analytics 4, Trello, Gmail, YouTube, Telegram, WhatsApp, Instagram, Facebook, X, LinkedIn. 
 - Campaña Trabajo con fecha de inicio 14 de agosto 2026, título Trabajo, asunto Trabajo, mensaje: %fecha del envío del mensaje%. El trabajo del día es: Objetivo Diario: %objetivo diairo% Objetivo semanal: %objetivo semanal% Objetivo mensual: %objetivo mensual% Tareas en Proceso: %tarjetas de Trello en lista En Proceso%.
-- Campaña Posicionamiento web con fecha de inicio 14 de agosto 2026, titulo Posicionamiento web, asunto Posicionamiento web, mensaje Auditorías SEO: %auditoria SEO cliente 1% %auditoria SEO cliente 2% etc para gsrabogados.com.ar, oteguiobras.com, zingueriazarza.com, decotay.com.ar, tay.com.ar, mottobasic.com, selvaggiesteban.dev, lanuscomputacion.com, selvaggiconsultores.com, ingenieriaproyectos.com.ar, identidadmarketing.com, mueblescavah.com.ar, muebles-cavah.com.ar, smartalk.cl
+- Campaña Posicionamiento web con fecha de inicio 14 de agosto 2026, titulo Posicionamiento web, asunto Posicionamiento web, mensaje Auditorías SEO: %auditoria SEO cliente 1% %auditoria SEO cliente 2% etc.
 - Campaña Ejercicio contable 2026 con fecha de inicio 14 de agosto 2026, título Ejercicio contable 2026, asunto Ejercicio contable 2026, mensaje Objetivo diario %objetivo diario% Objetivo semanal %objetivo semanal% Objetivo mensual %objetivo mensual% Facturación mensual %facturacion mensual% 
 
 Incluir 
-- C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\AGENTS.md 
-- C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\ENRICH_RULES.md
-- C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\ESTEBAN.md
-- .env-example para C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\.env
-- C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\skills
-- C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\scripts
-- C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\core
-- C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\.claude
-- C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\.github
-- C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\.opencode
-- C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\data
-- C:\Users\Esteban Selvaggi\Desktop\subagent-driven_development\logs
+- AGENTS.md 
+- ENRICH_RULES.md
+- ESTEBAN.md
+- .env-example para .env
+- skills
+- scripts
+- core
+- .claude
+- .github
+- .opencode
+- data
+- logs
 
----
+## 🚀 Mantenimiento de oteguiobras.com
 
-© 2026 Esteban Selvaggi - Excelencia en Ingeniería
+Para asegurar la estabilidad del sitio y evitar la pérdida de datos, se han implementado procesos de despliegue y respaldo específicos.
+
+### 🛠️ Proceso de Actualización (`deploy.php`)
+A diferencia del instalador inicial, el script `deploy.php` está diseñado para actualizaciones seguras sin afectar la data del cliente.
+
+**¿Qué modifica en el hosting (`public_html`)?**
+- **Actualiza**: 
+  - El frontend compilado (todos los archivos dentro de `/dist` se copian al root).
+  - El backend de la API (carpeta `/api`).
+- **NO toca (Preserva)**:
+  - La carpeta `/images` (evita borrar las fotos reales de las obras subidas vía FTP).
+  - La carpeta `/cvs` y `/migration`.
+  - Archivos de configuración sensibles como `.env`.
+
+**¿Qué modifica en la base de datos?**
+- **Absolutamente nada**. `deploy.php` no ejecuta scripts SQL ni modifica tablas, asegurando que las configuraciones personalizadas (como Obras Destacadas) y los datos ingresados por el administrador permanezcan intactos.
+
+### 💾 Herramientas de Soporte
+- **`backup.php`**: Realiza una copia de seguridad completa de la base de datos (`.sql`) y de las carpetas críticas (`images`, `api`, `cvs`) en un archivo `.zip` con marca de tiempo.
+- **`Logger.php`**: Registra todas las actividades del sistema en `/logs/activity.log` para auditoría y resolución de errores.
+
+> **⚠️ ADVERTENCIA**: No utilizar `install.php` en sitios ya operativos, ya que este script sobreescribe la base de datos con valores por defecto y reemplaza la carpeta de imágenes del servidor con la versión limitada de GitHub.
+
