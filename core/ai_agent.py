@@ -2,32 +2,143 @@ import os
 import sys
 import time
 import threading
+import json
 from datetime import datetime
+from typing import List, Dict, Any, Optional
+
 from core.logger import logger
 from core.integrations import TelegramIntegration
-from scripts.campaigns.trabajo_campaign import run_trabajo_campaign
-from scripts.campaigns.posicionamiento_campaign import run_posicionamiento_campaign
-from scripts.campaigns.contable_campaign import run_contable_campaign
-from scripts.campaigns.chatbot_wordpress_campaign import run_chatbot_wp_campaign
-from scripts.campaigns.deep_seo_audit_campaign import run_deep_seo_audit_campaign
-from scripts.campaigns.wp_pages_campaign import run_wp_pages_campaign
-from scripts.campaigns.ai_ads_campaign import run_ai_ads_campaign
-from scripts.campaigns.online_store_catalog_campaign import run_store_catalog_campaign
-from scripts.campaigns.ai_automation_campaign import run_ai_automation_campaign
-from scripts.campaigns.ai_email_marketing_campaign import run_ai_email_marketing_campaign
 from core.ai_engine import llm
+from core.state import state_store
+from core.tools import registry
+import core.capabilities # This triggers registration of all tools
+
+# Legacy campaign imports for backward compatibility
+try:
+    from scripts.campaigns.trabajo_campaign import run_trabajo_campaign
+    from scripts.campaigns.posicionamiento_campaign import run_posicionamiento_campaign
+    from scripts.campaigns.contable_campaign import run_contable_campaign
+except ImportError:
+    logger.warning("Legacy campaigns could not be imported.")
+
+class AgentOrchestrator:
+    """
+    The SOTA Reasoning Core of the AI Agent.
+    Handles perception, planning, action, and evaluation.
+    """
+    def __init__(self):
+        self.tools = registry
+        self.state = state_store
+
+    def perceive(self) -> Dict[str, Any]:
+        """Collects current state and environmental context."""
+        return {
+            "current_metrics": self.state.get_metrics(),
+            "available_tools": self.tools.list_tools(),
+            "timestamp": datetime.now().isoformat()
+        }
+
+    def plan(self, goal: str, context: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """
+        Uses the LLM to generate a sequence of tool calls to achieve the goal.
+        """
+        system_prompt = (
+            "You are the Master Orchestrator for Esteban Selvaggi's AI Agent. "
+            "Your goal is to decompose a high-level request into a sequence of tool calls. "
+            "You have access to the following tools:\n"
+            f"{json.dumps(context['available_tools'], indent=2)}\n\n"
+            "Current system state:\n"
+            f"{json.dumps(context['current_metrics'], indent=2)}\n\n"
+            "Return a JSON array of tool calls. Each call must be: "
+            "{\"tool\": \"ToolName\", \"args\": {\\\"arg_name\\\": \\\"value\\\"}}"
+        )
+
+        prompt = f"Goal: {goal}\n\nGenerate the sequence of tool calls to achieve this goal."
+
+        try:
+            result = llm.generate_structured(
+                prompt=prompt,
+                system_instruction=system_prompt,
+                model="gemini"
+            )
+            # The LLM might return a dict with a list, or just a list.
+            if isinstance(result, dict) and "plan" in result:
+                return result["plan"]
+            if isinstance(result, list):
+                return result
+            return []
+        except Exception as e:
+            logger.error(f"Planning failed: {e}")
+            return []
+
+    def act(self, plan: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Executes the sequence of tools and collects results."""
+        results = []
+        for step in plan:
+            tool_name = step.get("tool")
+            args = step.get("args", {})
+
+            logger.info(f"Executing tool: {tool_name} with args {args}")
+            tool = self.tools.get_tool(tool_name)
+
+            if tool:
+                try:
+                    res = tool.execute(**args)
+                    results.append({"tool": tool_name, "status": "success", "result": res})
+                except Exception as e:
+                    logger.error(f"Tool {tool_name} failed: {e}")
+                    results.append({"tool": tool_name, "status": "error", "error": str(e)})
+            else:
+                logger.error(f"Tool {tool_name} not found in registry.")
+                results.append({"tool": tool_name, "status": "not_found"})
+
+        return results
+
+    def evaluate(self, goal: str, results: List[Dict[str, Any]]) -> str:
+        """
+        Synthesizes the results into a final report and updates the state store.
+        """
+        system_prompt = "You are a Business Analyst. Synthesize the tool results into a professional report for Esteban Selvaggi."
+        prompt = f"Goal: {goal}\n\nTool Results:\n{json.dumps(results, indent=2)}\n\nSynthesize a final report."
+
+        try:
+            report = llm.generate_structured(
+                prompt=prompt,
+                system_instruction=system_prompt,
+                model="gemini"
+            )
+            final_text = report.get("report", str(report))
+
+            # Update state store with a summary of this execution
+            self.state.set(f"last_run_{datetime.now().strftime('%Y%m%d')}", {
+                "goal": goal,
+                "status": "completed",
+                "summary": final_text[:200] + "..."
+            })
+            self.state.save()
+
+            return final_text
+        except Exception as e:
+            logger.error(f"Evaluation failed: {e}")
+            return "Error synthesizing final report."
+
+    def run(self, goal: str) -> str:
+        """The main agentic loop: Perceive -> Plan -> Act -> Evaluate."""
+        logger.info(f"Starting goal-oriented execution: {goal}")
+
+        context = self.perceive()
+        plan = self.plan(goal, context)
+
+        if not plan:
+            return "I couldn't determine a plan to achieve this goal."
+
+        results = self.act(plan)
+        return self.evaluate(goal, results)
 
 def load_conventions():
-    """
-    Loads conventions and rules from project documentation files.
-    """
+    """Loads conventions and rules from project documentation files."""
     conventions = []
-    files = [
-        "AGENTS.md",
-        "ENRICH_RULES.md",
-        "ESTEBAN.md"
-    ]
-
+    files = ["AGENTS.md", "ENRICH_RULES.md", "ESTEBAN.md"]
     for file_name in files:
         path = os.path.join(os.getcwd(), file_name)
         if os.path.exists(path):
@@ -37,171 +148,49 @@ def load_conventions():
                     conventions.append(f"--- {file_name} ---\\n{content}")
             except Exception as e:
                 logger.error(f"Could not read convention file {file_name}: {e}")
-
     return "\\n\\n".join(conventions)
 
 def decode_instruction(text, conventions):
-    """
-    Uses the AI engine to decode a natural language instruction from Telegram
-    into a specific agent action.
-    """
-    logger.info(f"Decoding instruction: {text}")
-
+    """Maps natural language to a goal for the Orchestrator."""
     system_prompt = (
-        "You are the Instruction Decoder for Esteban Selvaggi's AI Agent. "
-        "Your goal is to map a natural language instruction to one of the following actions: "
-        "1. RUN_TRABAJO: Run the 'Trabajo' campaign report. "
-        "2. RUN_POSICIONAMIENTO: Run the 'Posicionamiento web' SEO audits. "
-        "3. RUN_CONTABLE: Run the 'Ejercicio contable 2026' report. "
-        "4. RUN_CHATBOT_WP: Run the 'Chatbot WordPress' implementation plan. "
-        "5. RUN_DEEP_SEO: Run the 'Deep Auditoría SEO' technical report. "
-        "6. RUN_WP_PAGES: Run the 'Páginas de WordPress' optimization report. "
-        "7. RUN_AI_ADS: Run the 'Creador de anuncios con IA' generator. "
-        "8. RUN_STORE_CATALOG: Run the 'Catálogo de Tienda Online' optimizer. "
-        "9. RUN_AI_AUTOMATION: Run the 'Automatizaciones con IA' roadmap. "
-        "10. RUN_EMAIL_MARKETING: Run the 'E-mail marketing con IA' sequence. "
-        "11. RUN_ALL: Run all campaigns. "
-        "12. UNKNOWN: The instruction is unclear. "
-        f"\\n\\nProject Conventions:\\n{conventions}"
+        "You are the Instruction Decoder. Map the request to a clear goal for the Orchestrator. "
+        "If the request is a known campaign, translate it into a high-level goal. "
+        f"Project Conventions:\\n{conventions}"
     )
-
-    prompt = f"Instruction: {text}\\n\\nReturn a JSON object with the key 'action' and the value as one of the listed action keys."
-
+    prompt = f"Instruction: {text}\\n\\nReturn a JSON object with the key 'goal'."
     try:
-        result = llm.generate_structured(
-            prompt=prompt,
-            system_instruction=system_prompt,
-            model="gemini"
-        )
-        return result.get("action", "UNKNOWN")
+        result = llm.generate_structured(prompt=prompt, system_instruction=system_prompt, model="gemini")
+        return result.get("goal", "Run general system check")
     except Exception as e:
         logger.error(f"Error decoding instruction: {e}")
-        return "UNKNOWN"
+        return "Run general system check"
 
-def should_run_now():
-    """
-    Checks if the agent should run based on the requirements:
-    - Days: Monday, Wednesday, Friday.
-    - Times: 09:00 and 17:00.
-    """
-    now = datetime.now()
-    weekday = now.strftime("%a") # Mon, Tue, ...
-    hour = now.hour
-    minute = now.minute
-
-    allowed_days = ["Mon", "Wed", "Fri"]
-    allowed_hours = [9, 17]
-
-    if weekday in allowed_days and hour in allowed_hours and 0 <= minute < 10:
-        return True
-
-    return False
-
-def run_all_campaigns(conventions=None):
-    """
-    Orchestrates the execution of all defined campaigns.
-    """
-    logger.info("=== AI Agent Execution Started ===")
-
-    if conventions is None:
-        conventions = load_conventions()
-
-    logger.info("Project conventions applied.")
-
-    # 1. Trabajo Campaign
-    try:
-        run_trabajo_campaign(conventions=conventions)
-    except Exception as e:
-        logger.error(f"Trabajo campaign failed: {e}")
-
-    # 2. Posicionamiento Campaign
-    try:
-        run_posicionamiento_campaign(conventions=conventions)
-    except Exception as e:
-        logger.error(f"Posicionamiento campaign failed: {e}")
-
-    # 3. Contable Campaign
-    try:
-        run_contable_campaign(conventions=conventions)
-    except Exception as e:
-        logger.error(f"Contable campaign failed: {e}")
-
-    logger.info("=== AI Agent Execution Finished ===")
-
-def execute_action(action, chat_id, tg, conventions):
-    """
-    Helper to execute an action and notify the user via Telegram.
-    Runs in a separate thread to avoid blocking the listener.
-    """
+def execute_action(action_goal, chat_id, tg, conventions):
+    """Helper to execute a goal and notify via Telegram."""
     def wrapper():
         try:
-            if action == "RUN_TRABAJO":
-                tg.send_message(chat_id, "🚀 Executing 'Trabajo' campaign...")
-                run_trabajo_campaign(conventions=conventions)
-                tg.send_message(chat_id, "✅ 'Trabajo' campaign completed.")
-            elif action == "RUN_POSICIONAMIENTO":
-                tg.send_message(chat_id, "🚀 Executing 'Posicionamiento web' campaign...")
-                run_posicionamiento_campaign(conventions=conventions)
-                tg.send_message(chat_id, "✅ 'Posicionamiento web' campaign completed.")
-            elif action == "RUN_CONTABLE":
-                tg.send_message(chat_id, "🚀 Executing 'Ejercicio contable 2026' campaign...")
-                run_contable_campaign(conventions=conventions)
-                tg.send_message(chat_id, "✅ 'Ejercicio contable' campaign completed.")
-            elif action == "RUN_CHATBOT_WP":
-                tg.send_message(chat_id, "🚀 Executing 'Chatbot WordPress' campaign...")
-                run_chatbot_wp_campaign(conventions=conventions)
-                tg.send_message(chat_id, "✅ 'Chatbot WordPress' campaign completed.")
-            elif action == "RUN_DEEP_SEO":
-                tg.send_message(chat_id, "🚀 Executing 'Deep Auditoría SEO' campaign...")
-                run_deep_seo_audit_campaign(conventions=conventions)
-                tg.send_message(chat_id, "✅ 'Deep Auditoría SEO' campaign completed.")
-            elif action == "RUN_WP_PAGES":
-                tg.send_message(chat_id, "🚀 Executing 'Páginas de WordPress' campaign...")
-                run_wp_pages_campaign(conventions=conventions)
-                tg.send_message(chat_id, "✅ 'Páginas de WordPress' campaign completed.")
-            elif action == "RUN_AI_ADS":
-                tg.send_message(chat_id, "🚀 Executing 'Creador de anuncios con IA' campaign...")
-                run_ai_ads_campaign(conventions=conventions)
-                tg.send_message(chat_id, "✅ 'Creador de anuncios con IA' campaign completed.")
-            elif action == "RUN_STORE_CATALOG":
-                tg.send_message(chat_id, "🚀 Executing 'Catálogo de Tienda Online' campaign...")
-                run_store_catalog_campaign(conventions=conventions)
-                tg.send_message(chat_id, "✅ 'Catálogo de Tienda Online' campaign completed.")
-            elif action == "RUN_AI_AUTOMATION":
-                tg.send_message(chat_id, "🚀 Executing 'Automatizaciones con IA' campaign...")
-                run_ai_automation_campaign(conventions=conventions)
-                tg.send_message(chat_id, "✅ 'Automatizaciones con IA' campaign completed.")
-            elif action == "RUN_EMAIL_MARKETING":
-                tg.send_message(chat_id, "🚀 Executing 'E-mail marketing con IA' campaign...")
-                run_ai_email_marketing_campaign(conventions=conventions)
-                tg.send_message(chat_id, "✅ 'E-mail marketing con IA' campaign completed.")
-            elif action == "RUN_ALL":
-                tg.send_message(chat_id, "🚀 Executing ALL campaigns...")
-                run_all_campaigns(conventions=conventions)
-                tg.send_message(chat_id, "✅ All campaigns completed.")
-            else:
-                tg.send_message(chat_id, "❓ Sorry, I couldn't decode that instruction. Try 'Run all campaigns' or 'Run SEO audits'.")
+            orchestrator = AgentOrchestrator()
+            tg.send_message(chat_id, f"🚀 Planning goal: {action_goal}...")
+            report = orchestrator.run(action_goal)
+            tg.send_message(chat_id, f"✅ Goal completed.\n\n{report}")
         except Exception as e:
-            logger.exception(f"Error executing action {action}: {e}")
-            tg.send_message(chat_id, f"❌ An error occurred during execution: {str(e)}")
+            logger.exception(f"Error executing goal {action_goal}: {e}")
+            tg.send_message(chat_id, f"❌ An error occurred: {str(e)}")
 
     threading.Thread(target=wrapper, daemon=True).start()
 
 def listen_telegram():
-    """
-    Polls Telegram for new messages, decodes them, and executes instructions.
-    Optimized for 24/7 operation.
-    """
+    """Polls Telegram for new messages and triggers the Orchestrator."""
     token = os.environ.get("TELEGRAM_BOT_TOKEN")
     if not token:
-        logger.error("TELEGRAM_BOT_TOKEN not set in environment.")
+        logger.error("TELEGRAM_BOT_TOKEN not set.")
         return
 
     tg = TelegramIntegration(token)
     conventions = load_conventions()
     offset = None
 
-    logger.info("Telegram listener started (24/7 Mode). Waiting for instructions...")
+    logger.info("Telegram listener started. Waiting for instructions...")
 
     while True:
         try:
@@ -212,27 +201,20 @@ def listen_telegram():
                     if "message" in update and "text" in update["message"]:
                         chat_id = update["message"]["chat"]["id"]
                         text = update["message"]["text"]
-
                         logger.info(f"Received message from {chat_id}: {text}")
-                        action = decode_instruction(text, conventions)
-                        execute_action(action, chat_id, tg, conventions)
-
-            time.sleep(10) # Poll every 10 seconds
+                        goal = decode_instruction(text, conventions)
+                        execute_action(goal, chat_id, tg, conventions)
+            time.sleep(10)
         except Exception as e:
-            logger.error(f"Unexpected error in Telegram listener loop: {e}")
-            time.sleep(30) # Backoff on error
+            logger.error(f"Unexpected error in Telegram listener: {e}")
+            time.sleep(30)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         if sys.argv[1] == "--now":
-            logger.info("Manual trigger detected. Running campaigns immediately...")
-            run_all_campaigns()
+            # Legacy support for --now: run a general health check goal
+            AgentOrchestrator().run("Perform a general health check of all system metrics.")
         elif sys.argv[1] == "--listen":
             listen_telegram()
     else:
-        # Default behavior: check schedule and then enter listen mode
-        if should_run_now():
-            run_all_campaigns()
-
-        # Always enter listen mode to support 24/7 operation
         listen_telegram()

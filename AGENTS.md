@@ -1,6 +1,6 @@
 # AGENTS.md — Inventario de Agentes, Repositorios y MCP Servers
 
-> **Última actualización:** 2026-07-27
+> **Última actualización:** 2026-09-04
 > **Proyecto raíz:** `.`
 
 ---
@@ -47,6 +47,7 @@
 |---|---|---|
 | `skills/ads_strategist.md` | `skills/ads_strategist.md` | Estrategia publicitaria TOFU/MOFU/BOFU |
 | `skills/google-ads-audit.md` | `skills/google-ads-audit.md` | Auditoría de Google Ads |
+| `skills/diseño-web-ia.md` | `skills/diseño-web-ia.md` | Forward Deployed Engineer para diseño web con IA |
 
 ---
 
@@ -232,7 +233,7 @@ pip install paddleocr paddlepaddle             # pendiente
 |---|---|
 | Scripts utilitarios | 11 dirs (+ 1 .py raíz) |
 | Repos auxiliares core/ | 1 (`free-claude-code`) |
-| Skills | 2 |
+| Skills | 3 |
 | Módulos core/*.py | 5 (`lead`, `services`, `telemetry`, `ai_engine`, `__init__`) |
 | MCP servers ✅ conectados | 14 |
 | MCP servers ⏳ con keys | 18 |
@@ -317,4 +318,4 @@ pip install paddleocr paddlepaddle             # pendiente
 
 ---
 
-**Versión:** 2026.07.27 | **Engineering Excellence**
+**Versión:** 2026.09.04 | **Engineering Excellence**

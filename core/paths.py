@@ -15,7 +15,7 @@ CORE_DIR = PROJECT_ROOT / "core"
 SKILLS_DIR = PROJECT_ROOT / "skills"
 
 # Path to financial data CSV
-FINANCIAL_DATA_PATH = Path(os.environ.get("FINANCIAL_DATA_PATH", r"C:\Users\Esteban Selvaggi\Desktop\Esteban\sesiones_consultoria_informatica.csv"))
+FINANCIAL_DATA_PATH = Path(os.environ.get("FINANCIAL_DATA_PATH", DATA_DIR / "financials.csv"))
 
 
 def get_path(*args):
