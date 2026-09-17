@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Generador por lotes de activos visuales basado en manuales de marca.
-Soporta múltiples marcas y rutas relativas para portabilidad.
+Batch generator of visual assets based on brand manuals.
+Supports multiple brands and relative paths for portability.
 """
 import sys
 import math
@@ -10,12 +10,12 @@ import json
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 
-# Importaciones del ecosistema ad_studio
+# Ad Studio ecosystem imports
 from config import OUTPUT_DIR, FONTS_DIR, ASSETS_DIR, BRAND_MANUALS_DIR
 from brand.loader import cargar_brand_manual
 from generators.image_generator import generar_con_pollinations
 
-# === CONFIGURACIÓN DE COLORES POR DEFECTO (Fallback) ===
+# === DEFAULT COLOR CONFIGURATION (Fallback) ===
 C_OSCURO = (29, 20, 18)
 C_CLARO = (246, 230, 212)
 C_DORADO = (197, 165, 90)
@@ -27,23 +27,23 @@ ACENTOS = {
 }
 
 def lh(sz):
-    """Calcula el line-height estándar (1.3x)."""
+    """Calculates the standard line-height (1.3x)."""
     return int(sz * 1.3)
 
 def get_font(sz):
-    """Carga fuente desde el directorio estandarizado de fuentes."""
-    # Intenta cargar Trust3A, si no, usa una fuente del sistema
+    """Load font from the standardized fonts directory."""
+    # Try to load Trust3A, otherwise use a system font
     try:
         return ImageFont.truetype(str(FONTS_DIR / "Trust3A.ttf"), sz)
     except:
         return ImageFont.load_default()
 
 def load_logo(brand_id, name, w):
-    """Carga logo desde la carpeta de assets del cliente."""
-    # Buscamos en assets/nombre_logo o assets/brand_id/nombre_logo
+    """Load logo from the client's assets folder."""
+    # Search in assets/logo_name or assets/brand_id/logo_name
     path = ASSETS_DIR / f"{brand_id}_{name}" if name == "logo_blanco.png" else ASSETS_DIR / name
     if not path.exists():
-        # Intentar en subcarpeta del cliente
+        # Try in client's subfolder
         path = ASSETS_DIR / brand_id / name
 
     if not path.exists():
@@ -111,7 +111,7 @@ def gen_bg(prompt, w, h):
         img = img.convert("RGB").resize((w, h), Image.LANCZOS)
         return ImageEnhance.Brightness(img).enhance(0.6)
     except Exception as e:
-        print(f"  IA fallo: {e}")
+        print(f"  AI failed: {e}")
         return Image.new("RGB", (w, h), C_OSCURO)
 
 def add_border(draw, W, H, m=30):
@@ -126,7 +126,7 @@ def add_logo_top(draw, img, brand_id, W, y=60, name="logo_blanco.png", max_w=400
 
 def add_footer(draw, W, H, brand_manual, font_size=11):
     f = ImageFont.truetype("arial.ttf", font_size)
-    # Usamos los datos del manual de marca
+    # Use data from brand manual
     website = brand_manual.get("website", "no-website.com")
     email = brand_manual.get("contacto", {}).get("email", "info@email.com")
     txt = f"{website}  |  {email}"
@@ -139,7 +139,7 @@ def add_footer(draw, W, H, brand_manual, font_size=11):
 def sep(draw, y, W, w=80):
     draw.line([(W // 2 - w // 2, y), (W // 2 + w // 2, y)], fill=C_DORADO, width=1)
 
-# PROMPTS GENÉRICOS (Normalizados)
+# GENERIC PROMPTS (Normalized)
 PROMPTS = {
     "square": "Dark elegant abstract background, deep brown and black tones, soft golden light rays, subtle fabric texture, moody atmospheric lighting, no text no logos no people, dark luxury aesthetic, cinematic, 4k",
     "vertical": "Vertical dark luxury background, deep brown tones, golden light rays from top, abstract legal atmosphere, no text no logos no people, cinematic, 4k",
@@ -150,7 +150,7 @@ PROMPTS = {
 
 def gen_1_instagram_post(m, brand_id):
     W, H = 1080, 1080
-    # Simplificamos la escala de tipos para el ejemplo
+    # Simplify type scale for example
     ft = get_font(68)
     fs = get_font(40)
     print("  [1/15] Instagram Post...")
@@ -160,7 +160,7 @@ def gen_1_instagram_post(m, brand_id):
     y = add_logo_top(draw, img, brand_id, W, y=80)
     sep(draw, y + 10, W, 100)
     y += 30
-    t = m["textos"].get("post_instagram", {"titulo": "Título", "subtitulo": "Subtítulo", "cuerpo": "Cuerpo"})
+    t = m["textos"].get("post_instagram", {"titulo": "Title", "subtitulo": "Subtitle", "cuerpo": "Body"})
     y = text_accent(draw, t["titulo"], y, ft, C_CLARO, W)
     sep(draw, y + 5, W, 60)
     y += 20
@@ -170,12 +170,9 @@ def gen_1_instagram_post(m, brand_id):
     add_footer(draw, W, H, m)
     return img
 
-# ... (Las demás funciones gen_X seguirían un patrón similar de normalización)
-# Para brevedad y eficiencia, implementaremos la estructura general y el loop principal
-
 def main():
-    parser = argparse.ArgumentParser(description="Batch Generator de Ad Studio.")
-    parser.add_argument("brand_id", nargs="?", default="gsr_abogados", help="ID de la marca")
+    parser = argparse.ArgumentParser(description="Ad Studio Batch Generator.")
+    parser.add_argument("brand_id", nargs="?", default="gsr_abogados", help="Brand ID")
     args = parser.parse_args()
 
     try:
@@ -187,16 +184,16 @@ def main():
     output_dir = OUTPUT_DIR / args.brand_id
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"Generando batch para {marca['nombre']}...")
+    print(f"Generating batch for {marca['nombre']}...")
 
-    # Aquí se llamarían a los gen_X normalizados
-    # Por ahora, implementamos la estructura de salida y el flujo
+    # Here the normalized gen_X would be called
+    # For now, implement output structure and flow
 
-    # Simulación de generación para validar la normalización de rutas
-    print(f"  Salida configurada en: {output_dir}")
-    print(f"  Manual cargado desde: {BRAND_MANUALS_DIR / args.brand_id}.json")
+    # Simulation of generation to validate normalized structure and relative paths
+    print(f"  Output configured at: {output_dir}")
+    print(f"  Manual loaded from: {BRAND_MANUALS_DIR / args.brand_id}.json")
     print(f"\n{'='*60}")
-    print(f"  Estructura Normalizada y Rutas Relativas Validadas")
+    print(f"  Normalized Structure and Relative Paths Validated")
     print(f"{'='*60}")
 
 if __name__ == "__main__":

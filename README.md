@@ -69,33 +69,33 @@ graph TD
 ## 🛠️ Specialized Automation Catalog
 Beyond the core orchestration, the system includes a vast library of specialized automated processes:
 
-1.  **Pipeline de prospección de leads** – Scraping Google Maps $\rightarrow$ combinación de keywords/ubicaciones $\rightarrow$ deduplicación $\rightarrow$ importación a SQLite central
-2.  **Motor de email marketing multicuenta** – 10 cuentas SMTP rotativas, threading, drip campaigns, rebotes, validación de dominios
-3.  **Bot IMAP de detección de leads** – Monitorea inbox, detecta remitentes nuevos, los importa a la base de contactos
-4.  **Lanzador de campañas de email** – Segmentación por país (España/Argentina), preparación de listas, ejecución programada
-5.  **Gmail Manager / Orquestador** – Gestión de múltiples cuentas Gmail, reportes de actividad, control de envíos
-6.  **WhatsApp Web RPA** – Playwright automatiza envío de mensajes por WhatsApp Web sin API oficial
-7.  **Facebook Groups RPA** – Playwright postea contenido en grupos de Facebook automáticamente
-8.  **Testeador de formularios web** – Llena y envía formularios de contacto de sitios web para testear/contactar
-9.  **Generador de contenido SEO** – Genera artículos SEO optimizados automáticamente
-10. **Generador de landing pages** – Crea landing pages completas desde templates con datos del cliente
-11. **Backup automático del VPS** – Ejecuta backup completo del servidor, lo almacena y reporta
-12. **Auditoría de base de datos** – Diagnóstico de duplicados, migración de schema, auditoría completa
-13. **Editor visual de contactos** – Streamlit app para CRUD de la base de contactos
-14. **Crawler SEO WordPress** – Analiza sitios WordPress, extrae métricas SEO, estructura de contenido
-15. **Investigación competitiva ecommerce** – Scrapea competidores, analiza precios, catálogos, posicionamiento
-16. **Asistente de research con IA** – Investigación profunda de mercados/tendencias usando modelos de IA
-17. **Scraping de directorios** – Kompass, Páginas Amarillas $\rightarrow$ extracción de datos empresariales
-18. **Crawler de keywords long-tail** – Descubre y cataloga keywords long-tail para SEO
-19. **API Trello (lectura)** – Lee boards, cards, lists para seguimiento de proyectos
-20. **API Google Calendar** – Lee/crea eventos para gestión de agenda
-21. **Dashboard contable** – Extrae datos de PDFs ARCA/Santander/MercadoPago $\rightarrow$ reportes HTML
-22. **Generador de comandos PDF** – Crea guías de comandos en PDF para clientes
-23. **Sitio Astro deploy** – Desarrollo y deploy de selvaggiesteban.dev (Astro + Cloudflare)
-24. **Telemetry / Reportes consolidados** – Genera reportes de actividad de todo el sistema
-25. **Pipeline de servicios a clientes** – Generación de contratos, entrega de sitios, seguimiento post venta
-26. **Validación de emails** – MailboxValidator integrado para limpiar listas de contactos
-27. **Análisis de calidad de listas** – Evalúa salud de listas de email
+1.  **Lead Prospecting Pipeline** – Scraping Google Maps $\rightarrow$ combination of keywords/locations $\rightarrow$ deduplication $\rightarrow$ import to central SQLite
+2.  **Multi-account Email Marketing Engine** – 10 rotating SMTP accounts, threading, drip campaigns, bounces, domain validation
+3.  **IMAP Lead Detection Bot** – Monitors inbox, detects new senders, imports them to the contacts database
+4.  **Email Campaign Launcher** – Segmentation by country (Spain/Argentina), list preparation, scheduled execution
+5.  **Gmail Manager / Orchestrator** – Management of multiple Gmail accounts, activity reports, delivery control
+6.  **WhatsApp Web RPA** – Playwright automates message sending via WhatsApp Web without an official API
+7.  **Facebook Groups RPA** – Playwright automatically posts content in Facebook groups
+8.  **Web Form Tester** – Fills and sends contact forms on websites for testing/contacting
+9.  **SEO Content Generator** – Automatically generates SEO-optimized articles
+10. **Landing Page Generator** – Creates complete landing pages from templates with customer data
+11. **Automatic VPS Backup** – Executes full server backup, stores it, and reports result
+12. **Database Audit** – Duplicate diagnosis, schema migration, complete audit
+13. **Visual Contact Editor** – Streamlit app for contacts database CRUD
+14. **WordPress SEO Crawler** – Analyzes WordPress sites, extracts SEO metrics, content structure
+15. **Ecommerce Competitive Research** – Scrapes competitors, analyzes prices, catalogs, positioning
+16. **AI Research Assistant** – Deep research on markets/trends using AI models
+17. **Directory Scraping** – Kompass, Yellow Pages $\rightarrow$ business data extraction
+18. **Long-tail Keyword Crawler** – Discovers and catalogs long-tail keywords for SEO
+19. **Trello API (Read-only)** – Reads boards, cards, lists for project tracking
+20. **Google Calendar API** – Reads/creates events for agenda management
+21. **Accounting Dashboard** – Extracts data from ARCA/Santander/MercadoPago PDFs $\rightarrow$ HTML reports
+22. **PDF Command Generator** – Creates command guides in PDF for clients
+23. **Astro Site Deploy** – Development and deploy of selvaggiesteban.dev (Astro + Cloudflare)
+24. **Telemetry / Consolidated Reports** – Generates activity reports for the entire system
+25. **Client Services Pipeline** – Generation of contracts, site delivery, post-sale tracking
+26. **Email Validation** – MailboxValidator integrated to clean contact lists
+27. **List Quality Analysis** – Evaluates the health of email lists
 
 ---
 

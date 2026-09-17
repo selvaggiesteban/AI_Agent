@@ -5,7 +5,7 @@ from pathlib import Path
 
 from core.paths import INPUTS_DIR
 
-# Rutas dinámicas
+# Dynamic paths
 DB_PATH = INPUTS_DIR / "contacts.db"
 
 def get_connection():

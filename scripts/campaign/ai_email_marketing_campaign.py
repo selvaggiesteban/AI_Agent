@@ -6,12 +6,12 @@ from core.ai_engine import llm
 
 def run_ai_email_marketing_campaign(conventions=""):
     """
-    Executes the 'E-mail marketing con IA' campaign:
+    Executes the 'AI Email Marketing' campaign:
     1. Analyzes target audience and goals.
     2. Generates a sequence of high-converting emails.
     3. Sends the sequence plan via Gmail.
     """
-    logger.info("Starting 'E-mail marketing con IA' campaign...")
+    logger.info("Starting 'AI Email Marketing' campaign...")
     try:
         with open("data/campaign_config.json", "r", encoding="utf-8") as f:
             config = json.load(f).get("email_marketing", {})
@@ -44,12 +44,12 @@ def run_ai_email_marketing_campaign(conventions=""):
         )
 
         if success:
-            logger.info("'E-mail marketing con IA' campaign completed successfully.")
+            logger.info("'AI Email Marketing' campaign completed successfully.")
         else:
-            logger.error("'E-mail marketing con IA' campaign failed to send email.")
+            logger.error("'AI Email Marketing' campaign failed to send email.")
 
     except Exception as e:
-        logger.exception(f"Critical error in 'E-mail marketing con IA' campaign: {e}")
+        logger.exception(f"Critical error in 'AI Email Marketing' campaign: {e}")
 
 if __name__ == "__main__":
     run_ai_email_marketing_campaign()

@@ -1,57 +1,57 @@
-# Documento Maestro — Proveedores LLM, API Keys y Modelos
+# Master Document — LLM Providers, API Keys, and Models
 
-**Última actualización:** 2026-06-23
-**Propósito:** Referencia centralizada para configurar cualquier script, servicio o herramienta que requiera acceso a modelos de lenguaje.
-
----
-
-## Tabla de Contenidos
-
-1. [Resumen Ejecutivo](#resumen-ejecutivo)
-2. [Proveedores Activos (API Keys válidas)](#proveedores-activos)
-3. [Proveedores Pendientes (API Keys inválidas)](#proveedores-pendientes)
-4. [Proxy Free Claude Code](#proxy-free-claude-code)
-5. [Modelos Recomendados por Uso](#modelos-recomendados)
-6. [Quick Reference para Scripts](#quick-reference)
+**Last Update:** 2026-06-23
+**Purpose:** Central reference for configuring any script, service, or tool requiring access to language models.
 
 ---
 
-## Resumen Ejecutivo
+## Table of Contents
 
-| Proveedor | API Key | Estado | Modelos Gratis | Endpoint |
+1. [Executive Summary](#executive-summary)
+2. [Active Providers (Valid API Keys)](#active-providers)
+3. [Pending Providers (Invalid API Keys)](#pending-providers)
+4. [Free Claude Code Proxy](#free-claude-code-proxy)
+5. [Recommended Models by Use Case](#recommended-models)
+6. [Quick Reference for Scripts](#quick-reference)
+
+---
+
+## Executive Summary
+
+| Provider | API Key | Status | Free Models | Endpoint |
 |-----------|---------|--------|----------------|----------|
-| **NVIDIA NIM** | `nvapi-Y-0W1p...` | ✅ ACTIVO | 121 (todos gratis en trial) | `https://integrate.api.nvidia.com/v1` |
-| **OpenRouter** | `sk-or-v1-2a0f...` | ✅ ACTIVO | 26 modelos `:free` | `https://openrouter.ai/api/v1` |
-| **Groq** | `gsk_R9K1PW...` | ✅ ACTIVO | 17 modelos (todos gratis trial) | `https://api.groq.com/openai/v1` |
-| **Cerebras** | `csk-4cyrrw...` | ✅ ACTIVO | 2 modelos (gratis trial) | `https://api.cerebras.ai/v1` |
-| **Google Gemini** | `AIzaSyBBsb...` | ❌ INVÁLIDA | — | `https://generativelanguage.googleapis.com` |
-| **DeepSeek** | *(sin key)* | ⏳ PENDIENTE | — | `https://api.deepseek.com/v1` |
-| **Kimi (Moonshot)** | *(sin key)* | ⏳ PENDIENTE | — | `https://api.moonshot.cn/v1` |
-| **Mistral** | *(sin key)* | ⏳ PENDIENTE | — | `https://api.mistral.ai/v1` |
+| **NVIDIA NIM** | `nvapi-Y-0W1p...` | ✅ ACTIVE | 121 (all free in trial) | `https://integrate.api.nvidia.com/v1` |
+| **OpenRouter** | `sk-or-v1-2a0f...` | ✅ ACTIVE | 26 `:free` models | `https://openrouter.ai/api/v1` |
+| **Groq** | `gsk_R9K1PW...` | ✅ ACTIVE | 17 models (all free trial) | `https://api.groq.com/openai/v1` |
+| **Cerebras** | `csk-4cyrrw...` | ✅ ACTIVE | 2 models (free trial) | `https://api.cerebras.ai/v1` |
+| **Google Gemini** | `AIzaSyBBsb...` | ❌ INVALID | — | `https://generativelanguage.googleapis.com` |
+| **DeepSeek** | *(no key)* | ⏳ PENDING | — | `https://api.deepseek.com/v1` |
+| **Kimi (Moonshot)** | *(no key)* | ⏳ PENDING | — | `https://api.moonshot.cn/v1` |
+| **Mistral** | *(no key)* | ⏳ PENDING | — | `https://api.mistral.ai/v1` |
 
 ---
 
-## Proveedores Activos
+## Active Providers
 
 ### 1. NVIDIA NIM (build.nvidia.com)
 
 **API Key:** `nvapi-TU_API_KEY_AQUI`
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
 | Endpoint | `https://integrate.api.nvidia.com/v1` |
-| Compatibilidad | OpenAI-compatible |
-| Free Tier | 1,000 inference credits (hasta 5,000 al solicitar) |
-| Rate Limit | **40 RPM** (no publicado, visible en UI de build.nvidia.com) |
-| Cadena | No expira (es trial, no tiene fecha de vencimiento) |
-| Production | Requiere licencia NVIDIA AI Enterprise ($4,500/GPU/año) |
+| Compatibility | OpenAI-compatible |
+| Free Tier | 1,000 inference credits (up to 5,000 upon request) |
+| Rate Limit | **40 RPM** (not published, visible in build.nvidia.com UI) |
+| Lifespan | Does not expire (trial, no expiration date) |
+| Production | Requires NVIDIA AI Enterprise license ($4,500/GPU/year) |
 
-**Modelos Destacados (121 totales):**
+**Featured Models (121 total):**
 
-| Modelo | ID | Tipo | Contexto |
+| Model | ID | Type | Context |
 |--------|-----|------|----------|
 | GLM-5.1 (Z.ai) | `z-ai/glm-5.1` | Chat/Code | — |
-| Nemotron Ultra 550B | `nvidia/nemotron-3-ultra-550b-a55b` | Razonamiento | 1M |
+| Nemotron Ultra 550B | `nvidia/nemotron-3-ultra-550b-a55b` | Reasoning | 1M |
 | Nemotron Super 120B | `nvidia/nemotron-3-super-120b-a12b` | Chat | 1M |
 | DeepSeek V4 Flash | `deepseek-ai/deepseek-v4-flash` | Chat | — |
 | DeepSeek V4 Pro | `deepseek-ai/deepseek-v4-pro` | Chat | — |
@@ -63,7 +63,7 @@
 | Kimi K2.6 | `moonshotai/kimi-k2.6` | Chat | — |
 | Mistral Large 3 675B | `mistralai/mistral-large-3-675b-instruct-2512` | Chat | — |
 
-**Uso en Python:**
+**Python Usage:**
 ```python
 import openai
 
@@ -74,18 +74,18 @@ client = openai.OpenAI(
 
 response = client.chat.completions.create(
     model="z-ai/glm-5.1",
-    messages=[{"role": "user", "content": "Hola"}],
+    messages=[{"role": "user", "content": "Hello"}],
     max_tokens=100
 )
 print(response.choices[0].message.content)
 ```
 
-**Uso en curl:**
+**curl Usage:**
 ```bash
 curl -s https://integrate.api.nvidia.com/v1/chat/completions \
   -H "Authorization: Bearer nvapi-TU_API_KEY_AQUI" \
   -H "Content-Type: application/json" \
-  -d '{"model":"z-ai/glm-5.1","messages":[{"role":"user","content":"Hola"}],"max_tokens":100}'
+  -d '{"model":"z-ai/glm-5.1","messages":[{"role":"user","content":"Hello"}],"max_tokens":100}'
 ```
 
 ---
@@ -94,19 +94,19 @@ curl -s https://integrate.api.nvidia.com/v1/chat/completions \
 
 **API Key:** `sk-or-v1-TU_API_KEY_AQUI`
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
 | Endpoint | `https://openrouter.ai/api/v1` |
-| Compatibilidad | OpenAI-compatible |
-| Free Tier | 50 req/día (sin credits), 1,000 req/día (con $1+ credits), 20 RPM |
-| Rate Limit | **20 RPM** para modelos `:free` |
-| Plataforma Fee | 0% (free), 5.5% (pay-as-you-go) |
+| Compatibility | OpenAI-compatible |
+| Free Tier | 50 req/day (no credits), 1,000 req/day (with $1+ credits), 20 RPM |
+| Rate Limit | **20 RPM** for `:free` models |
+| Platform Fee | 0% (free), 5.5% (pay-as-you-go) |
 
-**Modelos Gratis Disponibles (26):**
+**Free Models Available (26):**
 
-| Modelo | ID | Contexto | Notas |
+| Model | ID | Context | Notes |
 |--------|-----|----------|-------|
-| Qwen3 Coder | `qwen/qwen3-coder:free` | 1M | **Saturado frecuentemente** |
+| Qwen3 Coder | `qwen/qwen3-coder:free` | 1M | **Frequently saturated** |
 | Nemotron Ultra 550B | `nvidia/nemotron-3-ultra-550b-a55b:free` | 1M | |
 | Nemotron Super 120B | `nvidia/nemotron-3-super-120b-a12b:free` | 1M | |
 | GPT-OSS 120B | `openai/gpt-oss-120b:free` | 131K | |
@@ -117,11 +117,11 @@ curl -s https://integrate.api.nvidia.com/v1/chat/completions \
 | Gemma 4 26B | `google/gemma-4-26b-a4b-it:free` | 262K | |
 | Qwen3 Next 80B | `qwen/qwen3-next-80b-a3b-instruct:free` | 262K | |
 | Poolside Laguna M.1 | `poolside/laguna-m.1:free` | 262K | |
-| OpenRouter Free Router | `openrouter/free` | 200K | Auto-selecciona modelo |
+| OpenRouter Free Router | `openrouter/free` | 200K | Auto-selects model |
 | Nemotron Nano 30B | `nvidia/nemotron-3-nano-30b-a3b:free` | 256K | |
 | North Mini Code | `cohere/north-mini-code:free` | 256K | |
 
-**Uso en Python:**
+**Python Usage:**
 ```python
 import openai
 
@@ -132,18 +132,18 @@ client = openai.OpenAI(
 
 response = client.chat.completions.create(
     model="openai/gpt-oss-120b:free",
-    messages=[{"role": "user", "content": "Hola"}],
+    messages=[{"role": "user", "content": "Hello"}],
     max_tokens=100
 )
 print(response.choices[0].message.content)
 ```
 
-**Uso en curl:**
+**curl Usage:**
 ```bash
 curl -s https://openrouter.ai/api/v1/chat/completions \
   -H "Authorization: Bearer sk-or-v1-TU_API_KEY_AQUI" \
   -H "Content-Type: application/json" \
-  -d '{"model":"openai/gpt-oss-120b:free","messages":[{"role":"user","content":"Hola"}],"max_tokens":100}'
+  -d '{"model":"openai/gpt-oss-120b:free","messages":[{"role":"user","content":"Hello"}],"max_tokens":100}'
 ```
 
 ---
@@ -152,16 +152,16 @@ curl -s https://openrouter.ai/api/v1/chat/completions \
 
 **API Key:** `gsk_TU_API_KEY_AQUI`
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
 | Endpoint | `https://api.groq.com/openai/v1` |
-| Compatibilidad | OpenAI-compatible |
-| Free Tier | 30 RPM / 6K TPM / 14,400 RPD (varía por modelo) |
-| Velocidad | **Ultra-rápido** (hardware专用 LPU) |
+| Compatibility | OpenAI-compatible |
+| Free Tier | 30 RPM / 6K TPM / 14,400 RPD (varies by model) |
+| Speed | **Ultra-fast** (Dedicated LPU hardware) |
 
-**Modelos y Rate Limits (Free Tier):**
+**Models and Rate Limits (Free Tier):**
 
-| Modelo | ID | RPM | RPD | TPM | TPD |
+| Model | ID | RPM | RPD | TPM | TPD |
 |--------|-----|-----|-----|-----|-----|
 | Llama 3.1 8B | `llama-3.1-8b-instant` | 30 | 14,400 | 6,000 | 500K |
 | Llama 3.3 70B | `llama-3.3-70b-versatile` | 30 | 1,000 | 12,000 | 100K |
@@ -174,7 +174,7 @@ curl -s https://openrouter.ai/api/v1/chat/completions \
 | Whisper V3 | `whisper-large-v3` | 20 | 2,000 | — | — |
 | Whisper V3 Turbo | `whisper-large-v3-turbo` | 20 | 2,000 | — | — |
 
-**Uso en Python:**
+**Python Usage:**
 ```python
 import openai
 
@@ -185,18 +185,18 @@ client = openai.OpenAI(
 
 response = client.chat.completions.create(
     model="llama-3.1-8b-instant",
-    messages=[{"role": "user", "content": "Hola"}],
+    messages=[{"role": "user", "content": "Hello"}],
     max_tokens=100
 )
 print(response.choices[0].message.content)
 ```
 
-**Uso en curl:**
+**curl Usage:**
 ```bash
 curl -s https://api.groq.com/openai/v1/chat/completions \
   -H "Authorization: Bearer gsk_TU_API_KEY_AQUI" \
   -H "Content-Type: application/json" \
-  -d '{"model":"llama-3.1-8b-instant","messages":[{"role":"user","content":"Hola"}],"max_tokens":100}'
+  -d '{"model":"llama-3.1-8b-instant","messages":[{"role":"user","content":"Hello"}],"max_tokens":100}'
 ```
 
 ---
@@ -205,21 +205,21 @@ curl -s https://api.groq.com/openai/v1/chat/completions \
 
 **API Key:** `csk-TU_API_KEY_AQUI`
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
 | Endpoint | `https://api.cerebras.ai/v1` |
-| Compatibilidad | OpenAI-compatible |
+| Compatibility | OpenAI-compatible |
 | Free Tier | 5 RPM / 30K TPM / 1M TPH / 1M TPD |
-| Velocidad | **20x más rápido que GPU** (hardware专用 wafer) |
+| Speed | **20x faster than GPU** (Dedicated wafer hardware) |
 
-**Modelos Disponibles:**
+**Models Available:**
 
-| Modelo | ID | RPM | TPM |
+| Model | ID | RPM | TPM |
 |--------|-----|-----|-----|
 | GPT-OSS 120B | `gpt-oss-120b` | 5 | 30K |
 | Z.ai GLM 4.7 | `zai-glm-4.7` | 5 | 30K |
 
-**Uso en Python:**
+**Python Usage:**
 ```python
 import openai
 
@@ -230,158 +230,158 @@ client = openai.OpenAI(
 
 response = client.chat.completions.create(
     model="zai-glm-4.7",
-    messages=[{"role": "user", "content": "Hola"}],
+    messages=[{"role": "user", "content": "Hello"}],
     max_tokens=100
 )
 print(response.choices[0].message.content)
 ```
 
-**Uso en curl:**
+**curl Usage:**
 ```bash
 curl -s https://api.cerebras.ai/v1/chat/completions \
   -H "Authorization: Bearer csk-TU_API_KEY_AQUI" \
   -H "Content-Type: application/json" \
-  -d '{"model":"zai-glm-4.7","messages":[{"role":"user","content":"Hola"}],"max_tokens":100}'
+  -d '{"model":"zai-glm-4.7","messages":[{"role":"user","content":"Hello"}],"max_tokens":100}'
 ```
 
 ---
 
-## Proveedores Pendientes
+## Pending Providers
 
 ### 5. Google Gemini
 
-**API Key:** `AIzaSy_TU_API_KEY_AQUI` (proyecto) / `AIzaSyAEmt_-Qj_9f5c0V8491BpvQ9pbwUg5jhA` (otro)
+**API Key:** `AIzaSy_TU_API_KEY_AQUI` (project) / `AIzaSyAEmt_-Qj_9f5c0V8491BpvQ9pbwUg5jhA` (other)
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| Estado | ❌ **API KEY INVÁLIDA** |
+| Status | ❌ **API KEY INVALID** |
 | Endpoint | `https://generativelanguage.googleapis.com/v1beta` |
-| Acción requerir | Regenerar key en [Google AI Studio](https://aistudio.google.com/apikey) |
+| Required Action | Regenerate key in [Google AI Studio](https://aistudio.google.com/apikey) |
 
-**Modelos disponibles (cuando se arregle la key):**
-- `gemini-2.5-flash` — Gratis, 1M contexto
-- `gemini-2.5-pro` — Gratis con límites, 1M contexto
-- `gemini-2.0-flash` — Gratis, 1M contexto
+**Models available (once key is fixed):**
+- `gemini-2.5-flash` — Free, 1M context
+- `gemini-2.5-pro` — Free with limits, 1M context
+- `gemini-2.0-flash` — Free, 1M context
 
 ---
 
 ### 6. DeepSeek
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| Estado | ⏳ **SIN API KEY** |
+| Status | ⏳ **NO API KEY** |
 | Endpoint | `https://api.deepseek.com/v1` |
-| Precio | $0.14/$0.28 por 1M tokens (el más barato del mundo) |
-| Acción requerir | Obtener key en [platform.deepseek.com](https://platform.deepseek.com) |
+| Price | $0.14/$0.28 per 1M tokens (cheapest in the world) |
+| Required Action | Get key at [platform.deepseek.com](https://platform.deepseek.com) |
 
 ---
 
 ### 7. Kimi (Moonshot AI)
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| Estado | ⏳ **SIN API KEY** |
+| Status | ⏳ **NO API KEY** |
 | Endpoint | `https://api.moonshot.cn/v1` |
-| Precio | $0.95/$4.00 por 1M tokens |
-| Acción requerir | Obtener key en [platform.moonshot.cn](https://platform.moonshot.cn) |
+| Price | $0.95/$4.00 per 1M tokens |
+| Required Action | Get key at [platform.moonshot.cn](https://platform.moonshot.cn) |
 
 ---
 
 ### 8. Mistral
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| Estado | ⏳ **SIN API KEY** |
+| Status | ⏳ **NO API KEY** |
 | Endpoint | `https://api.mistral.ai/v1` |
-| Modelos gratis | Mistral 7B, Codestral 22B |
-| Acción requerir | Obtener key en [console.mistral.ai](https://console.mistral.ai) |
+| Free Models | Mistral 7B, Codestral 22B |
+| Required Action | Get key at [console.mistral.ai](https://console.mistral.ai) |
 
 ---
 
-## Proxy Free Claude Code
+## Free Claude Code Proxy
 
-### Configuración Actual
+### Current Configuration
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| Modelo principal | `nvidia_nim/z-ai/glm-5.1` |
-| Puerto | `8082` |
+| Primary Model | `nvidia_nim/z-ai/glm-5.1` |
+| Port | `8082` |
 | Auth Token | `freecc` |
 | Admin UI | `http://127.0.0.1:8082/admin` |
-| Rate Limit | 18 req/60s (configurable en `.env`) |
+| Rate Limit | 18 req/60s (configurable in `.env`) |
 
-### Archivos de Configuración
+### Configuration Files
 
-| Archivo | Propósito |
+| File | Purpose |
 |---------|-----------|
-| `core/free-claude-code/.env` | Config del proxy (API keys, modelo, rate limits) |
-| `~/.fcc/.env` | Managed env (copia sincronizada) |
-| `~/.claude/settings.json` | Config de Claude Code (modelo, hooks, plugins) |
+| `core/free-claude-code/.env` | Proxy config (API keys, model, rate limits) |
+| `~/.fcc/.env` | Managed env (synchronized copy) |
+| `~/.claude/settings.json` | Claude Code config (model, hooks, plugins) |
 
-### Comandos
+### Commands
 
 ```bash
-# Iniciar proxy
+# Start proxy
 fcc-server
 
-# Iniciar Claude Code con proxy
+# Start Claude Code with proxy
 fcc-claude
 
-# Verificar proxy
+# Verify proxy
 Invoke-RestMethod -Uri "http://127.0.0.1:8082/v1/models" -Headers @{"x-api-key"="freecc"}
 ```
 
-### Cambiar Modelo
+### Changing Model
 
-1. Editar `core/free-claude-code/.env` → cambiar `MODEL=`
-2. Copiar a `~/.fcc/.env`
-3. Editar `~/.claude/settings.json` → cambiar `"model":`
-4. Reiniciar `fcc-server`
+1. Edit `core/free-claude-code/.env` $\rightarrow$ change `MODEL=`
+2. Copy to `~/.fcc/.env`
+3. Edit `~/.claude/settings.json` $\rightarrow$ change `"model":`
+4. Restart `fcc-server`
 
 ---
 
-## Modelos Recomendados por Uso
+## Recommended Models by Use Case
 
-### Coding / Programación
-| Modelo | Proveedor | Velocidad | Contexto | Gratis |
+### Coding / Programming
+| Model | Provider | Speed | Context | Free |
 |--------|-----------|-----------|----------|--------|
-| `z-ai/glm-5.1` | NVIDIA NIM | Rápido | — | ✅ |
-| `qwen/qwen3-coder:free` | OpenRouter | Medio | 1M | ✅ (saturado) |
-| `openai/gpt-oss-120b:free` | OpenRouter | Rápido | 131K | ✅ |
-| `gpt-oss-120b` | Cerebras | Ultra-rápido | — | ✅ |
+| `z-ai/glm-5.1` | NVIDIA NIM | Fast | — | ✅ |
+| `qwen/qwen3-coder:free` | OpenRouter | Medium | 1M | ✅ (saturated) |
+| `openai/gpt-oss-120b:free` | OpenRouter | Fast | 131K | ✅ |
+| `gpt-oss-120b` | Cerebras | Ultra-fast | — | ✅ |
 
-### Chat / Conversación
-| Modelo | Proveedor | Velocidad | Contexto | Gratis |
+### Chat / Conversation
+| Model | Provider | Speed | Context | Free |
 |--------|-----------|-----------|----------|--------|
-| `llama-3.1-8b-instant` | Groq | Ultra-rápido | — | ✅ |
-| `nvidia/nemotron-3-ultra-550b-a55b:free` | OpenRouter | Medio | 1M | ✅ |
-| `zai-glm-4.7` | Cerebras | Ultra-rápido | — | ✅ |
+| `llama-3.1-8b-instant` | Groq | Ultra-fast | — | ✅ |
+| `nvidia/nemotron-3-ultra-550b-a55b:free` | OpenRouter | Medium | 1M | ✅ |
+| `zai-glm-4.7` | Cerebras | Ultra-fast | — | ✅ |
 
-### Razonamiento / Análisis Complejo
-| Modelo | Proveedor | Velocidad | Contexto | Gratis |
+### Reasoning / Complex Analysis
+| Model | Provider | Speed | Context | Free |
 |--------|-----------|-----------|----------|--------|
-| `nvidia/nemotron-3-ultra-550b-a55b` | NVIDIA NIM | Lento | 1M | ✅ |
-| `nvidia/nemotron-3-ultra-550b-a55b:free` | OpenRouter | Lento | 1M | ✅ |
-| `qwen/qwen3.5-397b-a17b` | NVIDIA NIM | Lento | — | ✅ |
+| `nvidia/nemotron-3-ultra-550b-a55b` | NVIDIA NIM | Slow | 1M | ✅ |
+| `nvidia/nemotron-3-ultra-550b-a55b:free` | OpenRouter | Slow | 1M | ✅ |
+| `qwen/qwen3.5-397b-a17b` | NVIDIA NIM | Slow | — | ✅ |
 
-### Ultra-Rápido (latencia mínima)
-| Modelo | Proveedor | Velocidad | RPM Free |
+### Ultra-Fast (Minimum Latency)
+| Model | Provider | Speed | Free RPM |
 |--------|-----------|-----------|----------|
 | `llama-3.1-8b-instant` | Groq | 560 tok/s | 30 |
 | `zai-glm-4.7` | Cerebras | 20x GPU | 5 |
-| `z-ai/glm-5.1` | NVIDIA NIM | Rápido | 40 |
+| `z-ai/glm-5.1` | NVIDIA NIM | Fast | 40 |
 
 ### Speech-to-Text
-| Modelo | Proveedor | Request/Day |
+| Model | Provider | Request/Day |
 |--------|-----------|-------------|
 | `whisper-large-v3` | Groq | 2,000 |
 | `whisper-large-v3-turbo` | Groq | 2,000 |
 
 ---
 
-## Quick Reference para Scripts
+## Quick Reference for Scripts
 
-### Variables de Entorno (copiar y pegar)
+### Environment Variables (Copy and Paste)
 
 ```bash
 # NVIDIA NIM
@@ -405,7 +405,7 @@ export ANTHROPIC_AUTH_TOKEN="freecc"
 export ANTHROPIC_BASE_URL="http://127.0.0.1:8082"
 ```
 
-### Snippet Python Universal (con fallback)
+### Universal Python Snippet (with fallback)
 
 ```python
 import openai
@@ -439,7 +439,7 @@ PROVIDERS = [
 ]
 
 def chat(prompt: str, provider_index: int = 0) -> str:
-    """Envía un prompt al LLM con fallback automático entre proveedores."""
+    """Sends a prompt to the LLM with automatic fallback between providers."""
     for i in range(provider_index, len(PROVIDERS)):
         p = PROVIDERS[i]
         try:
@@ -451,21 +451,21 @@ def chat(prompt: str, provider_index: int = 0) -> str:
             )
             return r.choices[0].message.content
         except Exception as e:
-            print(f"[{p['name']}] Error: {e}, intentando siguiente...")
+            print(f"[{p['name']}] Error: {e}, trying next...")
             continue
-    raise Exception("Todos los proveedores fallaron")
+    raise Exception("All providers failed")
 
-# Uso
-print(chat("Explica qué es un agente de IA en 3 oraciones"))
+# Usage
+print(chat("Explain what an AI agent is in 3 sentences"))
 ```
 
 ---
 
-## Notas Importantes
+## Important Notes
 
-1. **NVIDIA NIM** tiene la mayor cantidad de modelos (121) y todos son gratis en trial. Es el más versátil.
-2. **Groq** es el más rápido (hardware专用 LPU) pero tiene menos modelos y RPD más bajo.
-3. **OpenRouter** tiene más modelos gratis (26) pero `qwen/qwen3-coder:free` está frecuentemente saturado.
-4. **Cerebras** es ultrarrápido pero solo tiene 2 modelos y 5 RPM.
-5. **Todas las API keys son de trial/free** — no usar en producción sin escalar.
-6. **El proxy Free Claude Code** usa NVIDIA NIM por defecto (GLM-5.1) — es el más estable para uso diario.
+1. **NVIDIA NIM** has the largest number of models (121) and all are free in trial. It is the most versatile.
+2. **Groq** is the fastest (Dedicated LPU hardware) but has fewer models and lower RPD.
+3. **OpenRouter** has more free models (26) but `qwen/qwen3-coder:free` is frequently saturated.
+4. **Cerebras** is ultra-fast but only has 2 models and 5 RPM.
+5. **All API keys are trial/free** — do not use in production without scaling.
+6. **The Free Claude Code Proxy** uses NVIDIA NIM by default (GLM-5.1) — it is the most stable for daily use.

@@ -22,7 +22,7 @@ class ProductivityTool(Tool):
         """
         try:
             with open("data/campaign_config.json", "r", encoding="utf-8") as f:
-                config = json.load(f).get("trabajo", {})
+                config = json.load(f).get("productivity", {})
 
             if not config:
                 return "Productivity configuration not found."
@@ -34,15 +34,15 @@ class ProductivityTool(Tool):
 
             # 1. Fetch Goals from Google Sheet
             sheet_data = google.get_sheet_data(config["google_sheet_id"], config["google_sheet_range"])
-            goals = {"objetivo_diario": "N/A", "objetivo_semanal": "N/A", "objetivo_mensual": "N/A"}
+            goals = {"daily_goal": "N/A", "weekly_goal": "N/A", "monthly_goal": "N/A"}
             if len(sheet_data) >= 4:
-                goals["objetivo_diario"] = sheet_data[1][0] if len(sheet_data[1]) > 0 else "N/A"
-                goals["objetivo_semanal"] = sheet_data[2][0] if len(sheet_data[2]) > 0 else "N/A"
-                goals["objetivo_mensual"] = sheet_data[3][0] if len(sheet_data[3]) > 0 else "N/A"
+                goals["daily_goal"] = sheet_data[1][0] if len(sheet_data[1]) > 0 else "N/A"
+                goals["weekly_goal"] = sheet_data[2][0] if len(sheet_data[2]) > 0 else "N/A"
+                goals["monthly_goal"] = sheet_data[3][0] if len(sheet_data[3]) > 0 else "N/A"
 
             # 2. Fetch Trello Cards
-            cards = trello.get_board_cards(config["trello_board_id"], "En Proceso")
-            cards_text = "\n".join([f"- {c['name']}" for c in cards]) if cards else "No hay tareas en proceso."
+            cards = trello.get_board_cards(config["trello_board_id"], "In Progress")
+            cards_text = "\n".join([f"- {c['name']}" for c in cards]) if cards else "No tasks in progress."
 
             # 3. Generate Personalized Message with AI
             system_prompt = (
@@ -53,9 +53,9 @@ class ProductivityTool(Tool):
 
             prompt = (
                 f"Generate a daily report based on the following data:\n"
-                f"Daily Goal: {goals['objetivo_diario']}\n"
-                f"Weekly Goal: {goals['objetivo_semanal']}\n"
-                f"Monthly Goal: {goals['objetivo_mensual']}\n"
+                f"Daily Goal: {goals['daily_goal']}\n"
+                f"Weekly Goal: {goals['weekly_goal']}\n"
+                f"Monthly Goal: {goals['monthly_goal']}\n"
                 f"Tasks in Process: {cards_text}\n\n"
                 f"Return a JSON object with a 'body_html' key containing the formatted report in HTML."
             )
@@ -66,10 +66,10 @@ class ProductivityTool(Tool):
                     system_instruction=system_prompt,
                     model="gemini"
                 )
-                message_html = ai_result.get("body_html", f"<p>{config['email_template'].format(objetivo_diario=goals['objetivo_diario'], objetivo_semanal=goals['objetivo_semanal'], objetivo_mensual=goals['objetivo_mensual'], trello_cards=cards_text)}</p>")
+                message_html = ai_result.get("body_html", f"<p>{config['email_template'].format(daily_goal=goals['daily_goal'], weekly_goal=goals['weekly_goal'], monthly_goal=goals['monthly_goal'], trello_cards=cards_text)}</p>")
             except Exception as e:
                 logger.error(f"AI report generation failed: {e}")
-                message_html = f"<p>{config['email_template'].format(objetivo_diario=goals['objetivo_diario'], objetivo_semanal=goals['objetivo_semanal'], objetivo_mensual=goals['objetivo_mensual'], trello_cards=cards_text)}</p>"
+                message_html = f"<p>{config['email_template'].format(daily_goal=goals['daily_goal'], weekly_goal=goals['weekly_goal'], monthly_goal=goals['monthly_goal'], trello_cards=cards_text)}</p>"
 
             # 4. Send via Gmail
             success = gmail.send_email(

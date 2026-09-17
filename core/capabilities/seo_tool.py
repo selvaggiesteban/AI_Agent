@@ -25,7 +25,7 @@ class SEOTool(Tool):
         try:
             if domains is None:
                 with open("data/campaign_config.json", "r", encoding="utf-8") as f:
-                    config = json.load(f).get("posicionamiento", {})
+                    config = json.load(f).get("seo", {})
                     domains = config.get("domains", [])
                     email_subject = config.get("email_subject", "SEO Audit Report")
                     email_template = config.get("email_template", "SEO Audits:\n{seo_audits}")

@@ -6,12 +6,12 @@ from core.ai_engine import llm
 
 def run_ai_ads_campaign(conventions=""):
     """
-    Executes the 'Creador de anuncios con IA' campaign:
+    Executes the 'AI Ad Creator' campaign:
     1. Takes product/service descriptions.
     2. Generates high-converting ad copies for Facebook, Instagram, and Google Ads.
     3. Sends the copies via Gmail.
     """
-    logger.info("Starting 'Creador de anuncios con IA' campaign...")
+    logger.info("Starting 'AI Ad Creator' campaign...")
     try:
         with open("data/campaign_config.json", "r", encoding="utf-8") as f:
             config = json.load(f).get("ai_ads", {})
@@ -43,12 +43,12 @@ def run_ai_ads_campaign(conventions=""):
         )
 
         if success:
-            logger.info("'Creador de anuncios con IA' campaign completed successfully.")
+            logger.info("'AI Ad Creator' campaign completed successfully.")
         else:
-            logger.error("'Creador de anuncios con IA' campaign failed to send email.")
+            logger.error("'AI Ad Creator' campaign failed to send email.")
 
     except Exception as e:
-        logger.exception(f"Critical error in 'Creador de anuncios con IA' campaign: {e}")
+        logger.exception(f"Critical error in 'AI Ad Creator' campaign: {e}")
 
 if __name__ == "__main__":
     run_ai_ads_campaign()

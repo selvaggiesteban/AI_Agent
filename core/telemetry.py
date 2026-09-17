@@ -12,17 +12,17 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+#
 """
-Telemetry — Reporting transversal para pipelines Lead y Services.
+Telemetry — Cross-pipeline reporting for Lead and Services pipelines.
 
-Consolida datos de:
+Consolidates data from:
   - logs/pipeline/lead_execution_log.json
   - logs/pipeline/services_execution_log.json
-  - logs/pipeline/telemetry.json (consolidado)
+  - logs/pipeline/telemetry.json (consolidated)
 
-Uso:
-  python -m core.telemetry [--reporte] [--consolidar] [--status]
+Usage:
+  python -m core.telemetry [--report] [--consolidate] [--status]
 """
 
 import json
@@ -65,11 +65,11 @@ def _save_json(path: Path, data: Any) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Consolidar telemetría de ambos pipelines
+# Consolidate telemetry from both pipelines
 # ---------------------------------------------------------------------------
 
-def consolidar() -> Dict:
-    logger.info("Consolidando telemetría de Lead + Services...")
+def consolidate() -> Dict:
+    logger.info("Consolidating Lead + Services telemetry...")
 
     lead_events = _load_json(LEAD_LOG)
     services_events = _load_json(SERVICES_LOG)
@@ -92,31 +92,31 @@ def consolidar() -> Dict:
 
 
 # ---------------------------------------------------------------------------
-# Generar reporte de contabilidad por cliente
+# Generate accounting report by client
 # ---------------------------------------------------------------------------
 
-def reporte_contabilidad() -> Dict:
-    logger.info("Generando reporte de contabilidad...")
+def accounting_report() -> Dict:
+    logger.info("Generating accounting report...")
 
     if not DB_PATH.exists():
-        logger.error("DB no encontrada")
+        logger.error("DB not found")
         return {"error": "db_missing"}
 
     conn = sqlite3.connect(str(DB_PATH))
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    # Clientes con entregas
+    # Clients with deliveries
     cursor.execute("""
         SELECT title, primary_email, sector, address, deliverability,
                date_added
         FROM main
-        WHERE deliverability IN ('caliente', 'tibio')
+        WHERE deliverability IN ('hot', 'warm')
         ORDER BY deliverability, title
     """)
     active_clients = [dict(row) for row in cursor.fetchall()]
 
-    # Clientes por score
+    # Clients by score
     cursor.execute("""
         SELECT deliverability, COUNT(*) as cnt
         FROM main
@@ -140,12 +140,12 @@ def reporte_contabilidad() -> Dict:
     }
 
     _save_json(ACCOUNTING_LOG, accounting)
-    logger.info("  Total leads: %d | Activos: %d", total, len(active_clients))
+    logger.info("  Total leads: %d | Active: %d", total, len(active_clients))
     return accounting
 
 
 # ---------------------------------------------------------------------------
-# Resumen rápido de estado
+# Quick status summary
 # ---------------------------------------------------------------------------
 
 def status() -> Dict:
@@ -155,7 +155,7 @@ def status() -> Dict:
     lead_runs = [e for e in lead_events if e.get("event") == "pipeline_complete"]
     services_runs = [e for e in services_events if e.get("event") == "pipeline_complete"]
 
-    # Último run de cada pipeline
+    # Last run of each pipeline
     last_lead = lead_runs[-1] if lead_runs else None
     last_services = services_runs[-1] if services_runs else None
 
@@ -184,20 +184,20 @@ def status() -> Dict:
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description="Telemetry — Reporting transversal")
-    parser.add_argument("--consolidar", action="store_true", help="Consolidar telemetría de ambos pipelines")
-    parser.add_argument("--reporte", action="store_true", help="Generar reporte de contabilidad")
-    parser.add_argument("--status", action="store_true", help="Ver estado de telemetría")
+    parser = argparse.ArgumentParser(description="Telemetry — Cross-pipeline reporting")
+    parser.add_argument("--consolidate", action="store_true", help="Consolidate telemetry from both pipelines")
+    parser.add_argument("--report", action="store_true", help="Generate accounting report")
+    parser.add_argument("--status", action="store_true", help="View telemetry status")
 
     args = parser.parse_args()
 
-    if not any([args.consolidar, args.reporte, args.status]):
+    if not any([args.consolidate, args.report, args.status]):
         args.status = True
 
-    if args.consolidar:
-        consolidar()
-    if args.reporte:
-        reporte_contabilidad()
+    if args.consolidate:
+        consolidate()
+    if args.report:
+        accounting_report()
     if args.status:
         status()
 

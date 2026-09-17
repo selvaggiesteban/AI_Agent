@@ -8,15 +8,15 @@ from playwright.async_api import async_playwright
 from core.rpa_bot import BaseBot
 
 PROMPT_MESSENGER = """
-Actuá como un experto en prospección comercial para Esteban Selvaggi. 
-Analizá los siguientes mensajes de un chat de Facebook Messenger.
-Extraé el Nombre y Apellido real del interlocutor.
-Determiná su interés en servicios profesionales (0-100).
+Act as a commercial prospecting expert for Esteban Selvaggi.
+Analyze the following messages from a Facebook Messenger chat.
+Extract the real First and Last Name of the interlocutor.
+Determine their interest in professional services (0-100).
 
-MENSAJES:
+MESSAGES:
 {contexto}
 
-Respondé SOLO en formato JSON puro:
+Respond ONLY in pure JSON format:
 {{
   "nombre": "...",
   "interes": 65,
@@ -32,7 +32,7 @@ class MessengerBot(BaseBot):
 
     async def run(self):
         async with async_playwright() as p:
-            print(f"[*] Iniciando Messenger RPA (Perfil: {self.profile_name})")
+            print(f"[*] Starting Messenger RPA (Profile: {self.profile_name})")
             browser = await p.chromium.launch_persistent_context(
                 user_data_dir=self.profile_path,
                 headless=False,
@@ -40,13 +40,13 @@ class MessengerBot(BaseBot):
             )
             page = await browser.new_page()
             await page.goto("https://www.facebook.com/messages/t/")
-            
-            print("[!] Esperando carga de Messenger...")
+
+            print("[!] Waiting for Messenger to load...")
             try:
                 await page.wait_for_selector("div[role='grid']", timeout=45000)
-                print("✅ Bandeja de Messenger cargada.")
+                print("✅ Messenger inbox loaded.")
             except:
-                print("❌ Timeout bandeja Messenger.")
+                print("❌ Messenger inbox timeout.")
                 await browser.close()
                 return
 
@@ -55,9 +55,9 @@ class MessengerBot(BaseBot):
                 try:
                     await chat.click()
                     await asyncio.sleep(4)
-                    
+
                     name_elem = await page.query_selector("span[style*='-webkit-line-clamp: 1']")
-                    fb_name = await name_elem.inner_text() if name_elem else "Desconocido"
+                    fb_name = await name_elem.inner_text() if name_elem else "Unknown"
 
                     bubble_elements = await page.query_selector_all("div[dir='auto'][role='none']")
                     messages = []
@@ -65,17 +65,17 @@ class MessengerBot(BaseBot):
                         text = await b.inner_text()
                         if len(text) > 2:
                             messages.append(text.strip())
-                    
+
                     if messages:
-                        print(f"[*] Analizando chat con: {fb_name}")
+                        print(f"[*] Analyzing chat with: {fb_name}")
                         analysis = await self.analyze_content(messages)
                         if analysis and analysis.get('nombre'):
                             self.update_lead(fb_name, analysis, "Messenger")
                 except Exception as e:
-                    print(f"Error chat Messenger: {e}")
+                    print(f"Messenger chat error: {e}")
 
             await browser.close()
-            print("--- Ciclo Messenger Finalizado ---")
+            print("--- Messenger Cycle Finished ---")
 
 if __name__ == "__main__":
     bot = MessengerBot()

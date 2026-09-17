@@ -1,16 +1,16 @@
 from pathlib import Path
 
-# Ruta base del módulo ad_studio
+# Base path of the ad_studio module
 BASE_DIR = Path(__file__).parent
 
-# Directorio de salida para todas las imágenes generadas
+# Output directory for all generated images
 OUTPUT_DIR = BASE_DIR / "output"
 
-# Directorio donde se almacenan los manuales de marca (JSON)
+# Directory where brand manuals (JSON) are stored
 BRAND_MANUALS_DIR = BASE_DIR / "brand_manuals"
 
-# Directorio de assets globales
+# Global assets directory
 ASSETS_DIR = BASE_DIR / "assets"
 
-# Directorio de fuentes
+# Fonts directory
 FONTS_DIR = BASE_DIR / "fonts"

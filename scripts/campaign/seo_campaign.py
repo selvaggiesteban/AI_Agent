@@ -45,14 +45,14 @@ def perform_seo_audit(google_integration, domain, conventions=""):
         logger.error(f"SEO audit AI summary failed for {domain}: {e}")
         return f"Metrics fetched: {metrics_summary}"
 
-def run_posicionamiento_campaign(conventions=""):
+def run_seo_campaign(conventions=""):
     """
-    Executes the 'Posicionamiento web' campaign:
+    Executes the 'Web Positioning' campaign:
     1. Loops through a list of domains.
     2. Performs a real SEO audit using GSC/GA4 for each.
     3. Sends a consolidated report via Gmail with attachments.
     """
-    logger.info("Starting 'Posicionamiento web' campaign...")
+    logger.info("Starting 'Web Positioning' campaign...")
 
     try:
         with open("data/campaign_config.json", "r", encoding="utf-8") as f:
@@ -91,12 +91,12 @@ def run_posicionamiento_campaign(conventions=""):
         )
 
         if success:
-            logger.info("'Posicionamiento web' campaign completed successfully.")
+            logger.info("'Web Positioning' campaign completed successfully.")
         else:
-            logger.error("'Posicionamiento web' campaign failed to send email.")
+            logger.error("'Web Positioning' campaign failed to send email.")
 
     except Exception as e:
-        logger.exception(f"Critical error in 'Posicionamiento web' campaign: {e}")
+        logger.exception(f"Critical error in 'Web Positioning' campaign: {e}")
 
 if __name__ == "__main__":
-    run_posicionamiento_campaign()
+    run_seo_campaign()

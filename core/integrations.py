@@ -140,7 +140,7 @@ class TrelloIntegration:
         self.token = token
         self.client = pytrello.TrelloClient(api_key=api_key, token=token)
 
-    def get_board_cards(self, board_id: str, list_name: str = "En Proceso") -> List[Dict[str, Any]]:
+    def get_board_cards(self, board_id: str, list_name: str = "In Process") -> List[Dict[str, Any]]:
         """Fetches cards from a specific list on a Trello board."""
         try:
             board = self.client.get_board(board_id)
@@ -268,7 +268,7 @@ class GmailIntegration:
 
             imap = imaplib.IMAP4_SSL("imap.gmail.com")
             imap.login(self.sender_email, self.app_password)
-            status, data = imap.append("[Gmail]/Borradores", "\\Draft", None, raw.encode("utf-8"))
+            status, data = imap.append("[Gmail]/Drafts", "\\Draft", None, raw.encode("utf-8"))
             imap.logout()
 
             if status == "OK":

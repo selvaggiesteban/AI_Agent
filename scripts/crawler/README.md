@@ -1,132 +1,132 @@
 # SEO Crawler Suite
 
-Suite de herramientas Python para rastrear sitios web y generar reportes SEO completos.
+Suite of Python tools to crawl websites and generate comprehensive SEO reports.
 
-## 📋 Herramientas Incluidas
+## 📋 Included Tools
 
 ### 1. WordPress SEO Crawler (`wordpress_seo_crawler.py`)
-Rastreador de blogs WordPress para análisis SEO completo.
+WordPress blog crawler for full SEO analysis.
 
 ### 2. Site Mapper (`site_mapper.py`)
-Mapea todas las páginas de un sitio web generando una lista completa de URLs.
+Maps all pages of a website, generating a complete list of URLs.
 
 ### 3. SEO Verifier (`seo_verifier.py`)
-Verifica 17+ requisitos SEO en cada página del sitio.
+Verifies 17+ SEO requirements on each page of the site.
 
 ### 4. HTML Report Generator (`html_report_generator.py`)
-Genera reportes HTML interactivos con resultados visuales.
+Generates interactive HTML reports with visual results.
 
-## 🚀 Instalación
+## 🚀 Installation
 
-### 1. Requisitos previos
-- Python 3.7 o superior
-- pip (gestor de paquetes de Python)
+### 1. Prerequisites
+- Python 3.7 or higher
+- pip (Python package manager)
 
-### 2. Instalar dependencias
+### 2. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 💻 Uso Rápido
+## 💻 Quick Start
 
-### Paso 1: Mapear el sitio
+### Step 1: Map the site
 ```bash
 python site_mapper.py https://lanuscomputacion.com -o lanus_map.json
 ```
 
-### Paso 2: Verificar SEO
+### Step 2: Verify SEO
 ```bash
 python seo_verifier.py -f lanus_map.json -o lanus_seo.json
 ```
 
-### Paso 3: Generar reporte HTML
+### Step 3: Generate HTML report
 ```bash
-python html_report_generator.py lanus_seo.json -o reportes/lanuscomputacion/
+python html_report_generator.py lanus_seo.json -o reports/lanuscomputacion/
 ```
 
-## 📊 Flujo de Trabajo Completo
+## 📊 Complete Workflow
 
 ```bash
-# 1. Mapear los 3 sitios
+# 1. Map the 3 sites
 python site_mapper.py https://lanuscomputacion.com -o data/lanus_map.json
 python site_mapper.py https://selvaggiconsultores.com -o data/selvaggiconsultores_map.json
 python site_mapper.py https://selvaggiesteban.dev -o data/selvaggiesteban_map.json
 
-# 2. Verificar SEO en cada sitio
+# 2. Verify SEO for each site
 python seo_verifier.py -f data/lanus_map.json -o data/lanus_seo.json
 python seo_verifier.py -f data/selvaggiconsultores_map.json -o data/selvaggiconsultores_seo.json
 python seo_verifier.py -f data/selvaggiesteban_map.json -o data/selvaggiesteban_seo.json
 
-# 3. Generar reportes HTML
-python html_report_generator.py data/lanus_seo.json -o reportes/lanuscomputacion/
-python html_report_generator.py data/selvaggiconsultores_seo.json -o reportes/selvaggiconsultores/
-python html_report_generator.py data/selvaggiesteban_seo.json -o reportes/selvaggiesteban/
+# 3. Generate HTML reports
+python html_report_generator.py data/lanus_seo.json -o reports/lanuscomputacion/
+python html_report_generator.py data/selvaggiconsultores_seo.json -o reports/selvaggiconsultores/
+python html_report_generator.py data/selvaggiesteban_seo.json -o reports/selvaggiesteban/
 
-# 4. Generar reporte comparativo
-python html_report_generator.py data/lanus_seo.json -o reportes/ --compare data/selvaggiconsultores_seo.json data/selvaggiesteban_seo.json
+# 4. Generate comparative report
+python html_report_generator.py data/lanus_seo.json -o reports/ --compare data/selvaggiconsultores_seo.json data/selvaggiesteban_seo.json
 ```
 
-## 🔍 Verificaciones SEO
+## 🔍 SEO Verifications
 
-El script `seo_verifier.py` verifica los siguientes requisitos:
+The `seo_verifier.py` script verifies the following requirements:
 
-### SEO Técnico
-- ✅ Meta título único por página
-- ✅ Meta descripción única
-- ✅ H1 único por página
-- ✅ H1 diferente al meta-título
-- ✅ Schema JSON-LD presente
+### Technical SEO
+- ✅ Unique meta title per page
+- ✅ Unique meta description
+- ✅ Unique H1 per page
+- ✅ H1 different from meta-title
+- ✅ JSON-LD Schema present
 - ✅ Open Graph image
 - ✅ Favicon
 
-### Diseño Responsive
-- ✅ Viewport meta tag configurado
-- ✅ Imágenes en formato WebP
-- ✅ Alt text en todas las imágenes
+### Responsive Design
+- ✅ Viewport meta tag configured
+- ✅ Images in WebP format
+- ✅ Alt text on all images
 
-### Legal y Contacto
-- ✅ Aviso de Cookies
-- ✅ Políticas de Privacidad
-- ✅ Información de contacto real
+### Legal and Contact
+- ✅ Cookie Notice
+- ✅ Privacy Policies
+- ✅ Real contact information
 
-### Analytics y Redes
-- ✅ Google Analytics configurado
-- ✅ Redes sociales en footer
-- ✅ Portfolio en footer
+### Analytics and Social
+- ✅ Google Analytics configured
+- ✅ Social networks in footer
+- ✅ Portfolio in footer
 
-### Contenido
-- ✅ FAQ presente
+### Content
+- ✅ FAQ present
 
-## 📁 Estructura de Archivos
+## 📁 File Structure
 
 ```
 crawler/
-├── wordpress_seo_crawler.py    # Crawler original WordPress
-├── site_mapper.py              # Mapeador de sitios
-├── seo_verifier.py             # Verificador SEO
-├── html_report_generator.py    # Generador de reportes HTML
-├── requirements.txt            # Dependencias
-├── README.md                   # Esta documentación
-├── data/                       # Datos generados (JSON, CSV)
-│   ├── *_map.json              # Mapas de sitios
-│   └── *_seo.json              # Resultados SEO
-└── reportes/                   # Reportes HTML generados
+├── wordpress_seo_crawler.py    # Original WordPress Crawler
+├── site_mapper.py              # Site Mapper
+├── seo_verifier.py             # SEO Verifier
+├── html_report_generator.py    # HTML Report Generator
+├── requirements.txt            # Dependencies
+├── README.md                   # This documentation
+├── data/                       # Generated data (JSON, CSV)
+│   ├── *_map.json              # Site maps
+│   └── *_seo.json              # SEO results
+└── reports/                    # Generated HTML reports
     ├── lanuscomputacion/
     ├── selvaggiconsultores/
     └── selvaggiesteban/
 ```
 
-## 📊 Formato de Salida
+## 📊 Output Format
 
-### JSON (para procesamiento programático)
+### JSON (for programmatic processing)
 ```json
 {
   "base_url": "https://lanuscomputacion.com",
   "total_pages": 50,
   "results": [
     {
-      "url": "https://lanuscomputacion.com/servicios/seo",
+      "url": "https://lanuscomputacion.com/services/seo",
       "score": 85.7,
       "passed": 15,
       "failed": 2,
@@ -136,88 +136,88 @@ crawler/
 }
 ```
 
-### HTML (para visualización)
-Reportes interactivos con:
-- Resumen general con estadísticas
-- Detalle por página con colores
-- Filtros por verificación
-- Diseño responsive
+### HTML (for visualization)
+Interactive reports with:
+- General summary with statistics
+- Page detail with colors
+- Filters by verification
+- Responsive design
 
-## ⚙️ Opciones de los Scripts
+## ⚙️ Script Options
 
 ### site_mapper.py
 ```bash
 python site_mapper.py <url> [-m MAX_PAGES] [-d DELAY] [-o OUTPUT]
 ```
-- `url`: URL base del sitio
-- `-m, --max-pages`: Máximo de páginas (default: 200)
-- `-d, --delay`: Delay entre peticiones (default: 0.5s)
-- `-o, --output`: Nombre base del archivo de salida
+- `url`: Base URL of the site
+- `-m, --max-pages`: Maximum number of pages (default: 200)
+- `-d, --delay`: Delay between requests (default: 0.5s)
+- `-o, --output`: Base name of the output file
 
 ### seo_verifier.py
 ```bash
 python seo_verifier.py [urls...] [-f FILE] [-d DELAY] [-o OUTPUT]
 ```
-- `urls`: URLs a verificar
-- `-f, --file`: Archivo JSON con URLs (generado por site_mapper.py)
-- `-d, --delay`: Delay entre peticiones (default: 0.5s)
-- `-o, --output`: Nombre base del archivo de salida
+- `urls`: URLs to verify
+- `-f, --file`: JSON file with URLs (generated by site_mapper.py)
+- `-d, --delay`: Delay between requests (default: 0.5s)
+- `-o, --output`: Base name of the output file
 
 ### html_report_generator.py
 ```bash
 python html_report_generator.py <input> [-o OUTPUT_DIR] [-n NAME] [--compare FILES...]
 ```
-- `input`: Archivo JSON con resultados
-- `-o, --output-dir`: Directorio de salida (default: reportes)
-- `-n, --name`: Nombre del archivo HTML (default: reporte_seo.html)
-- `--compare`: Archivos JSON adicionales para comparar
+- `input`: JSON file with results
+- `-o, --output-dir`: Output directory (default: reports)
+- `-n, --name`: HTML filename (default: report_seo.html)
+- `--compare`: Additional JSON files to compare
 
-## 🎯 Casos de Uso
+## 🎯 Use Cases
 
-### 1. Auditoría SEO completa
+### 1. Full SEO Audit
 ```bash
-python site_mapper.py https://misitio.com -o data/map.json
+python site_mapper.py https://mysite.com -o data/map.json
 python seo_verifier.py -f data/map.json -o data/seo.json
-python html_report_generator.py data/seo.json -o reportes/misitio/
+python html_report_generator.py data/seo.json -o reports/mysite/
 ```
 
-### 2. Comparar 2 sitios competidores
+### 2. Compare 2 Competitor Sites
 ```bash
-python html_report_generator.py data/mi_sitio.json -o reportes/ --compare data/competidor.json
+python html_report_generator.py data/my_site.json -o reports/ --compare data/competitor.json
 ```
 
-### 3. Monitoreo periódico
+### 3. Periodic Monitoring
 ```bash
-# Ejecutar semanalmente y guardar con fecha
+# Run weekly and save with date
 python seo_verifier.py -f data/map.json -o "data/seo_$(date +%Y%m%d).json"
 ```
 
-## 🐛 Solución de Problemas
+## 🐛 Troubleshooting
 
-### Error de conexión
+### Connection Error
 ```bash
-# Aumentar delay
-python site_mapper.py https://ejemplo.com -d 2.0
+# Increase delay
+python site_mapper.py https://example.com -d 2.0
 ```
 
 ### Timeout
 ```bash
-# Reducir páginas máximas
-python site_mapper.py https://ejemplo.com -m 50
+# Reduce maximum pages
+python site_mapper.py https://example.com -m 50
 ```
 
-### Memoria insuficiente
+### Insufficient Memory
 ```bash
-# Procesar por lotes
-python site_mapper.py https://ejemplo.com -m 100 -o batch1.json
+# Process in batches
+python site_mapper.py https://example.com -m 100 -o batch1.json
 ```
 
-## 📚 Dependencias
+## 📚 Dependencies
 
-- **requests**: Peticiones HTTP
-- **beautifulsoup4**: Análisis HTML
-- **lxml**: Parser rápido para BeautifulSoup
+- **requests**: HTTP requests
+- **beautifulsoup4**: HTML analysis
+- **lxml**: Fast parser for BeautifulSoup
 
-## 📄 Licencia
+## 📄 License
 
-Script de uso libre para análisis SEO.
+Free use script for SEO analysis.

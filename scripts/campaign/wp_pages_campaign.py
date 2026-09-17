@@ -6,12 +6,12 @@ from core.ai_engine import llm
 
 def run_wp_pages_campaign(conventions=""):
     """
-    Executes the 'Páginas de WordPress' campaign:
+    Executes the 'WordPress Pages' campaign:
     1. Analyzes existing WP page structures.
     2. Suggests optimizations for conversion and UX.
     3. Sends results via Gmail.
     """
-    logger.info("Starting 'Páginas de WordPress' campaign...")
+    logger.info("Starting 'WordPress Pages' campaign...")
     try:
         with open("data/campaign_config.json", "r", encoding="utf-8") as f:
             config = json.load(f).get("wp_pages", {})
@@ -44,12 +44,12 @@ def run_wp_pages_campaign(conventions=""):
         )
 
         if success:
-            logger.info("'Páginas de WordPress' campaign completed successfully.")
+            logger.info("'WordPress Pages' campaign completed successfully.")
         else:
-            logger.error("'Páginas de WordPress' campaign failed to send email.")
+            logger.error("'WordPress Pages' campaign failed to send email.")
 
     except Exception as e:
-        logger.exception(f"Critical error in 'Páginas de WordPress' campaign: {e}")
+        logger.exception(f"Critical error in 'WordPress Pages' campaign: {e}")
 
 if __name__ == "__main__":
     run_wp_pages_campaign()

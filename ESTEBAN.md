@@ -53,10 +53,10 @@
 - [SQLite](https://github.com/modelcontextprotocol/servers/tree/main/src/sqlite)
 - [Postgres](https://github.com/modelcontextprotocol/servers/tree/main/src/postgres)
 - [GitHub MCP](https://github.com/github/github-mcp-server) — PRs, issues, commits, code review
-- [Playwright MCP](https://github.com/microsoft/playwright-mcp) — Browser automation y testing
+- [Playwright MCP](https://github.com/microsoft/playwright-mcp) — Browser automation and testing
 - [Sentry MCP](https://github.com/getsentry/sentry-mcp) — Error monitoring
 - [Cloudflare MCP](https://github.com/cloudflare/mcp-server-cloudflare) — Workers, KV, D1, R2
-- [Supabase MCP](https://supabase.com/docs/guides/ai-tools/mcp) — Database y auth
+- [Supabase MCP](https://supabase.com/docs/guides/ai-tools/mcp) — Database and auth
 
 ### Third-Party MCP Servers
 
@@ -121,34 +121,34 @@
 
 ### Claude Code
 
-- [mcp-server-dev](https://github.com/anthropics/claude-plugins-official) — Scaffolding de servidores MCP
-- [Superpowers](https://github.com/obra/superpowers) — Suite de skills para AI engineering
-- [Skill Creator](https://claude.com/plugins) — Crear y distribuir skills personalizadas
-- [Claude Code Setup](https://claude.com/plugins) — Configuración inicial y mejores prácticas
-- [Plugin Developer Toolkit](https://claude.com/plugins) — Desarrollo de plugins
-- [Frontend Design](https://claude.com/plugins) — Diseño frontend con Figma integration
-- [postman](https://claude.com/plugins) — API testing con Postman
-- [PostHog](https://claude.com/plugins) — Analytics y tracking de eventos
-- [Qodo Skills](https://claude.com/plugins) — Code review y testing
-- [Datadog](https://claude.com/plugins) — Monitoreo y observabilidad
+- [mcp-server-dev](https://github.com/anthropics/claude-plugins-official) — MCP server scaffolding
+- [Superpowers](https://github.com/obra/superpowers) — Skill suite for AI engineering
+- [Skill Creator](https://claude.com/plugins) — Create and distribute custom skills
+- [Claude Code Setup](https://claude.com/plugins) — Initial setup and best practices
+- [Plugin Developer Toolkit](https://claude.com/plugins) — Plugin development
+- [Frontend Design](https://claude.com/plugins) — Frontend design with Figma integration
+- [postman](https://claude.com/plugins) — API testing with Postman
+- [PostHog](https://claude.com/plugins) — Analytics and event tracking
+- [Qodo Skills](https://claude.com/plugins) — Code review and testing
+- [Datadog](https://claude.com/plugins) — Monitoring and observability
 
 ### OpenCode
 
-- [opencode-daytona](https://github.com/daytonaio/daytona/tree/main/libs/opencode-plugin) — Sandboxes aislados con git sync y live previews
-- [opencode-firecrawl](https://github.com/firecrawl/opencode-firecrawl) — Web scraping, crawling y search vía Firecrawl CLI
-- [opencode-sentry-monitor](https://github.com/stolinski/opencode-sentry-monitor) — Trace y debug de agentes con Sentry AI Monitoring
-- [opencode-jfrog-plugin](https://github.com/jfrog/opencode-jfrog-plugin) — Integración con JFrog platform
-- [opencode-openai-codex-auth](https://github.com/numman-ali/opencode-openai-codex-auth) — Usar suscripción ChatGPT Plus/Pro
-- [opencode-gemini-auth](https://github.com/jenslys/opencode-gemini-auth) — Usar plan Gemini existente
-- [opencode-antigravity-auth](https://github.com/NoeFabris/opencode-antigravity-auth) — Modelos gratuitos vía Antigravity
-- [opencode-dynamic-context-pruning](https://github.com/Tarquinen/opencode-dynamic-context-pruning) — Optimización de tokens podando outputs obsoletos
-- [opencode-vibeguard](https://github.com/inkdust2021/opencode-vibeguard) — Redacción de secrets/PII antes de llamadas LLM
-- [opencode-pty](https://github.com/shekohex/opencode-pty) — Procesos background en PTY con input interactivo
-- [opencode-supermemory](https://github.com/supermemoryai/opencode-supermemory) — Memoria persistente entre sesiones
-- [opencode-background-agents](https://github.com/kdcokenny/opencode-background-agents) — Background agents estilo Claude Code
-- [opencode-workspace](https://github.com/kdcokenny/opencode-workspace) — Orquestación multi-agent (16 componentes)
-- [opencode-worktree](https://github.com/kdcokenny/opencode-worktree) — Git worktrees de cero fricción
-- [opencode-scheduler](https://github.com/different-ai/opencode-scheduler) — Jobs recurrentes con cron syntax
-- [opencode-conductor](https://github.com/derekbar90/opencode-conductor) — Workflow Context → Spec → Plan → Implement
-- [opencode-wakatime](https://github.com/angristan/opencode-wakatime) — Tracking de uso con Wakatime
-- [opencode-notificator](https://github.com/panta82/opencode-notificator) — Notificaciones desktop y alertas sonoras
+- [opencode-daytona](https://github.com/daytonaio/daytona/tree/main/libs/opencode-plugin) — Isolated sandboxes with git sync and live previews
+- [opencode-firecrawl](https://github.com/firecrawl/opencode-firecrawl) — Web scraping, crawling, and search via Firecrawl CLI
+- [opencode-sentry-monitor](https://github.com/stolinski/opencode-sentry-monitor) — Agent trace and debug with Sentry AI Monitoring
+- [opencode-jfrog-plugin](https://github.com/jfrog/opencode-jfrog-plugin) — Integration with JFrog platform
+- [opencode-openai-codex-auth](https://github.com/numman-ali/opencode-openai-codex-auth) — Use ChatGPT Plus/Pro subscription
+- [opencode-gemini-auth](https://github.com/jenslys/opencode-gemini-auth) — Use existing Gemini plan
+- [opencode-antigravity-auth](https://github.com/NoeFabris/opencode-antigravity-auth) — Free models via Antigravity
+- [opencode-dynamic-context-pruning](https://github.com/Tarquinen/opencode-dynamic-context-pruning) — Token optimization by pruning obsolete outputs
+- [opencode-vibeguard](https://github.com/inkdust2021/opencode-vibeguard) — Redaction of secrets/PII before LLM calls
+- [opencode-pty](https://github.com/shekohex/opencode-pty) — Background processes in PTY with interactive input
+- [opencode-supermemory](https://github.com/supermemoryai/opencode-supermemory) — Persistent memory between sessions
+- [opencode-background-agents](https://github.com/kdcokenny/opencode-background-agents) — Claude Code-style background agents
+- [opencode-workspace](https://github.com/kdcokenny/opencode-workspace) — Multi-agent orchestration (16 components)
+- [opencode-worktree](https://github.com/kdcokenny/opencode-worktree) — Frictionless git worktrees
+- [opencode-scheduler](https://github.com/different-ai/opencode-scheduler) — Recurring jobs with cron syntax
+- [opencode-conductor](https://github.com/derekbar90/opencode-conductor) — Workflow Context $\rightarrow$ Spec $\rightarrow$ Plan $\rightarrow$ Implement
+- [opencode-wakatime](https://github.com/angristan/opencode-wakatime) — Usage tracking with Wakatime
+- [opencode-notificator](https://github.com/panta82/opencode-notificator) — Desktop notifications and sound alerts

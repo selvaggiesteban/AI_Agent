@@ -50,55 +50,62 @@ class FacebookGroupBot(BaseBot):
                 yield d
 
     async def post_to_group(self, page, group_url):
-        print(f"[*] Navegando a: {group_url}")
+        print(f"[*] Navigating to: {group_url}")
         try:
-            # Forzamos la URL para ir directamente a la zona de creación si es posible
+            # Force the URL to go directly to the creation area if possible
             await page.goto(group_url, wait_until="domcontentloaded", timeout=60000)
             await asyncio.sleep(random.uniform(6, 9))
 
-            # 1. Identificar si es un grupo de Compra/Venta (Marketplace)
-            # Los grupos de venta tienen botones como "¿Qué vendes?" o "Vender algo"
+            # 1. Identify if it's a Buy/Sell group (Marketplace)
+            # Sell groups have buttons like "What are you selling?" or "Sell something"
             sell_selectors = [
                 'span:has-text("¿Qué vendes?")',
                 'span:has-text("Vender algo")',
-                'span:has-text("Vender")'
+                'span:has-text("Vender")',
+                'span:has-text("What are you selling?")',
+                'span:has-text("Sell something")',
+                'span:has-text("Sell")'
             ]
-            
+
             is_sell_group = False
             for s in sell_selectors:
                 if await page.query_selector(s):
                     is_sell_group = True
                     break
 
-            # 2. Si es grupo de venta, preferimos ir a la pestaña "Conversación" para un post normal
+            # 2. If it's a sell group, we prefer to go to the "Discussion" tab for a normal post
             if is_sell_group:
-                print("[*] Detectado grupo de venta, buscando pestaña Conversación...")
+                print("[*] Sell group detected, searching for Discussion tab...")
                 conv_found = False
                 tabs = await page.query_selector_all('a[role="tab"]')
                 for tab in tabs:
                     text = await tab.inner_text()
-                    if "Conversación" in text or "Discusión" in text:
+                    if any(keyword in text for keyword in ["Conversación", "Discusión", "Discussion"]):
                         await tab.click()
                         await asyncio.sleep(5)
                         conv_found = True
                         break
                 if not conv_found:
-                    # A veces no es un tab, sino un link
+                    # Sometimes it's not a tab, but a link
                     links = await page.query_selector_all('a')
                     for link in links:
                         text = await link.inner_text()
-                        if "Conversación" in text or "Discusión" in text:
+                        if any(keyword in text for keyword in ["Conversación", "Discusión", "Discussion"]):
                             await link.click()
                             await asyncio.sleep(5)
                             break
 
-            # 3. Buscar el botón de "Escribe algo..." pero filtrando para que sea el principal
-            # Evitamos los que están dentro de comentarios buscando roles de botón fuera de listas de noticias
+            # 3. Search for the "Write something..." button but filter so it's the main one
+            # We avoid those inside comments by searching for button roles outside news lists
             main_post_selectors = [
                 'div[role="button"]:has-text("Escribe algo...")',
                 'div[role="button"]:has-text("Crear publicación pública...")',
                 'div[aria-label*="Escribe algo"]',
-                'div[role="button"]:has-text("¿Qué estás pensando?")'
+                'div[role="button"]:has-text("¿Qué estás pensando?")',
+                'div[role="button"]:has-text("Write something...")',
+                'div[role="button"]:has-text("Create a public post...")',
+                'div[aria-label*="Write something"]',
+                'div[role="button"]:has-text("What\'s on your mind?")'
             ]
 
             found = False
@@ -107,38 +114,39 @@ class FacebookGroupBot(BaseBot):
                     elements = await page.query_selector_all(selector)
                     for element in elements:
                         if await element.is_visible():
-                            await element.click(force=True) # Usamos force para saltar overlays
+                            await element.click(force=True) # Use force to skip overlays
                             found = True
                             break
                     if found: break
                 except: continue
 
             if not found:
-                print(f"[-] No se encontró área de post principal en {group_url}")
+                print(f"[-] Main post area not found in {group_url}")
                 return False
 
-            print("[*] Botón de post clickeado, esperando modal...")
+            print("[*] Post button clicked, waiting for modal...")
             await asyncio.sleep(5)
-            
-            # 4. Escribir el mensaje en el modal (Surgical Targeting)
+
+            # 4. Write the message in the modal (Surgical Targeting)
             try:
-                # Buscamos el modal que específicamente sea para crear publicaciones
+                # We look for the modal that is specifically for creating posts
                 modal_selectors = [
                     'div[role="dialog"][aria-label="Crear publicación"]',
                     'div[role="dialog"][aria-label="Create post"]',
                     'div[role="dialog"]:has-text("Crear publicación")',
+                    'div[role="dialog"]:has-text("Create post")',
                     'div[role="dialog"]' # Fallback
                 ]
-                
+
                 modal = None
                 for ms in modal_selectors:
                     elements = await page.query_selector_all(ms)
                     for el in elements:
                         if await el.is_visible():
-                            # Verificamos que contenga un textbox para estar seguros
+                            # Verify it contains a textbox to be sure
                             if await el.query_selector('div[role="textbox"]'):
                                 modal = el
-                                print(f"[*] Modal correcto detectado: {ms}")
+                                print(f"[*] Correct modal detected: {ms}")
                                 break
                     if modal: break
 
@@ -147,50 +155,50 @@ class FacebookGroupBot(BaseBot):
                     if textbox:
                         await textbox.click(force=True)
                         await asyncio.sleep(3)
-                        # Limpiamos y escribimos
+                        # Clear and write
                         await textbox.fill(MESSAGE)
                         await asyncio.sleep(random.uniform(4, 6))
-                        
-                        # 5. Botón Publicar dentro del modal
+
+                        # 5. Post button inside the modal
                         post_btn_selectors = [
                             'div[aria-label="Publicar"][role="button"]',
                             'div[aria-label="Post"][role="button"]',
                             'div[role="button"]:has-text("Publicar")',
                             'div[role="button"]:has-text("Post")'
                         ]
-                        
+
                         btn_found = False
                         for btn_selector in post_btn_selectors:
                             btn = await modal.query_selector(btn_selector)
                             if btn and await btn.is_visible():
-                                # Verificamos que esté habilitado (FB a veces lo deshabilita mientras procesa)
+                                # Verify it's enabled (FB sometimes disables it while processing)
                                 await btn.click(force=True)
                                 btn_found = True
                                 break
-                        
+
                         if btn_found:
-                            print(f"[+] Publicando... esperando confirmación final")
-                            # Esperar a que el modal desaparezca
+                            print(f"[+] Posting... waiting for final confirmation")
+                            # Wait for modal to disappear
                             try:
                                 await asyncio.sleep(10)
-                                print("[+] Publicación enviada.")
+                                print("[+] Post sent.")
                                 return True
                             except: return True
                     else:
-                        print("[-] No se encontró textbox en el modal.")
+                        print("[-] No textbox found in the modal.")
                 else:
-                    print("[-] No se detectó el modal de publicación.")
+                    print("[-] Post modal not detected.")
             except Exception as e:
-                print(f"[-] Error procesando modal: {e}")
-            
+                print(f"[-] Error processing modal: {e}")
+
             return False
         except Exception as e:
-            print(f"[-] Error en {group_url}: {e}")
+            print(f"[-] Error in {group_url}: {e}")
             return False
 
     async def run(self):
         if not self.groups:
-            print("❌ No se encontraron grupos en el .env (FACEBOOK_GROUPS)")
+            print("❌ No groups found in .env (FACEBOOK_GROUPS)")
             return
 
         # Check log for already processed groups TODAY
@@ -199,49 +207,49 @@ class FacebookGroupBot(BaseBot):
         if self.log_file.exists():
             with open(self.log_file, "r", encoding="utf-8") as f:
                 for line in f:
-                    if today_str in line and "EXITO" in line:
+                    if today_str in line and "SUCCESS" in line:
                         parts = line.split(" | ")
                         if len(parts) >= 3: processed_today.add(parts[2].strip())
 
         groups_to_process = [g for g in self.groups if g not in processed_today]
         if not groups_to_process:
-            print("✅ Todo procesado por hoy.")
+            print("✅ All processed for today.")
             return
 
-        print(f"[*] Grupos pendientes: {len(groups_to_process)}")
+        print(f"[*] Pending groups: {len(groups_to_process)}")
         delay_gen = self.get_delays()
 
         async with async_playwright() as p:
-            print(f"[*] Iniciando Chrome (Perfil: {self.profile_name})")
+            print(f"[*] Starting Chrome (Profile: {self.profile_name})")
             browser = await p.chromium.launch_persistent_context(
                 user_data_dir=self.profile_path,
                 headless=False,
                 args=[f"--profile-directory={self.profile_name}"]
             )
-            
+
             page = browser.pages[0] if browser.pages else await browser.new_page()
-            
-            print("[*] Validando sesión en Facebook...")
+
+            print("[*] Validating session on Facebook...")
             await page.goto("https://www.facebook.com/", wait_until="domcontentloaded")
             await asyncio.sleep(5)
-            
+
             if "login" in page.url or await page.query_selector('input[name="email"]'):
-                print("⚠️ No detecto sesión. Por favor logueate manualmente en la ventana abierta.")
+                print("⚠️ Session not detected. Please login manually in the open window.")
                 # Wait for user to login
                 while "login" in page.url or await page.query_selector('input[name="email"]'):
                     await asyncio.sleep(5)
-                print("✅ Sesión detectada.")
+                print("✅ Session detected.")
 
             for i, group in enumerate(groups_to_process):
                 success = await self.post_to_group(page, group)
-                
+
                 with open(self.log_file, "a", encoding="utf-8") as f:
-                    status = "EXITO" if success else "FALLO"
+                    status = "SUCCESS" if success else "FAILURE"
                     f.write(f"{datetime.now().isoformat()} | {status} | {group} | MSG: {MESSAGE[:30]}...\n")
 
                 if i < len(groups_to_process) - 1:
                     delay = next(delay_gen)
-                    print(f"[*] Espera de {delay} min...")
+                    print(f"[*] Wait for {delay} min...")
                     for _ in range(delay * 60): await asyncio.sleep(1)
 
             await browser.close()

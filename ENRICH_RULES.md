@@ -1,74 +1,74 @@
-# ENRICH_RULES.md — Reglas de Enriquecimiento de contacts.db
+# ENRICH_RULES.md — Enrichment Rules for contacts.db
 
-> **Última actualización:** 2026-07-27
-> **DB:** `data/inputs/contacts.db` (SQLite, v4 normalizada, ~124K contactos)
+> **Last Update:** 2026-07-27
+> **DB:** `data/inputs/contacts.db` (SQLite, normalized v4, ~124K contacts)
 
 ---
 
-## 1. Validación de Emails — Código existente
+## 1. Email Validation — Existing Code
 
-### 1.1 Scripts que ya implementan validación
+### 1.1 Scripts already implementing validation
 
-| Script | Ubicación | Qué hace | Reglas |
+| Script | Location | Action | Rules |
 |---|---|---|---|
-| `archive/cleanup_phase4.py` | `scripts/database_manager/archive/` | Elimina emails junk de la DB | 12 emails exactos + 2 dominios (`example.com`, `ejemplo.com`) + 2 substrings (`sentry`, `wixpress`) |
-| `enrich_campaign_logs.py` | `scripts/database_manager/` | Filtra junk al importar logs EXITO/FALLO | `JUNK_PATTERNS`: sentry, wixpress, example, test, demo, `@2x.png`, `.js`, `username@domain`, `your@mail`, `juan.perez`, beispiel, ejemplo, mysite |
-| `enrich_gmail_csvs.py` | `scripts/database_manager/` | Filtra junk al importar Gmail CSVs | Mismos `JUNK_PATTERNS` |
-| `enrich_identity_maps.py` | `scripts/database_manager/` | Filtra junk al importar identity maps | Mismos `JUNK_PATTERNS` |
-| `campaign_engine.py` | `scripts/e-mail_marketing_manager/e-mail_marketing_campaigns/` | Filtra al crear campañas | Regex + `exclude_patterns`: sentry, wixpress, noreply, abuse |
-| `generate_5_csvs.py` | `scripts/e-mail_marketing_manager/` | Detecta auto-respuestas | `AUTO_REPLY_PATTERNS`: auto-reply, mailer-daemon, noreply, postmaster, bounce, donotreply, etc. (13 patrones) |
+| `archive/cleanup_phase4.py` | `scripts/database_manager/archive/` | Removes junk emails from DB | 12 exact emails + 2 domains (`example.com`, `ejemplo.com`) + 2 substrings (`sentry`, `wixpress`) |
+| `enrich_campaign_logs.py` | `scripts/database_manager/` | Filters junk when importing SUCCESS/FAILURE logs | `JUNK_PATTERNS`: sentry, wixpress, example, test, demo, `@2x.png`, `.js`, `username@domain`, `your@mail`, `juan.perez`, beispiel, ejemplo, mysite |
+| `enrich_gmail_csvs.py` | `scripts/database_manager/` | Filters junk when importing Gmail CSVs | Same `JUNK_PATTERNS` |
+| `enrich_identity_maps.py` | `scripts/database_manager/` | Filters junk when importing identity maps | Same `JUNK_PATTERNS` |
+| `campaign_engine.py` | `scripts/e-mail_marketing_manager/e-mail_marketing_campaigns/` | Filters when creating campaigns | Regex + `exclude_patterns`: sentry, wixpress, noreply, abuse |
+| `generate_5_csvs.py` | `scripts/e-mail_marketing_manager/` | Detects auto-replies | `AUTO_REPLY_PATTERNS`: auto-reply, mailer-daemon, noreply, postmaster, bounce, donotreply, etc. (13 patterns) |
 
-### 1.2 Reglas consolidadas de validación
+### 1.2 Consolidated Validation Rules
 
-**Regex base:**
+**Base Regex:**
 ```
 ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
 ```
 
-**Dominios reject** (substrings en dominio):
+**Reject Domains** (substrings in domain):
 `sentry`, `wixpress`, `example`, `ejemplo`, `test`, `demo`
 
-**Patrones reject** (substrings en email completo):
+**Reject Patterns** (substrings in full email):
 `@2x.png`, `@2x.webp`, `.js`, `username@domain`, `your@mail`, `juan.perez`, `beispiel`, `ejemplo`, `mysite`
 
-**Auto-reply / system reject** (prefix o substring):
+**Auto-reply / system reject** (prefix or substring):
 `noreply`, `no-reply`, `mailer-daemon`, `postmaster`, `abuse`, `auto-reply`, `donotreply`, `auto_submit`
 
-**Emails placeholder exactos** (rechazar si coincide):
-`tunombre@email.com`, `usuario@dominio.com`, `nombre@ejemplo.com`, `john@doe.com`, `info@yourdomain.com`, `info@website.com`, `hola@miempresa.es`, `email@example.com`, `ejemplo@mail.com`, `email@ejemplo.com`, `nombre@mail.com`, `theratio_interior@mail.com`
+**Exact Placeholder Emails** (reject if match):
+`yourname@email.com`, `user@domain.com`, `name@example.com`, `john@doe.com`, `info@yourdomain.com`, `info@website.com`, `hello@mycompany.es`, `email@example.com`, `example@mail.com`, `email@example.com`, `name@mail.com`, `theratio_interior@mail.com`
 
-### 1.3 Regla para múltiples emails en un campo
+### 1.3 Rule for multiple emails in one field
 
-La DB tiene dos columnas: `lead.primary_email` y `lead.secondary_emails`.
+The DB has two columns: `lead.primary_email` and `lead.secondary_emails`.
 
-Si el CSV trae múltiples emails en el campo `emails`:
-- **Primero** → `lead.primary_email`
-- **Resto** → `lead.secondary_emails` (separados por `;`)
-- Cada email individual debe pasar la validación antes de guardarse
+If the CSV contains multiple emails in the `emails` field:
+- **First** $\rightarrow$ `lead.primary_email`
+- **Others** $\rightarrow$ `lead.secondary_emails` (separated by `;`)
+- Each individual email must pass validation before being saved.
 
-### 1.4 Regla de máxima cobertura
+### 1.4 Maximum Coverage Rule
 
-**Siempre insertar TODOS los emails nuevos de todas las filas**, no solo el primer email. Cada email válido que no exista en la DB debe generar un contacto nuevo.
+**Always insert ALL new emails from all rows**, not just the first email. Every valid email that does not exist in the DB should generate a new contact.
 
-- Un CSV con 38,869 filas puede contener ~5,177 emails únicos nuevos
-- Si solo se toma el primer email de cada fila, se pierden ~565 emails (secundarios)
-- Contactos con más de 1 email pueden recibir más de 1 campaña (una por cada email)
+- A CSV with 38,869 rows can contain ~5,177 new unique emails.
+- If only the first email of each row is taken, ~565 emails (secondary) are lost.
+- Contacts with more than 1 email can receive more than 1 campaign (one for each email).
 
 ---
 
-## 2. Encoding (Mojibake) — Código existente
+## 2. Encoding (Mojibake) — Existing Code
 
-### 2.1 Script actual
+### 2.1 Current Script
 
-`cleanup_phase3.py:153-171` → función `fix_title_encoding()`
+`cleanup_phase3.py:153-171` $\rightarrow$ `fix_title_encoding()` function
 
-- Solo cubre el campo `title`
-- Define 16 patrones de reemplazo
-- **NO cubre**: `city` (1.158 filas afectadas), `country` (841), `sector` (14), `address`
+- Only covers the `title` field.
+- Defines 16 replacement patterns.
+- **Does NOT cover**: `city` (1,158 rows affected), `country` (841), `sector` (14), `address`.
 
-### 2.2 Patrones de mojibake detectados
+### 2.2 Detected Mojibake Patterns
 
-**Double-encoded UTF-8** (los más comunes):
+**Double-encoded UTF-8** (most common):
 ```
 Ã± → ñ    Ã© → é    Ã¡ → á    Ã³ → ó
 Ã­ → í    Ã¼ → ü    Ã  → à    Ã¨ → è
@@ -76,28 +76,28 @@ Si el CSV trae múltiples emails en el campo `emails`:
 Ã§ → ç    Ã® → î    Ã´ → ô
 ```
 
-**Patrones Â prefix:**
+**Â prefix patterns:**
 ```
 Â° → °    Âº → º    Â· → ·
 ```
 
-**Triple-encoded** (casos puntuales):
+**Triple-encoded** (isolated cases):
 ```
 Ã³nico → único    Ã³noma → autónoma
 ```
 
-### 2.3 Regla de aplicación
+### 2.3 Application Rule
 
-- Aplicar SOLO si el string contiene patrones de mojibake (detectar con `Ã` o `Â`)
-- No sobrescribir si la corrección no tiene sentido
-- Loggear cada corrección aplicada (campo, ROWID, valor antes/después)
-- Aplicar a TODOS los campos de texto: `title`, `sector`, `city`, `province`, `country`, `address`
+- Apply ONLY if the string contains mojibake patterns (detect with `Ã` or `Â`).
+- Do not overwrite if the correction makes no sense.
+- Log each applied correction (field, ROWID, value before/after).
+- Apply to ALL text fields: `title`, `sector`, `city`, `province`, `country`, `address`.
 
 ---
 
-## 3. Reglas de Mapeo CSV Gosom → contacts.db
+## 3. Gosom CSV $\rightarrow$ contacts.db Mapping Rules
 
-### 3.1 Estructura del CSV Gosom (35 columnas)
+### 3.1 Gosom CSV Structure (35 columns)
 
 ```
 input_id, link, title, category, address, open_hours, popular_times,
@@ -109,211 +109,211 @@ menu, owner, complete_address, about, user_reviews,
 user_reviews_extended, emails
 ```
 
-### 3.2 Mapeo de campos
+### 3.2 Field Mapping
 
-| Columna CSV | Columna DB | Tipo | Transformación |
+| CSV Column | DB Column | Type | Transformation |
 |---|---|---|---|
-| `title` | `main.title` | TEXT | Sin transformación |
-| `category` | `main.sector` | TEXT | Sin transformación |
-| `address` | `main.address` | TEXT | Sin transformación |
-| `complete_address` → `city` | `main.city` | TEXT | Parsear JSON, extraer campo `city` |
-| `complete_address` → `state` | `main.province` | TEXT | Parsear JSON, extraer campo `state` |
-| `complete_address` → `country` | `main.country` | TEXT | Parsear JSON, extraer campo `country` |
-| *(fijo)* | `main.entity_type` | TEXT | `"empresa"` |
-| `website` | `lead.website` | TEXT | Agregar `https://` si falta el protocolo |
-| `phone` | `lead.phone` | TEXT | Sin transformación |
-| `link` | `lead.google_maps` | TEXT | Solo si el contacto es nuevo en la DB |
-| `emails` | `lead.primary_email` | TEXT | Validar con regex + blacklist. Si hay múltiples: primero → `primary_email`, resto → `secondary_emails` (separados por `;`) |
-| *(fijo)* | `contact.date_added` | TEXT | `datetime.now().isoformat()` |
+| `title` | `main.title` | TEXT | No transformation |
+| `category` | `main.sector` | TEXT | No transformation |
+| `address` | `main.address` | TEXT | No transformation |
+| `complete_address` $\rightarrow$ `city` | `main.city` | TEXT | Parse JSON, extract `city` field |
+| `complete_address` $\rightarrow$ `state` | `main.province` | TEXT | Parse JSON, extract `state` field |
+| `complete_address` $\rightarrow$ `country` | `main.country` | TEXT | Parse JSON, extract `country` field |
+| *(fixed)* | `main.entity_type` | TEXT | `"company"` |
+| `website` | `lead.website` | TEXT | Add `https://` if protocol is missing |
+| `phone` | `lead.phone` | TEXT | No transformation |
+| `link` | `lead.google_maps` | TEXT | Only if the contact is new in the DB |
+| `emails` | `lead.primary_email` | TEXT | Validate with regex + blacklist. If multiple: first $\rightarrow$ `primary_email`, others $\rightarrow$ `secondary_emails` (separated by `;`) |
+| *(fixed)* | `contact.date_added` | TEXT | `datetime.now().isoformat()` |
 
-### 3.3 Campos ignorados del CSV
+### 3.3 Ignored CSV Fields
 
 `input_id`, `open_hours`, `popular_times`, `plus_code`, `review_count`, `review_rating`, `reviews_per_rating`, `latitude`, `longitude`, `cid`, `status`, `descriptions`, `reviews_link`, `thumbnail`, `timezone`, `price_range`, `data_id`, `street_view_url`, `place_id`, `images`, `reservations`, `order_online`, `menu`, `owner`, `about`, `user_reviews`, `user_reviews_extended`
 
-### 3.4 Archivos .txt (email list)
+### 3.4 .txt Files (email list)
 
-Los archivos `.txt` contienen emails separados por comas (no CSV con columnas).
-- Importar cada email como contacto nuevo
-- `lead.primary_email` = el email
-- `main.entity_type` = `"empresa"`
-- `contact.date_added` = `datetime.now().isoformat()`
-- Resto de campos = NULL
-- Aplicar misma validación de emails
+`.txt` files contain emails separated by commas (not column-based CSVs).
+- Import each email as a new contact.
+- `lead.primary_email` = the email.
+- `main.entity_type` = `"company"`.
+- `contact.date_added` = `datetime.now().isoformat()`.
+- Other fields = NULL.
+- Apply same email validation.
 
 ---
 
-## 4. Deduplicación
+## 4. Deduplication
 
-### 4.1 Clave de deduplicación
+### 4.1 Deduplication Key
 
-**Primaria:** `main.title` + `main.city` (ambos normalizados, lowercase, sin espacios extra)
+**Primary:** `main.title` + `main.city` (both normalized, lowercase, no extra spaces).
 
-### 4.2 Al encontrar duplicado
+### 4.2 Handling Duplicates
 
-Imprimir en consola:
+Print to console:
 ```
-DUPLICADO ENCONTRADO:
-  Existente: ROWID=X | title="..." | city="..." | email="..."
-  Nuevo:     title="..." | city="..." | email="..."
-  Opciones: [S]kip / [U]pdate / [M]erge
+DUPLICATE FOUND:
+  Existing: ROWID=X | title="..." | city="..." | email="..."
+  New:     title="..." | city="..." | email="..."
+  Options: [S]kip / [U]pdate / [M]erge
 ```
 
-Pausar y esperar input del usuario.
+Pause and wait for user input.
 
-- **Skip**: ignorar el nuevo, mantener el existente
-- **Update**: sobrescribir campos vacíos del existente con los valores nuevos
-- **Merge**: combinar campos (no sobrescribir lo que ya tiene dato)
-
----
-
-## 5. Notas de implementación
-
-- Los scripts de enrichment deben importar estas reglas como referencia
-- El regex y las listas de blacklist deben mantenerse en un solo lugar (este archivo o un módulo Python)
-- Cualquier cambio de reglas se documenta aquí con fecha
+- **Skip**: ignore the new one, keep existing.
+- **Update**: overwrite empty fields of existing with new values.
+- **Merge**: combine fields (do not overwrite existing data).
 
 ---
 
-## 6. Data Enrichment — Resultados (2026-07-20)
+## 5. Implementation Notes
 
-### 6.1 Fuentes de datos — Estado de importación
+- Enrichment scripts must import these rules as a reference.
+- Regex and blacklist lists must be maintained in a single place (this file or a Python module).
+- Any rule change is documented here with a date.
 
-| Fuente | Archivos | Emails únicos | Importados | Estado |
+---
+
+## 6. Data Enrichment — Results (2026-07-20)
+
+### 6.1 Data Sources — Import Status
+
+| Source | Files | Unique Emails | Imported | Status |
 |--------|----------|---------------|------------|--------|
-| Brevo CSV (base_tvmas.csv) | 1 | 9,310 | 9,310 | ✅ 99.96% cobertura |
-| Brevo CSV (brevo_10042026.csv) | 1 | 12,763 | ~12,763 | ✅ Derivado de base_tvmas |
-| Brevo CSV (brevo_consolidada_total.csv) | 1 | 12,763 | ~12,763 | ✅ Derivado de base_tvmas |
+| Brevo CSV (base_tvmas.csv) | 1 | 9,310 | 9,310 | ✅ 99.96% coverage |
+| Brevo CSV (brevo_10042026.csv) | 1 | 12,763 | ~12,763 | ✅ Derived from base_tvmas |
+| Brevo CSV (brevo_consolidada_total.csv) | 1 | 12,763 | ~12,763 | ✅ Derived from base_tvmas |
 | Gosom General | 1 | 5,347 | 5,347 | ✅ import_gosom_general.py |
 | Gosom RRHH | 1 | 5,434 | 5,434 | ✅ import_rrhh_gosom.py |
 | Gosom Root (44 CSVs) | 44 | ~4,500 | 303 | ✅ import_gosom_root.py |
 | WhatsApp VCFs | 13 | 92 | 92 | ✅ import_vcf.py (phone-only) |
-| XLSX Ferias (62 files) | 62 | ~34,000 | 0 | ✅ Ya en DB (duplicados) |
-| Blacklist (CONTACTOS RECHAZADOS) | 1 | 198 | 198 | ✅ Marcados BLACKLISTED |
-| Google Contacts (7 CSVs) | 7 | ~6,600 | 0 | ✅ Ya en DB (duplicados) |
-| Pre-existentes (date_added=NULL) | — | 99,261 | 99,261 | ✅ Brevo legacy import |
+| XLSX Trade Fairs (62 files) | 62 | ~34,000 | 0 | ✅ Already in DB (duplicates) |
+| Blacklist (REJECTED CONTACTS) | 1 | 198 | 198 | ✅ Marked BLACKLISTED |
+| Google Contacts (7 CSVs) | 7 | ~6,600 | 0 | ✅ Already in DB (duplicates) |
+| Pre-existing (date_added=NULL) | — | 99,261 | 99,261 | ✅ Brevo legacy import |
 
-### 6.2 Fuentes verificadas (gap cerrado)
+### 6.2 Verified Sources (Gap Closed)
 
-| Fuente | Archivos | Emails únicos | Resultado |
+| Source | Files | Unique Emails | Result |
 |--------|----------|---------------|-----------|
-| Gosom webdata/ (36 UUID CSVs) | 36 | 792 | ✅ Ya en DB (import_gosom_root.py) |
-| Gosom web_marketing_caba.csv | 1 | 231 | ✅ Ya en DB (import_gosom_root.py) |
-| contacts Mailrelay | 1 | 71 | ✅ Ya en DB (import_mailrelay.py creado) |
-| contacts selvaggiesteban (phone-only) | 1 | 2,643 | ✅ import_phone_contacts.py (dedup 15K→2.6K) |
-| LinkedIn people/authors CSVs | 2 | 118 | ✅ import_linkedin_profiles.py (sin email/tel) |
-| YOLANDA.csv | 1 | ~500 | ⏳ Formato no estándar (pendiente) |
+| Gosom webdata/ (36 UUID CSVs) | 36 | 792 | ✅ Already in DB (import_gosom_root.py) |
+| Gosom web_marketing_caba.csv | 1 | 231 | ✅ Already in DB (import_gosom_root.py) |
+| contacts Mailrelay | 1 | 71 | ✅ Already in DB (import_mailrelay.py created) |
+| contacts selvaggiesteban (phone-only) | 1 | 2,643 | ✅ import_phone_contacts.py (dedup 15K $\rightarrow$ 2.6K) |
+| LinkedIn people/authors CSVs | 2 | 118 | ✅ import_linkedin_profiles.py (no email/tel) |
+| YOLANDA.csv | 1 | ~500 | ⏳ Non-standard format (pending) |
 
-### 6.3 DB Estado actual
+### 6.3 DB Current State
 
-| Métrica | Valor |
+| Metric | Value |
 |---------|-------|
-| Total contactos | 123,763 |
-| Con email válido | 116,747 |
-| Con teléfonos | 59,739 |
-| Con LinkedIn | 114 |
-| Phone-only (sin email) | 5,738 |
-| Con redes sociales | 0 (8 columnas 100% NULL) |
-| Con sector | ~92,000 |
-| Con website | ~121,000 |
+| Total contacts | 123,763 |
+| With valid email | 116,747 |
+| With phones | 59,739 |
+| With LinkedIn | 114 |
+| Phone-only (no email) | 5,738 |
+| With social networks | 0 (8 columns 100% NULL) |
+| With sector | ~92,000 |
+| With website | ~121,000 |
 | BLACKLISTED | 198 |
-| Pre-existentes (sin fecha) | 99,261 |
-| Importados por scripts | ~24,500 |
+| Pre-existing (no date) | 99,261 |
+| Imported by scripts | ~24,500 |
 
-### 6.4 Scripts de importación y utilidades creados
+### 6.4 Import Scripts and Utilities Created
 
-| Script | Fuente | Estado |
+| Script | Source | Status |
 |--------|--------|--------|
-| `config.py` | Configuración centralizada | ✅ Activo |
-| `utils.py` | Utilidades compartidas | ✅ Activo |
-| `verify_imported.py` | Verificación de fuentes | ✅ Ejecutado |
-| `import_vcf.py` | WhatsApp VCFs | ✅ Completado (92 contactos) |
-| `import_gosom_root.py` | Gosom root CSVs | ✅ Completado (303 contactos) |
-| `import_gosom_general.py` | Gosom General CSV | ✅ Completado (5,347 contactos) |
-| `import_rrhh_gosom.py` | Gosom RRHH CSV | ✅ Completado (5,434 contactos) |
-| `import_xlsx.py` | XLSX ferias | ✅ Ejecutado (0 nuevos, todos duplicados) |
-| `import_blacklist.py` | CONTACTOS RECHAZADOS.docx | ✅ Completado (198 blacklisted) |
-| `import_google_contacts.py` | Google Contacts CSVs | ✅ Ejecutado (0 nuevos, 2 tel actualizados) |
-| `import_gosom_webdata.py` | Gosom webdata/ + web_marketing_caba | ✅ Ejecutado (0 nuevos, todos ya en DB) |
-| `import_mailrelay.py` | Mailrelay CSV | ✅ Ejecutado (0 nuevos, todos ya en DB) |
-| `import_phone_contacts.py` | contacts selvaggiesteban (phone-only) | ✅ 2,643 contactos importados |
-| `import_linkedin_profiles.py` | LinkedIn people/authors CSVs | ✅ 118 perfiles importados |
-| `cleanup_duplicate_emails.py` | Dedup de emails duplicados | ✅ Activo |
-| `remove_duplicates.py` | Dedup de CSVs | ✅ Activo |
-| `remove_duplicates_xlsx.py` | Dedup de XLSX | ✅ Activo |
-| `enrich_abogados.py` | Enriquecimiento de abogados vía web scraping | ✅ Activo |
-| `enumerate_prefixes.py` | Análisis de prefijos de email | ✅ Activo |
-| `archive/cleanup_phase3.py` | Cleanup archivado (encoding) | 📦 Archivado |
-| `archive/cleanup_phase4.py` | Cleanup archivado (junk emails) | 📦 Archivado |
-| `archive/cleanup_phase7.py` | Cleanup archivado | 📦 Archivado |
-| `archive/cleanup_phase8.py` | Cleanup archivado | 📦 Archivado |
-| `archive/cleanup_phase9.py` | Cleanup archivado | 📦 Archivado |
-| `archive/cleanup_phase10.py` | Cleanup archivado | 📦 Archivado |
-| `archive/cleanup_phase11.py` | Cleanup archivado | 📦 Archivado |
-| `archive/migrate_v4.py` | Migración DB v4 archivada | 📦 Archivado |
+| `config.py` | Centralized configuration | ✅ Active |
+| `utils.py` | Shared utilities | ✅ Active |
+| `verify_imported.py` | Source verification | ✅ Executed |
+| `import_vcf.py` | WhatsApp VCFs | ✅ Completed (92 contacts) |
+| `import_gosom_root.py` | Gosom root CSVs | ✅ Completed (303 contacts) |
+| `import_gosom_general.py` | Gosom General CSV | ✅ Completed (5,347 contacts) |
+| `import_rrhh_gosom.py` | Gosom RRHH CSV | ✅ Completed (5,434 contacts) |
+| `import_xlsx.py` | XLSX trade fairs | ✅ Executed (0 new, all duplicates) |
+| `import_blacklist.py` | REJECTED CONTACTS.docx | ✅ Completed (198 blacklisted) |
+| `import_google_contacts.py` | Google Contacts CSVs | ✅ Executed (0 new, 2 tel updated) |
+| `import_gosom_webdata.py` | Gosom webdata/ + web_marketing_caba | ✅ Executed (0 new, all already in DB) |
+| `import_mailrelay.py` | Mailrelay CSV | ✅ Executed (0 new, all already in DB) |
+| `import_phone_contacts.py` | contacts selvaggiesteban (phone-only) | ✅ 2,643 contacts imported |
+| `import_linkedin_profiles.py` | LinkedIn people/authors CSVs | ✅ 118 profiles imported |
+| `cleanup_duplicate_emails.py` | Duplicate email dedup | ✅ Active |
+| `remove_duplicates.py` | CSV dedup | ✅ Active |
+| `remove_duplicates_xlsx.py` | XLSX dedup | ✅ Active |
+| `enrich_abogados.py` | Lawyer enrichment via web scraping | ✅ Active |
+| `enumerate_prefixes.py` | Email prefix analysis | ✅ Active |
+| `archive/cleanup_phase3.py` | Archived cleanup (encoding) | 📦 Archived |
+| `archive/cleanup_phase4.py` | Archived cleanup (junk emails) | 📦 Archived |
+| `archive/cleanup_phase7.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase8.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase9.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase10.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase11.py` | Archived cleanup | 📦 Archived |
+| `archive/migrate_v4.py` | Archived DB v4 migration | 📦 Archived |
 
 ---
 
 ## 7. Schema Update — campaign.email_used
 
-### 7.1 Columna nueva
+### 7.1 New Column
 
 ```sql
 ALTER TABLE campaign ADD COLUMN email_used TEXT;
 ```
 
-Registra el email exacto del destinatario al que se envió cada campaña. Permite que un contacto con múltiples emails reciba múltiples campañas (una por cada email).
+Records the exact email of the recipient to whom each campaign was sent. Allows a contact with multiple emails to receive multiple campaigns (one per email).
 
-### 7.2 Uso
+### 7.2 Usage
 
-- Al enviar una campaña: `campaign.email_used = recipient_email`
-- Al consultar campañas: filtrar por `email_used` para saber a qué email se envió
-- Compatibilidad hacia atrás: filas existentes quedan con `email_used = NULL`
+- When sending a campaign: `campaign.email_used = recipient_email`
+- When querying campaigns: filter by `email_used` to know which email was used
+- Backward compatibility: existing rows remain with `email_used = NULL`
 
 ---
 
 ## 8. Schema Update — campaign.message
 
-### 8.1 Columna nueva
+### 8.1 New Column
 
 ```sql
 ALTER TABLE campaign ADD COLUMN message TEXT;
 ```
 
-Registra el cuerpo del mensaje enviado en cada campaña. Permite consultar el contenido exacto que recibió cada contacto.
+Records the body of the message sent in each campaign. Allows querying the exact content received by each contact.
 
-### 8.2 Uso
+### 8.2 Usage
 
-- Al enviar una campaña: `campaign.message = message_body`
-- Al consultar campañas: filtrar por `message` para saber qué contenido se envió
-- Compatibilidad hacia atrás: filas existentes quedan con `message = NULL`
+- When sending a campaign: `campaign.message = message_body`
+- When querying campaigns: filter by `message` to know what content was sent
+- Backward compatibility: existing rows remain with `message = NULL`
 
 ---
 
-## 9. Enriquecimiento Campaign LANÚS-03082026
+## 9. Enrichment Campaign LANÚS-03082026
 
-### 9.1 Datos de campaña
+### 9.1 Campaign Data
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
 | `list_val` | `LANÚS-03082026` |
-| `subject` | Servicio Técnico de Computadoras y Productos de Tecnología |
+| `subject` | Computer Technical Service and Technology Products |
 | `type` | `lanus_servicio_tecnico` |
-| `message` | Hola, buenos días. ¿Cómo estás? Espero que muy bien. Me comunico facilitando servicio técnico de computadoras y productos de tecnología. Brindamos soluciones tanto para particulares como para comercios y empresas de la zona. Si necesitás reparación, mantenimiento o equipamiento, podés contactarnos. Quedo a disposición para lo que necesites. Saludos cordiales |
+| `message` | Hello, good morning. How are you? I hope very well. I am contacting you to provide technical service for computers and technology products. We provide solutions for both individuals and shops and companies in the area. If you need repair, maintenance or equipment, you can contact us. I remain at your disposal for whatever you need. Kind regards |
 
-### 9.2 Resultados
+### 9.2 Results
 
-| Métrica | Valor |
+| Metric | Value |
 |---------|-------|
-| Fecha ejecución | 2026-08-03 |
-| Contactos insertados | 228 |
-| Cuentas utilizadas | 12 (19 emails cada una) |
-| Logs parseados | `log_lanus_cycle_20260803_112153.txt` (12) + `log_lanus_cycle_20260803_112606.txt` (216) |
+| Execution Date | 2026-08-03 |
+| Contacts inserted | 228 |
+| Accounts used | 12 (19 emails each) |
+| Logs parsed | `log_lanus_cycle_20260803_112153.txt` (12) + `log_lanus_cycle_20260803_112606.txt` (216) |
 | Script | `scripts/database_manager/enrich_lanus_campaign.py` |
 | Backup | `data/inputs/contacts_backup_before_lanus_enrich.db` |
 
-### 9.3 Cuentas y distribución
+### 9.3 Accounts and Distribution
 
-| Cuenta | Emails enviados |
+| Account | Emails sent |
 |--------|----------------|
 | wwwlanuscomputacion@gmail.com | 19 |
 | adrianaavila131969@gmail.com | 19 |
@@ -330,86 +330,79 @@ Registra el cuerpo del mensaje enviado en cada campaña. Permite consultar el co
 
 ---
 
-## 10. Enriquecimiento Campaign BA/CABA-03082026
+## 10. Enrichment Campaign BA/CABA-03082026
 
-### 10.1 Datos de campaña
+### 10.1 Campaign Data
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
 | `list_val` | `BA-CABA-03082026` |
-| `subject` | Servicio Tecnico de Computadoras y Productos de Tecnologia |
+| `subject` | Computer Technical Service and Technology Products |
 | `type` | `ba_caba_servicio_tecnico` |
-| `message` | Hola, buenos dias. Como estas? Espero que muy bien. Me comunico facilitando servicio tecnico de computadoras y productos de tecnologia. Brindamos soluciones tanto para particulares como para comercios y empresas de la zona. Si necesitás reparacion, mantenimiento o equipamiento, podes contactarnos. Quedo a disposicion para lo que necesites. Saludos cordiales |
+| `message` | Hello, good morning. How are you? I hope very well. I am contacting you to provide technical service for computers and technology products. We provide solutions for both individuals and shops and companies in the area. If you need repair, maintenance or equipment, you can contact us. I remain at your disposal for whatever you need. Kind regards |
 
-### 10.2 Resultados
+### 10.2 Results
 
-| Métrica | Valor |
+| Metric | Value |
 |---------|-------|
-| Fecha ejecución | 2026-08-03 |
-| Duración | 1:37:39 |
-| Emails enviados | 196 |
-| Contactos alcanzados | 9,800 (50 BCC × 196 emails) |
-| Entradas en campaign | 9,166 |
-| Skipped (no encontrados/duplicados) | 13 |
-| Cuentas utilizadas | 12 |
-| Estructura | TO=si misma, BCC=50 contactos |
+| Execution Date | 2026-08-03 |
+| Duration | 1:37:39 |
+| Emails sent | 196 |
+| Contacts reached | 9,800 (50 BCC $\times$ 196 emails) |
+| Entries in campaign | 9,166 |
+| Skipped (not found/duplicates) | 13 |
+| Accounts used | 12 |
+| Structure | TO=self, BCC=50 contacts |
 | Logs | `log_ba_ciclo_20260803_135251.txt` |
 
-### 10.3 Distribución por cuenta
+### 10.3 Distribution by Account
 
-| Cuenta | Emails enviados |
+| Account | Contacts |
 |--------|----------------|
-| fernando1141967@gmail.com | 850 contactos |
-| adrianaavila131969@gmail.com | 850 contactos |
-| wwwlanuscomputacion@gmail.com | 849 contactos |
-| selvaggiesteban9@gmail.com | 828 contactos |
-| selvaggiesteban4@gmail.com | 799 contactos |
-| selvaggiesteban2@gmail.com | 799 contactos |
-| selvaggiesteban11@gmail.com | 799 contactos |
-| selvaggiconsultores@gmail.com | 799 contactos |
-| marcelagomez7799@gmail.com | 799 contactos |
-| marketing1a1oficial@gmail.com | 798 contactos |
-| estebanmfwd@gmail.com | 796 contactos |
-| selvaggiesteban1@gmail.com | 200 contactos |
-
-### 10.4 Scripts creados
-
-| Script | Ubicación | Función |
-|--------|-----------|---------|
-| `campaign_sender_ba.py` | `scripts/e-mail_marketing_manager/` | Envío con 50 BCC, TO=si misma |
-| `enrich_ba_caba_campaign.py` | `scripts/database_manager/` | Enriquecimiento DB post-envío |
+| fernando1141967@gmail.com | 850 contacts |
+| adrianaavila131969@gmail.com | 850 contacts |
+| wwwlanuscomputacion@gmail.com | 849 contacts |
+| selvaggiesteban9@gmail.com | 828 contacts |
+| selvaggiesteban4@gmail.com | 799 contacts |
+| selvaggiesteban2@gmail.com | 799 contacts |
+| selvaggiesteban11@gmail.com | 799 contacts |
+| selvaggiconsultores@gmail.com | 799 contacts |
+| marketing1a1oficial@gmail.com | 799 contacts |
+| marketing1a1oficial@gmail.com | 798 contacts |
+| estebanmfwd@gmail.com | 796 contacts |
+| selvaggiesteban1@gmail.com | 200 contacts |
 
 ---
 
-## 11. Fuentes de Datos — CSVs del directorio Trabajo
+## 11. Data Sources — Work Directory CSVs
 
-### 11.1 Archivos CSV
+### 11.1 CSV Files
 
-| Archivo | Registros | Descripción |
+| File | Records | Description |
 |---------|-----------|-------------|
-| `TRABAJO - CAMPAÑAS.csv` | 18 | Campañas de email marketing enviadas |
-| `TRABAJO - CHAT.csv` | 0 | Historial de chats (vacío) |
-| `TRABAJO - COBERTURA GEOGRÁFICA.csv` | 12,045 | Zonas geográficas con coordenadas |
-| `TRABAJO - CONTROL HORARIO.csv` | 153 | Disponibilidad horaria por servicio/fecha |
-| `TRABAJO - E-MAILS.csv` | 17 | Cuentas de email (Gmail, Hostinger, Hotmail, iCloud) |
-| `TRABAJO - IA.csv` | 23 | Uso de agentes OLLAMA/GROQ por semana |
-| `TRABAJO - KEYWORDS.csv` | 1,747 | Lista de keywords de búsqueda |
-| `TRABAJO - OBJETIVOS.csv` | 12 | Objetivos mensuales 2026 |
-| `TRABAJO - PÁGINAS WEB.csv` | 50 | Páginas web con keywords y URLs |
-| `TRABAJO - SCRAP.csv` | 58 | Resultados de scraping por zona |
+| `WORK - CAMPAIGNS.csv` | 18 | Email marketing campaigns sent |
+| `WORK - CHAT.csv` | 0 | Chat history (empty) |
+| `WORK - GEOGRAPHIC COVERAGE.csv` | 12,045 | Geographic zones with coordinates |
+| `WORK - TIME CONTROL.csv` | 153 | Hourly availability by service/date |
+| `WORK - EMAILS.csv` | 17 | Email accounts (Gmail, Hostinger, Hotmail, iCloud) |
+| `WORK - AI.csv` | 23 | OLLAMA/GROQ agent usage per week |
+| `WORK - KEYWORDS.csv` | 1,747 | Search keyword list |
+| `WORK - OBJECTIVES.csv` | 12 | 2026 monthly objectives |
+| `WORK - WEB PAGES.csv` | 50 | Web pages with keywords and URLs |
+| `WORK - SCRAP.csv` | 58 | Scraping results by zone |
 
-### 11.2 JSON generado
+### 11.2 Generated JSON
 
-**Archivo:** `Trabajo/trabajo_data.json` (3.5 MB)
+**File:** `Work/work_data.json` (3.5 MB)
 
 **Script:** `scripts/csv_to_json.py`
 
-**Uso:**
+**Usage:**
 ```bash
 python scripts/csv_to_json.py
 ```
 
-### 11.3 Estructura del JSON
+### 11.3 JSON Structure
 
 ```json
 {
@@ -427,38 +420,38 @@ python scripts/csv_to_json.py
 }
 ```
 
-### 11.4 Mapeo de campos — CAMPAÑAS
+### 11.4 Field Mapping — CAMPAIGNS
 
-| Columna CSV | Campo JSON | Tipo |
+| CSV Column | JSON Field | Type |
 |-------------|------------|------|
-| `Título` | `titulo` | string |
-| `Cobertura geográfica` | `cobertura_geografica` | string |
-| `Lista` | `lista` | string |
-| `Asunto` | `asunto` | string |
-| `Fecha` | `fecha` | string |
-| `Mensaje` | `mensaje` | string |
-| `Estado` | `estado` | string |
-| `Emails enviados` | `emails_enviados` | int |
-| `Contactos únicos` | `contactos_unicos` | int |
-| `Fallos` | `fallos` | int |
-| `Duración` | `duracion` | string |
-| `Cuentas usadas` | `cuentas_usadas` | int |
+| `Title` | `titulo` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
+| `List` | `lista` | string |
+| `Subject` | `asunto` | string |
+| `Date` | `fecha` | string |
+| `Message` | `mensaje` | string |
+| `Status` | `estado` | string |
+| `Emails sent` | `emails_enviados` | int |
+| `Unique contacts` | `contactos_unicos` | int |
+| `Failures` | `fallos` | int |
+| `Duration` | `duracion` | string |
+| `Accounts used` | `cuentas_usadas` | int |
 | `Enriched` | `enriched` | string |
 | `Log file` | `log_file` | string |
 
-### 11.5 Mapeo de campos — E-MAILS
+### 11.5 Field Mapping — EMAILS
 
-| Columna CSV | Campo JSON | Tipo |
+| CSV Column | JSON Field | Type |
 |-------------|------------|------|
-| `Proveedor` | `proveedor` | string |
-| `Usuario` | `usuario` | string |
-| `Contraseña` | `contraseña` | string |
-| `Contraseña de Aplicación` | `contraseña_aplicacion` | string |
-| `ID de cliente de OAuth` | `oauth_client_id` | string |
+| `Provider` | `proveedor` | string |
+| `User` | `usuario` | string |
+| `Password` | `contraseña` | string |
+| `Application Password` | `contraseña_aplicacion` | string |
+| `OAuth Client ID` | `oauth_client_id` | string |
 
-### 11.6 Mapeo de campos — COBERTURA GEOGRÁFICA
+### 11.6 Field Mapping — GEOGRAPHIC COVERAGE
 
-| Columna CSV | Campo JSON | Tipo |
+| CSV Column | JSON Field | Type |
 |-------------|------------|------|
 | `order` | `order` | int |
 | `id` | `id` | string |
@@ -471,67 +464,2048 @@ python scripts/csv_to_json.py
 | `queries` | `queries` | string |
 | `density` | `density` | int |
 
-### 11.7 Mapeo de campos — CONTROL HORARIO
+### 11.7 Field Mapping — TIME CONTROL
 
-| Columna CSV | Campo JSON | Tipo |
+| CSV Column | JSON Field | Type |
 |-------------|------------|------|
-| `Precio` | `precio` | int |
-| `Servicio` | `servicio` | string |
-| `Fecha` | `fecha` | string |
+| `Price` | `precio` | int |
+| `Service` | `servicio` | string |
+| `Date` | `fecha` | string |
 | `9:00` - `16:00` | `horas.9:00` - `horas.16:00` | bool |
 
-### 11.8 Mapeo de campos — IA
+### 11.8 Field Mapping — AI
 
-| Columna CSV | Campo JSON | Tipo |
+| CSV Column | JSON Field | Type |
 |-------------|------------|------|
-| `AI_Agent` (parte 1) | `agente` | string |
-| `AI_Agent` (parte 2) | `email` | string |
-| `Semana X` | `semanas.Semana X` | bool |
+| `AI_Agent` (part 1) | `agente` | string |
+| `AI_Agent` (part 2) | `email` | string |
+| `Week X` | `semanas.Week X` | bool |
 
-### 11.9 Mapeo de campos — OBJETIVOS
+### 11.9 Field Mapping — OBJECTIVES
 
-| Columna CSV | Campo JSON | Tipo |
+| CSV Column | JSON Field | Type |
 |-------------|------------|------|
-| `Mes / Año` | `mes_anio` | string |
-| `Días Hábiles` | `dias_habiles` | int |
-| `IPC` | `ipc` | string |
-| `Precio por Sesión` | `precio_sesion` | int |
-| `Sesiones Disponibles` | `sesiones_disponibles` | int |
-| `Sesiones Vendidas (Objetivo)` | `sesiones_vendidas_objetivo` | int |
-| `Ganancias` | `ganancias` | string |
+| `Month / Year` | `mes_anio` | string |
+| `Working Days` | `dias_habiles` | int |
+| `CPI` | `ipc` | string |
+| `Price per Session` | `precio_sesion` | int |
+| `Available Sessions` | `sesiones_disponibles` | int |
+| `Sold Sessions (Target)` | `sesiones_vendidas_objetivo` | int |
+| `Earnings` | `ganancias` | string |
 
-### 11.10 Mapeo de campos — PÁGINAS WEB
+### 11.10 Field Mapping — WEB PAGES
 
-| Columna CSV | Campo JSON | Tipo |
+| CSV Column | JSON Field | Type |
 |-------------|------------|------|
-| `Sitio` | `sitio` | string |
+| `Site` | `sitio` | string |
 | `Keyword` | `keyword` | string |
-| `Cobertura geográfica` | `cobertura_geografica` | string |
-| `Campaña` | `campana` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
+| `Campaign` | `campana` | string |
 | `URL_ES` | `url_es` | string |
 | `URL_EN` | `url_en` | string |
-| `Links enviados` | `links_enviados` | string |
-| `Sesiones Vendidas (Objetivo)` | `sesiones_vendidas_objetivo` | string |
-| `Fecha / Hora` | `fecha_hora` | string |
+| `Links sent` | `links_enviados` | string |
+| `Sold Sessions (Target)` | `sesiones_vendidas_objetivo` | string |
+| `Date / Time` | `fecha_hora` | string |
 
-### 11.11 Mapeo de campos — SCRAPING
+### 11.11 Field Mapping — SCRAPING
 
-| Columna CSV | Campo JSON | Tipo |
+| CSV Column | JSON Field | Type |
 |-------------|------------|------|
-| `Título` | `titulo` | string |
-| `Cobertura geográfica` | `cobertura_geografica` | string |
+| `Title` | `titulo` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
 | `Keywords` | `keywords` | string |
-| `Fecha` | `fecha` | string |
-| `Estado` | `estado` | string |
+| `Date` | `fecha` | string |
+| `Status` | `estado` | string |
 | `Rows` | `rows` | int |
-| `E-mails únicos` | `emails_unicos` | int |
-| `Ubicación` | `ubicacion` | string |
-| `Duración` | `duracion` | string |
+| `Unique Emails` | `emails_unicos` | int |
+| `Location` | `ubicacion` | string |
+| `Duration` | `duracion` | string |
 | `Log File` | `log_file` | string |
 
-### 11.12 Notas
+### 11.12 Notes
 
-- Los números con separadores de miles (ej: `10.800`) se convierten a `10800`
-- Las coordenadas geográficas se almacenan como float (ej: `-347.100` → `-347.1`)
-- El CSV `TRABAJO - CHAT.csv` está vacío (solo encabezados)
-- El script `csv_to_json.py` maneja encoding UTF-8 y cp1252
+- Numbers with thousands separators (e.g., `10,800`) are converted to `10800`.
+- Geographic coordinates are stored as float (e.g., `-347.100` $\rightarrow$ `-347.1`).
+- The CSV `WORK - CHAT.csv` is empty (headers only).
+- The script `csv_to_json.py` handles UTF-8 and cp1252 encoding.
+
+---
+
+## 12. Deduplication
+
+### 12.1 Deduplication Key
+
+**Primary:** `main.title` + `main.city` (both normalized, lowercase, no extra spaces).
+
+### 12.2 Handling Duplicates
+
+Print to console:
+```
+DUPLICATE FOUND:
+  Existing: ROWID=X | title="..." | city="..." | email="..."
+  New:     title="..." | city="..." | email="..."
+  Options: [S]kip / [U]pdate / [M]erge
+```
+
+Pause and wait for user input.
+
+- **Skip**: ignore the new one, keep existing.
+- **Update**: overwrite empty fields of existing with new values.
+- **Merge**: combine fields (do not overwrite existing data).
+
+---
+
+## 13. Implementation Notes
+
+- Enrichment scripts must import these rules as a reference.
+- Regex and blacklist lists must be maintained in a single place (this file or a Python module).
+- Any rule change is documented here with a date.
+
+---
+
+## 14. Data Enrichment — Results (2026-07-20)
+
+### 14.1 Data Sources — Import Status
+
+| Source | Files | Unique Emails | Imported | Status |
+|--------|----------|---------------|------------|--------|
+| Brevo CSV (base_tvmas.csv) | 1 | 9,310 | 9,310 | ✅ 99.96% coverage |
+| Brevo CSV (brevo_10042026.csv) | 1 | 12,763 | ~12,763 | ✅ Derived from base_tvmas |
+| Brevo CSV (brevo_consolidada_total.csv) | 1 | 12,763 | ~12,763 | ✅ Derived from base_tvmas |
+| Gosom General | 1 | 5,347 | 5,347 | ✅ import_gosom_general.py |
+| Gosom RRHH | 1 | 5,434 | 5,434 | ✅ import_rrhh_gosom.py |
+| Gosom Root (44 CSVs) | 44 | ~4,500 | 303 | ✅ import_gosom_root.py |
+| WhatsApp VCFs | 13 | 92 | 92 | ✅ import_vcf.py (phone-only) |
+| XLSX Trade Fairs (62 files) | 62 | ~34,000 | 0 | ✅ Already in DB (duplicates) |
+| Blacklist (REJECTED CONTACTS) | 1 | 198 | 198 | ✅ Marked BLACKLISTED |
+| Google Contacts (7 CSVs) | 7 | ~6,600 | 0 | ✅ Already in DB (duplicates) |
+| Pre-existing (date_added=NULL) | — | 99,261 | 99,261 | ✅ Brevo legacy import |
+
+### 14.2 Verified Sources (Gap Closed)
+
+| Source | Files | Unique Emails | Result |
+|--------|----------|---------------|-----------|
+| Gosom webdata/ (36 UUID CSVs) | 36 | 792 | ✅ Already in DB (import_gosom_root.py) |
+| Gosom web_marketing_caba.csv | 1 | 231 | ✅ Already in DB (import_gosom_root.py) |
+| contacts Mailrelay | 1 | 71 | ✅ Already in DB (import_mailrelay.py created) |
+| contacts selvaggiesteban (phone-only) | 1 | 2,643 | ✅ import_phone_contacts.py (dedup 15K $\rightarrow$ 2.6K) |
+| LinkedIn people/authors CSVs | 2 | 118 | ✅ import_linkedin_profiles.py (no email/tel) |
+| YOLANDA.csv | 1 | ~500 | ⏳ Non-standard format (pending) |
+
+### 14.3 DB Current State
+
+| Metric | Value |
+|---------|-------|
+| Total contacts | 123,763 |
+| With valid email | 116,747 |
+| With phones | 59,739 |
+| With LinkedIn | 114 |
+| Phone-only (no email) | 5,738 |
+| With social networks | 0 (8 columns 100% NULL) |
+| With sector | ~92,000 |
+| With website | ~121,000 |
+| BLACKLISTED | 198 |
+| Pre-existing (no date) | 99,261 |
+| Imported by scripts | ~24,500 |
+
+### 14.4 Import Scripts and Utilities Created
+
+| Script | Source | Status |
+|--------|--------|--------|
+| `config.py` | Centralized configuration | ✅ Active |
+| `utils.py` | Shared utilities | ✅ Active |
+| `verify_imported.py` | Source verification | ✅ Executed |
+| `import_vcf.py` | WhatsApp VCFs | ✅ Completed (92 contacts) |
+| `import_gosom_root.py` | Gosom root CSVs | ✅ Completed (303 contacts) |
+| `import_gosom_general.py` | Gosom General CSV | ✅ Completed (5,347 contacts) |
+| `import_rrhh_gosom.py` | Gosom RRHH CSV | ✅ Completed (5,434 contacts) |
+| `import_xlsx.py` | XLSX trade fairs | ✅ Executed (0 new, all duplicates) |
+| `import_blacklist.py` | REJECTED CONTACTS.docx | ✅ Completed (198 blacklisted) |
+| `import_google_contacts.py` | Google Contacts CSVs | ✅ Executed (0 new, 2 tel updated) |
+| `import_gosom_webdata.py` | Gosom webdata/ + web_marketing_caba | ✅ Executed (0 new, all already in DB) |
+| `import_mailrelay.py` | Mailrelay CSV | ✅ Executed (0 new, all already in DB) |
+| `import_phone_contacts.py` | contacts selvaggiesteban (phone-only) | ✅ 2,643 contacts imported |
+| `import_linkedin_profiles.py` | LinkedIn people/authors CSVs | ✅ 118 profiles imported |
+| `cleanup_duplicate_emails.py` | Duplicate email dedup | ✅ Active |
+| `remove_duplicates.py` | CSV dedup | ✅ Active |
+| `remove_duplicates_xlsx.py` | XLSX dedup | ✅ Active |
+| `enrich_abogados.py` | Lawyer enrichment via web scraping | ✅ Active |
+| `enumerate_prefixes.py` | Email prefix analysis | ✅ Active |
+| `archive/cleanup_phase3.py` | Archived cleanup (encoding) | 📦 Archived |
+| `archive/cleanup_phase4.py` | Archived cleanup (junk emails) | 📦 Archived |
+| `archive/cleanup_phase7.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase8.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase9.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase10.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase11.py` | Archived cleanup | 📦 Archived |
+| `archive/migrate_v4.py` | Archived DB v4 migration | 📦 Archived |
+
+---
+
+## 15. Schema Update — campaign.email_used
+
+### 15.1 New Column
+
+```sql
+ALTER TABLE campaign ADD COLUMN email_used TEXT;
+```
+
+Records the exact email of the recipient to whom each campaign was sent. Allows a contact with multiple emails to receive multiple campaigns (one per email).
+
+### 15.2 Usage
+
+- When sending a campaign: `campaign.email_used = recipient_email`
+- When querying campaigns: filter by `email_used` to know which email was used
+- Backward compatibility: existing rows remain with `email_used = NULL`
+
+---
+
+## 16. Schema Update — campaign.message
+
+### 16.1 New Column
+
+```sql
+ALTER TABLE campaign ADD COLUMN message TEXT;
+```
+
+Records the body of the message sent in each campaign. Allows querying the exact content received by each contact.
+
+### 16.2 Usage
+
+- When sending a campaign: `campaign.message = message_body`
+- When querying campaigns: filter by `message` to know what content was sent
+- Backward compatibility: existing rows remain with `message = NULL`
+
+---
+
+## 17. Enrichment Campaign LANÚS-03082026
+
+### 17.1 Campaign Data
+
+| Field | Value |
+|-------|-------|
+| `list_val` | `LANÚS-03082026` |
+| `subject` | Computer Technical Service and Technology Products |
+| `type` | `lanus_servicio_tecnico` |
+| `message` | Hello, good morning. How are you? I hope very well. I am contacting you to provide technical service for computers and technology products. We provide solutions for both individuals and shops and companies in the area. If you need repair, maintenance or equipment, you can contact us. I remain at your disposal for whatever you need. Kind regards |
+
+### 17.2 Results
+
+| Metric | Value |
+|---------|-------|
+| Execution Date | 2026-08-03 |
+| Contacts inserted | 228 |
+| Accounts used | 12 (19 emails each) |
+| Logs parsed | `log_lanus_cycle_20260803_112153.txt` (12) + `log_lanus_cycle_20260803_112606.txt` (216) |
+| Script | `scripts/database_manager/enrich_lanus_campaign.py` |
+| Backup | `data/inputs/contacts_backup_before_lanus_enrich.db` |
+
+### 17.3 Accounts and Distribution
+
+| Account | Emails sent |
+|--------|----------------|
+| wwwlanuscomputacion@gmail.com | 19 |
+| adrianaavila131969@gmail.com | 19 |
+| fernando1141967@gmail.com | 19 |
+| selvaggiesteban9@gmail.com | 19 |
+| selvaggiesteban4@gmail.com | 19 |
+| selvaggiesteban11@gmail.com | 19 |
+| marketing1a1oficial@gmail.com | 19 |
+| selvaggiconsultores@gmail.com | 19 |
+| estebanmfwd@gmail.com | 19 |
+| selvaggiesteban1@gmail.com | 19 |
+| selvaggiesteban2@gmail.com | 19 |
+| marcelagomez7799@gmail.com | 19 |
+
+---
+
+## 18. Enrichment Campaign BA/CABA-03082026
+
+### 18.1 Campaign Data
+
+| Field | Value |
+|-------|-------|
+| `list_val` | `BA-CABA-03082026` |
+| `subject` | Computer Technical Service and Technology Products |
+| `type` | `ba_caba_servicio_tecnico` |
+| `message` | Hello, good morning. How are you? I hope very well. I am contacting you to provide technical service for computers and technology products. We provide solutions for both individuals and shops and companies in the area. If you need repair, maintenance or equipment, you can contact us. I remain at your disposal for whatever you need. Kind regards |
+
+### 18.2 Results
+
+| Metric | Value |
+|---------|-------|
+| Execution Date | 2026-08-03 |
+| Duration | 1:37:39 |
+| Emails sent | 196 |
+| Contacts reached | 9,800 (50 BCC $\times$ 196 emails) |
+| Entries in campaign | 9,166 |
+| Skipped (not found/duplicates) | 13 |
+| Accounts used | 12 |
+| Structure | TO=self, BCC=50 contacts |
+| Logs | `log_ba_ciclo_20260803_135251.txt` |
+
+### 18.3 Distribution by Account
+
+| Account | Contacts |
+|--------|----------------|
+| fernando1141967@gmail.com | 850 contacts |
+| adrianaavila131969@gmail.com | 850 contacts |
+| wwwlanuscomputacion@gmail.com | 849 contacts |
+| selvaggiesteban9@gmail.com | 828 contacts |
+| selvaggiesteban4@gmail.com | 799 contacts |
+| selvaggiesteban2@gmail.com | 799 contacts |
+| selvaggiesteban11@gmail.com | 799 contacts |
+| selvaggiconsultores@gmail.com | 799 contacts |
+| marketing1a1oficial@gmail.com | 799 contacts |
+| marketing1a1oficial@gmail.com | 798 contacts |
+| estebanmfwd@gmail.com | 796 contacts |
+| selvaggiesteban1@gmail.com | 200 contacts |
+
+---
+
+## 19. Data Sources — Work Directory CSVs
+
+### 19.1 CSV Files
+
+| File | Records | Description |
+|---------|-----------|-------------|
+| `WORK - CAMPAIGNS.csv` | 18 | Email marketing campaigns sent |
+| `WORK - CHAT.csv` | 0 | Chat history (empty) |
+| `WORK - GEOGRAPHIC COVERAGE.csv` | 12,045 | Geographic zones with coordinates |
+| `WORK - TIME CONTROL.csv` | 153 | Hourly availability by service/date |
+| `WORK - EMAILS.csv` | 17 | Email accounts (Gmail, Hostinger, Hotmail, iCloud) |
+| `WORK - AI.csv` | 23 | OLLAMA/GROQ agent usage per week |
+| `WORK - KEYWORDS.csv` | 1,747 | Search keyword list |
+| `WORK - OBJECTIVES.csv` | 12 | 2026 monthly objectives |
+| `WORK - WEB PAGES.csv` | 50 | Web pages with keywords and URLs |
+| `WORK - SCRAP.csv` | 58 | Scraping results by zone |
+
+### 19.2 Generated JSON
+
+**File:** `Work/work_data.json` (3.5 MB)
+
+**Script:** `scripts/csv_to_json.py`
+
+**Usage:**
+```bash
+python scripts/csv_to_json.py
+```
+
+### 19.3 JSON Structure
+
+```json
+{
+  "metadata": { ... },
+  "campanas": [ ... ],
+  "chat": [ ... ],
+  "cobertura_geografica": [ ... ],
+  "control_horario": [ ... ],
+  "emails_cuentas": [ ... ],
+  "agentes_ia": [ ... ],
+  "keywords": [ ... ],
+  "objetivos": [ ... ],
+  "paginas_web": [ ... ],
+  "scraping": [ ... ]
+}
+```
+
+### 19.4 Field Mapping — CAMPAIGNS
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Title` | `titulo` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
+| `List` | `lista` | string |
+| `Subject` | `asunto` | string |
+| `Date` | `fecha` | string |
+| `Message` | `mensaje` | string |
+| `Status` | `estado` | string |
+| `Emails sent` | `emails_enviados` | int |
+| `Unique contacts` | `contactos_unicos` | int |
+| `Failures` | `fallos` | int |
+| `Duration` | `duracion` | string |
+| `Accounts used` | `cuentas_usadas` | int |
+| `Enriched` | `enriched` | string |
+| `Log file` | `log_file` | string |
+
+### 19.5 Field Mapping — EMAILS
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Provider` | `proveedor` | string |
+| `User` | `usuario` | string |
+| `Password` | `contraseña` | string |
+| `Application Password` | `contraseña_aplicacion` | string |
+| `OAuth Client ID` | `oauth_client_id` | string |
+
+### 19.6 Field Mapping — GEOGRAPHIC COVERAGE
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `order` | `order` | int |
+| `id` | `id` | string |
+| `desc` | `desc` | string |
+| `north` | `north` | float |
+| `west` | `west` | float |
+| `south` | `south` | float |
+| `east` | `east` | float |
+| `cells` | `cells` | int |
+| `queries` | `queries` | string |
+| `density` | `density` | int |
+
+### 19.7 Field Mapping — TIME CONTROL
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Price` | `precio` | int |
+| `Service` | `servicio` | string |
+| `Date` | `fecha` | string |
+| `9:00` - `16:00` | `horas.9:00` - `horas.16:00` | bool |
+
+### 19.8 Field Mapping — AI
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `AI_Agent` (part 1) | `agente` | string |
+| `AI_Agent` (part 2) | `email` | string |
+| `Week X` | `semanas.Week X` | bool |
+
+### 19.9 Field Mapping — OBJECTIVES
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Month / Year` | `mes_anio` | string |
+| `Working Days` | `dias_habiles` | int |
+| `CPI` | `ipc` | string |
+| `Price per Session` | `precio_sesion` | int |
+| `Available Sessions` | `sesiones_disponibles` | int |
+| `Sold Sessions (Target)` | `sesiones_vendidas_objetivo` | int |
+| `Earnings` | `ganancias` | string |
+
+### 19.10 Field Mapping — WEB PAGES
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Site` | `sitio` | string |
+| `Keyword` | `keyword` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
+| `Campaign` | `campana` | string |
+| `URL_ES` | `url_es` | string |
+| `URL_EN` | `url_en` | string |
+| `Links sent` | `links_enviados` | string |
+| `Sold Sessions (Target)` | `sesiones_vendidas_objetivo` | string |
+| `Date / Time` | `fecha_hora` | string |
+
+### 19.11 Field Mapping — SCRAPING
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Title` | `titulo` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
+| `Keywords` | `keywords` | string |
+| `Date` | `fecha` | string |
+| `Status` | `estado` | string |
+| `Rows` | `rows` | int |
+| `Unique Emails` | `emails_unicos` | int |
+| `Location` | `ubicacion` | string |
+| `Duration` | `duracion` | string |
+| `Log File` | `log_file` | string |
+
+### 19.12 Notes
+
+- Numbers with thousands separators (e.g., `10,800`) are converted to `10800`.
+- Geographic coordinates are stored as float (e.g., `-347.100` $\rightarrow$ `-347.1`).
+- The CSV `WORK - CHAT.csv` is empty (headers only).
+- The script `csv_to_json.py` handles UTF-8 and cp1252 encoding.
+
+---
+
+## 20. Deduplication
+
+### 20.1 Deduplication Key
+
+**Primary:** `main.title` + `main.city` (both normalized, lowercase, no extra spaces).
+
+### 20.2 Handling Duplicates
+
+Print to console:
+```
+DUPLICATE FOUND:
+  Existing: ROWID=X | title="..." | city="..." | email="..."
+  New:     title="..." | city="..." | email="..."
+  Options: [S]kip / [U]pdate / [M]erge
+```
+
+Pause and wait for user input.
+
+- **Skip**: ignore the new one, keep existing.
+- **Update**: overwrite empty fields of existing with new values.
+- **Merge**: combine fields (do not overwrite existing data).
+
+---
+
+## 21. Implementation Notes
+
+- Enrichment scripts must import these rules as a reference.
+- Regex and blacklist lists must be maintained in a single place (this file or a Python module).
+- Any rule change is documented here with a date.
+
+---
+
+## 22. Data Enrichment — Results (2026-07-20)
+
+### 22.1 Data Sources — Import Status
+
+| Source | Files | Unique Emails | Imported | Status |
+|--------|----------|---------------|------------|--------|
+| Brevo CSV (base_tvmas.csv) | 1 | 9,310 | 9,310 | ✅ 99.96% coverage |
+| Brevo CSV (brevo_10042026.csv) | 1 | 12,763 | ~12,763 | ✅ Derived from base_tvmas |
+| Brevo CSV (brevo_consolidada_total.csv) | 1 | 12,763 | ~12,763 | ✅ Derived from base_tvmas |
+| Gosom General | 1 | 5,347 | 5,347 | ✅ import_gosom_general.py |
+| Gosom RRHH | 1 | 5,434 | 5,434 | ✅ import_rrhh_gosom.py |
+| Gosom Root (44 CSVs) | 44 | ~4,500 | 303 | ✅ import_gosom_root.py |
+| WhatsApp VCFs | 13 | 92 | 92 | ✅ import_vcf.py (phone-only) |
+| XLSX Trade Fairs (62 files) | 62 | ~34,000 | 0 | ✅ Already in DB (duplicates) |
+| Blacklist (REJECTED CONTACTS) | 1 | 198 | 198 | ✅ Marked BLACKLISTED |
+| Google Contacts (7 CSVs) | 7 | ~6,600 | 0 | ✅ Already in DB (duplicates) |
+| Pre-existing (date_added=NULL) | — | 99,261 | 99,261 | ✅ Brevo legacy import |
+
+### 22.2 Verified Sources (Gap Closed)
+
+| Source | Files | Unique Emails | Result |
+|--------|----------|---------------|-----------|
+| Gosom webdata/ (36 UUID CSVs) | 36 | 792 | ✅ Already in DB (import_gosom_root.py) |
+| Gosom web_marketing_caba.csv | 1 | 231 | ✅ Already in DB (import_gosom_root.py) |
+| contacts Mailrelay | 1 | 71 | ✅ Already in DB (import_mailrelay.py created) |
+| contacts selvaggiesteban (phone-only) | 1 | 2,643 | ✅ import_phone_contacts.py (dedup 15K $\rightarrow$ 2.6K) |
+| LinkedIn people/authors CSVs | 2 | 118 | ✅ import_linkedin_profiles.py (no email/tel) |
+| YOLANDA.csv | 1 | ~500 | ⏳ Non-standard format (pending) |
+
+### 22.3 DB Current State
+
+| Metric | Value |
+|---------|-------|
+| Total contacts | 123,763 |
+| With valid email | 116,747 |
+| With phones | 59,739 |
+| With LinkedIn | 114 |
+| Phone-only (no email) | 5,738 |
+| With social networks | 0 (8 columns 100% NULL) |
+| With sector | ~92,000 |
+| With website | ~121,000 |
+| BLACKLISTED | 198 |
+| Pre-existing (no date) | 99,261 |
+| Imported by scripts | ~24,500 |
+
+### 22.4 Import Scripts and Utilities Created
+
+| Script | Source | Status |
+|--------|--------|--------|
+| `config.py` | Centralized configuration | ✅ Active |
+| `utils.py` | Shared utilities | ✅ Active |
+| `verify_imported.py` | Source verification | ✅ Executed |
+| `import_vcf.py` | WhatsApp VCFs | ✅ Completed (92 contacts) |
+| `import_gosom_root.py` | Gosom root CSVs | ✅ Completed (303 contacts) |
+| `import_gosom_general.py` | Gosom General CSV | ✅ Completed (5,347 contacts) |
+| `import_rrhh_gosom.py` | Gosom RRHH CSV | ✅ Completed (5,434 contacts) |
+| `import_xlsx.py` | XLSX trade fairs | ✅ Executed (0 new, all duplicates) |
+| `import_blacklist.py` | REJECTED CONTACTS.docx | ✅ Completed (198 blacklisted) |
+| `import_google_contacts.py` | Google Contacts CSVs | ✅ Executed (0 new, 2 tel updated) |
+| `import_gosom_webdata.py` | Gosom webdata/ + web_marketing_caba | ✅ Executed (0 new, all already in DB) |
+| `import_mailrelay.py` | Mailrelay CSV | ✅ Executed (0 new, all already in DB) |
+| `import_phone_contacts.py` | contacts selvaggiesteban (phone-only) | ✅ 2,643 contacts imported |
+| `import_linkedin_profiles.py` | LinkedIn people/authors CSVs | ✅ 118 profiles imported |
+| `cleanup_duplicate_emails.py` | Duplicate email dedup | ✅ Active |
+| `remove_duplicates.py` | CSV dedup | ✅ Active |
+| `remove_duplicates_xlsx.py` | XLSX dedup | ✅ Active |
+| `enrich_abogados.py` | Lawyer enrichment via web scraping | ✅ Active |
+| `enumerate_prefixes.py` | Email prefix analysis | ✅ Active |
+| `archive/cleanup_phase3.py` | Archived cleanup (encoding) | 📦 Archived |
+| `archive/cleanup_phase4.py` | Archived cleanup (junk emails) | 📦 Archived |
+| `archive/cleanup_phase7.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase8.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase9.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase10.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase11.py` | Archived cleanup | 📦 Archived |
+| `archive/migrate_v4.py` | Archived DB v4 migration | 📦 Archived |
+
+---
+
+## 15. Schema Update — campaign.email_used
+
+### 15.1 New Column
+
+```sql
+ALTER TABLE campaign ADD COLUMN email_used TEXT;
+```
+
+Records the exact email of the recipient to whom each campaign was sent. Allows a contact with multiple emails to receive multiple campaigns (one per email).
+
+### 15.2 Usage
+
+- When sending a campaign: `campaign.email_used = recipient_email`
+- When querying campaigns: filter by `email_used` to know which email was used
+- Backward compatibility: existing rows remain with `email_used = NULL`
+
+---
+
+## 16. Schema Update — campaign.message
+
+### 16.1 New Column
+
+```sql
+ALTER TABLE campaign ADD COLUMN message TEXT;
+```
+
+Records the body of the message sent in each campaign. Allows querying the exact content received by each contact.
+
+### 16.2 Usage
+
+- When sending a campaign: `campaign.message = message_body`
+- When querying campaigns: filter by `message` to know what content was sent
+- Backward compatibility: existing rows remain with `message = NULL`
+
+---
+
+## 17. Enrichment Campaign LANÚS-03082026
+
+### 17.1 Campaign Data
+
+| Field | Value |
+|-------|-------|
+| `list_val` | `LANÚS-03082026` |
+| `subject` | Computer Technical Service and Technology Products |
+| `type` | `lanus_servicio_tecnico` |
+| `message` | Hello, good morning. How are you? I hope very well. I am contacting you to provide technical service for computers and technology products. We provide solutions for both individuals and shops and companies in the area. If you need repair, maintenance or equipment, you can contact us. I remain at your disposal for whatever you need. Kind regards |
+
+### 17.2 Results
+
+| Metric | Value |
+|---------|-------|
+| Execution Date | 2026-08-03 |
+| Contacts inserted | 228 |
+| Accounts used | 12 (19 emails each) |
+| Logs parsed | `log_lanus_cycle_20260803_112153.txt` (12) + `log_lanus_cycle_20260803_112606.txt` (216) |
+| Script | `scripts/database_manager/enrich_lanus_campaign.py` |
+| Backup | `data/inputs/contacts_backup_before_lanus_enrich.db` |
+
+### 17.3 Accounts and Distribution
+
+| Account | Emails sent |
+|--------|----------------|
+| wwwlanuscomputacion@gmail.com | 19 |
+| adrianaavila131969@gmail.com | 19 |
+| fernando1141967@gmail.com | 19 |
+| selvaggiesteban9@gmail.com | 19 |
+| selvaggiesteban4@gmail.com | 19 |
+| selvaggiesteban11@gmail.com | 19 |
+| marketing1a1oficial@gmail.com | 19 |
+| selvaggiconsultores@gmail.com | 19 |
+| estebanmfwd@gmail.com | 19 |
+| selvaggiesteban1@gmail.com | 19 |
+| selvaggiesteban2@gmail.com | 19 |
+| marcelagomez7799@gmail.com | 19 |
+
+---
+
+## 18. Enrichment Campaign BA/CABA-03082026
+
+### 18.1 Campaign Data
+
+| Field | Value |
+|-------|-------|
+| `list_val` | `BA-CABA-03082026` |
+| `subject` | Computer Technical Service and Technology Products |
+| `type` | `ba_caba_servicio_tecnico` |
+| `message` | Hello, good morning. How are you? I hope very well. I am contacting you to provide technical service for computers and technology products. We provide solutions for both individuals and shops and companies in the area. If you need repair, maintenance or equipment, you can contact us. I remain at your disposal for whatever you need. Kind regards |
+
+### 18.2 Results
+
+| Metric | Value |
+|---------|-------|
+| Execution Date | 2026-08-03 |
+| Duration | 1:37:39 |
+| Emails sent | 196 |
+| Contacts reached | 9,800 (50 BCC $\times$ 196 emails) |
+| Entries in campaign | 9,166 |
+| Skipped (not found/duplicates) | 13 |
+| Accounts used | 12 |
+| Structure | TO=self, BCC=50 contacts |
+| Logs | `log_ba_ciclo_20260803_135251.txt` |
+
+### 18.3 Distribution by Account
+
+| Account | Contacts |
+|--------|----------------|
+| fernando1141967@gmail.com | 850 contacts |
+| adrianaavila131969@gmail.com | 850 contacts |
+| wwwlanuscomputacion@gmail.com | 849 contacts |
+| selvaggiesteban9@gmail.com | 828 contacts |
+| selvaggiesteban4@gmail.com | 799 contacts |
+| selvaggiesteban2@gmail.com | 799 contacts |
+| selvaggiesteban11@gmail.com | 799 contacts |
+| selvaggiconsultores@gmail.com | 799 contacts |
+| marketing1a1oficial@gmail.com | 799 contacts |
+| marketing1a1oficial@gmail.com | 798 contacts |
+| estebanmfwd@gmail.com | 796 contacts |
+| selvaggiesteban1@gmail.com | 200 contacts |
+
+---
+
+## 19. Data Sources — Work Directory CSVs
+
+### 19.1 CSV Files
+
+| File | Records | Description |
+|---------|-----------|-------------|
+| `WORK - CAMPAIGNS.csv` | 18 | Email marketing campaigns sent |
+| `WORK - CHAT.csv` | 0 | Chat history (empty) |
+| `WORK - GEOGRAPHIC COVERAGE.csv` | 12,045 | Geographic zones with coordinates |
+| `WORK - TIME CONTROL.csv` | 153 | Hourly availability by service/date |
+| `WORK - EMAILS.csv` | 17 | Email accounts (Gmail, Hostinger, Hotmail, iCloud) |
+| `WORK - AI.csv` | 23 | OLLAMA/GROQ agent usage per week |
+| `WORK - KEYWORDS.csv` | 1,747 | Search keyword list |
+| `WORK - OBJECTIVES.csv` | 12 | 2026 monthly objectives |
+| `WORK - WEB PAGES.csv` | 50 | Web pages with keywords and URLs |
+| `WORK - SCRAP.csv` | 58 | Scraping results by zone |
+
+### 19.2 Generated JSON
+
+**File:** `Work/work_data.json` (3.5 MB)
+
+**Script:** `scripts/csv_to_json.py`
+
+**Usage:**
+```bash
+python scripts/csv_to_json.py
+```
+
+### 19.3 JSON Structure
+
+```json
+{
+  "metadata": { ... },
+  "campanas": [ ... ],
+  "chat": [ ... ],
+  "cobertura_geografica": [ ... ],
+  "control_horario": [ ... ],
+  "emails_cuentas": [ ... ],
+  "agentes_ia": [ ... ],
+  "keywords": [ ... ],
+  "objetivos": [ ... ],
+  "paginas_web": [ ... ],
+  "scraping": [ ... ]
+}
+```
+
+### 19.4 Field Mapping — CAMPAIGNS
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Title` | `titulo` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
+| `List` | `lista` | string |
+| `Subject` | `asunto` | string |
+| `Date` | `fecha` | string |
+| `Message` | `mensaje` | string |
+| `Status` | `estado` | string |
+| `Emails sent` | `emails_enviados` | int |
+| `Unique contacts` | `contactos_unicos` | int |
+| `Failures` | `fallos` | int |
+| `Duration` | `duracion` | string |
+| `Accounts used` | `cuentas_usadas` | int |
+| `Enriched` | `enriched` | string |
+| `Log file` | `log_file` | string |
+
+### 19.5 Field Mapping — EMAILS
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Provider` | `proveedor` | string |
+| `User` | `usuario` | string |
+| `Password` | `contraseña` | string |
+| `Application Password` | `contraseña_aplicacion` | string |
+| `OAuth Client ID` | `oauth_client_id` | string |
+
+### 19.6 Field Mapping — GEOGRAPHIC COVERAGE
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `order` | `order` | int |
+| `id` | `id` | string |
+| `desc` | `desc` | string |
+| `north` | `north` | float |
+| `west` | `west` | float |
+| `south` | `south` | float |
+| `east` | `east` | float |
+| `cells` | `cells` | int |
+| `queries` | `queries` | string |
+| `density` | `density` | int |
+
+### 19.7 Field Mapping — TIME CONTROL
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Price` | `precio` | int |
+| `Service` | `servicio` | string |
+| `Date` | `fecha` | string |
+| `9:00` - `16:00` | `horas.9:00` - `horas.16:00` | bool |
+
+### 19.8 Field Mapping — AI
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `AI_Agent` (part 1) | `agente` | string |
+| `AI_Agent` (part 2) | `email` | string |
+| `Week X` | `semanas.Week X` | bool |
+
+### 19.9 Field Mapping — OBJECTIVES
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Month / Year` | `mes_anio` | string |
+| `Working Days` | `dias_habiles` | int |
+| `CPI` | `ipc` | string |
+| `Price per Session` | `precio_sesion` | int |
+| `Available Sessions` | `sesiones_disponibles` | int |
+| `Sold Sessions (Target)` | `sesiones_vendidas_objetivo` | int |
+| `Earnings` | `ganancias` | string |
+
+### 19.10 Field Mapping — WEB PAGES
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Site` | `sitio` | string |
+| `Keyword` | `keyword` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
+| `Campaign` | `campana` | string |
+| `URL_ES` | `url_es` | string |
+| `URL_EN` | `url_en` | string |
+| `Links sent` | `links_enviados` | string |
+| `Sold Sessions (Target)` | `sesiones_vendidas_objetivo` | string |
+| `Date / Time` | `fecha_hora` | string |
+
+### 19.11 Field Mapping — SCRAPING
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Title` | `titulo` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
+| `Keywords` | `keywords` | string |
+| `Date` | `fecha` | string |
+| `Status` | `estado` | string |
+| `Rows` | `rows` | int |
+| `Unique Emails` | `emails_unicos` | int |
+| `Location` | `ubicacion` | string |
+| `Duration` | `duracion` | string |
+| `Log File` | `log_file` | string |
+
+### 19.12 Notes
+
+- Numbers with thousands separators (e.g., `10,800`) are converted to `10800`.
+- Geographic coordinates are stored as float (e.g., `-347.100` $\rightarrow$ `-347.1`).
+- The CSV `WORK - CHAT.csv` is empty (headers only).
+- The script `csv_to_json.py` handles UTF-8 and cp1252 encoding.
+
+---
+
+## 20. Deduplication
+
+### 20.1 Deduplication Key
+
+**Primary:** `main.title` + `main.city` (both normalized, lowercase, no extra spaces).
+
+### 20.2 Handling Duplicates
+
+Print to console:
+```
+DUPLICATE FOUND:
+  Existing: ROWID=X | title="..." | city="..." | email="..."
+  New:     title="..." | city="..." | email="..."
+  Options: [S]kip / [U]pdate / [M]erge
+```
+
+Pause and wait for user input.
+
+- **Skip**: ignore the new one, keep existing.
+- **Update**: overwrite empty fields of existing with new values.
+- **Merge**: combine fields (do not overwrite existing data).
+
+---
+
+## 21. Implementation Notes
+
+- Enrichment scripts must import these rules as a reference.
+- Regex and blacklist lists must be maintained in a single place (this file or a Python module).
+- Any rule change is documented here with a date.
+
+---
+
+## 22. Data Enrichment — Results (2026-07-20)
+
+### 22.1 Data Sources — Import Status
+
+| Source | Files | Unique Emails | Imported | Status |
+|--------|----------|---------------|------------|--------|
+| Brevo CSV (base_tvmas.csv) | 1 | 9,310 | 9,310 | ✅ 99.96% coverage |
+| Brevo CSV (brevo_10042026.csv) | 1 | 12,763 | ~12,763 | ✅ Derived from base_tvmas |
+| Brevo CSV (brevo_consolidada_total.csv) | 1 | 12,763 | ~12,763 | ✅ Derived from base_tvmas |
+| Gosom General | 1 | 5,347 | 5,347 | ✅ import_gosom_general.py |
+| Gosom RRHH | 1 | 5,434 | 5,434 | ✅ import_rrhh_gosom.py |
+| Gosom Root (44 CSVs) | 44 | ~4,500 | 303 | ✅ import_gosom_root.py |
+| WhatsApp VCFs | 13 | 92 | 92 | ✅ import_vcf.py (phone-only) |
+| XLSX Trade Fairs (62 files) | 62 | ~34,000 | 0 | ✅ Already in DB (duplicates) |
+| Blacklist (REJECTED CONTACTS) | 1 | 198 | 198 | ✅ Marked BLACKLISTED |
+| Google Contacts (7 CSVs) | 7 | ~6,600 | 0 | ✅ Already in DB (duplicates) |
+| Pre-existing (date_added=NULL) | — | 99,261 | 99,261 | ✅ Brevo legacy import |
+
+### 22.2 Verified Sources (Gap Closed)
+
+| Source | Files | Unique Emails | Result |
+|--------|----------|---------------|-----------|
+| Gosom webdata/ (36 UUID CSVs) | 36 | 792 | ✅ Already in DB (import_gosom_root.py) |
+| Gosom web_marketing_caba.csv | 1 | 231 | ✅ Already in DB (import_gosom_root.py) |
+| contacts Mailrelay | 1 | 71 | ✅ Already in DB (import_mailrelay.py created) |
+| contacts selvaggiesteban (phone-only) | 1 | 2,643 | ✅ import_phone_contacts.py (dedup 15K $\rightarrow$ 2.6K) |
+| LinkedIn people/authors CSVs | 2 | 118 | ✅ import_linkedin_profiles.py (no email/tel) |
+| YOLANDA.csv | 1 | ~500 | ⏳ Non-standard format (pending) |
+
+### 22.3 DB Current State
+
+| Metric | Value |
+|---------|-------|
+| Total contacts | 123,763 |
+| With valid email | 116,747 |
+| With phones | 59,739 |
+| With LinkedIn | 114 |
+| Phone-only (no email) | 5,738 |
+| With social networks | 0 (8 columns 100% NULL) |
+| With sector | ~92,000 |
+| With website | ~121,000 |
+| BLACKLISTED | 198 |
+| Pre-existing (no date) | 99,261 |
+| Imported by scripts | ~24,500 |
+
+### 22.4 Import Scripts and Utilities Created
+
+| Script | Source | Status |
+|--------|--------|--------|
+| `config.py` | Centralized configuration | ✅ Active |
+| `utils.py` | Shared utilities | ✅ Active |
+| `verify_imported.py` | Source verification | ✅ Executed |
+| `import_vcf.py` | WhatsApp VCFs | ✅ Completed (92 contacts) |
+| `import_gosom_root.py` | Gosom root CSVs | ✅ Completed (303 contacts) |
+| `import_gosom_general.py` | Gosom General CSV | ✅ Completed (5,347 contacts) |
+| `import_rrhh_gosom.py` | Gosom RRHH CSV | ✅ Completed (5,434 contacts) |
+| `import_xlsx.py` | XLSX trade fairs | ✅ Executed (0 new, all duplicates) |
+| `import_blacklist.py` | REJECTED CONTACTS.docx | ✅ Completed (198 blacklisted) |
+| `import_google_contacts.py` | Google Contacts CSVs | ✅ Executed (0 new, 2 tel updated) |
+| `import_gosom_webdata.py` | Gosom webdata/ + web_marketing_caba | ✅ Executed (0 new, all already in DB) |
+| `import_mailrelay.py` | Mailrelay CSV | ✅ Executed (0 new, all already in DB) |
+| `import_phone_contacts.py` | contacts selvaggiesteban (phone-only) | ✅ 2,643 contacts imported |
+| `import_linkedin_profiles.py` | LinkedIn people/authors CSVs | ✅ 118 profiles imported |
+| `cleanup_duplicate_emails.py` | Duplicate email dedup | ✅ Active |
+| `remove_duplicates.py` | CSV dedup | ✅ Active |
+| `remove_duplicates_xlsx.py` | XLSX dedup | ✅ Active |
+| `enrich_abogados.py` | Lawyer enrichment via web scraping | ✅ Active |
+| `enumerate_prefixes.py` | Email prefix analysis | ✅ Active |
+| `archive/cleanup_phase3.py` | Archived cleanup (encoding) | 📦 Archived |
+| `archive/cleanup_phase4.py` | Archived cleanup (junk emails) | 📦 Archived |
+| `archive/cleanup_phase7.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase8.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase9.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase10.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase11.py` | Archived cleanup | 📦 Archived |
+| `archive/migrate_v4.py` | Archived DB v4 migration | 📦 Archived |
+
+---
+
+## 15. Schema Update — campaign.email_used
+
+### 15.1 New Column
+
+```sql
+ALTER TABLE campaign ADD COLUMN email_used TEXT;
+```
+
+Records the exact email of the recipient to whom each campaign was sent. Allows a contact with multiple emails to receive multiple campaigns (one per email).
+
+### 15.2 Usage
+
+- When sending a campaign: `campaign.email_used = recipient_email`
+- When querying campaigns: filter by `email_used` to know which email was used
+- Backward compatibility: existing rows remain with `email_used = NULL`
+
+---
+
+## 16. Schema Update — campaign.message
+
+### 16.1 New Column
+
+```sql
+ALTER TABLE campaign ADD COLUMN message TEXT;
+```
+
+Records the body of the message sent in each campaign. Allows querying the exact content received by each contact.
+
+### 16.2 Usage
+
+- When sending a campaign: `campaign.message = message_body`
+- When querying campaigns: filter by `message` to know what content was sent
+- Backward compatibility: existing rows remain with `message = NULL`
+
+---
+
+## 17. Enrichment Campaign LANÚS-03082026
+
+### 17.1 Campaign Data
+
+| Field | Value |
+|-------|-------|
+| `list_val` | `LANÚS-03082026` |
+| `subject` | Computer Technical Service and Technology Products |
+| `type` | `lanus_servicio_tecnico` |
+| `message` | Hello, good morning. How are you? I hope very well. I am contacting you to provide technical service for computers and technology products. We provide solutions for both individuals and shops and companies in the area. If you need repair, maintenance or equipment, you can contact us. I remain at your disposal for whatever you need. Kind regards |
+
+### 17.2 Results
+
+| Metric | Value |
+|---------|-------|
+| Execution Date | 2026-08-03 |
+| Contacts inserted | 228 |
+| Accounts used | 12 (19 emails each) |
+| Logs parsed | `log_lanus_cycle_20260803_112153.txt` (12) + `log_lanus_cycle_20260803_112606.txt` (216) |
+| Script | `scripts/database_manager/enrich_lanus_campaign.py` |
+| Backup | `data/inputs/contacts_backup_before_lanus_enrich.db` |
+
+### 17.3 Accounts and Distribution
+
+| Account | Emails sent |
+|--------|----------------|
+| wwwlanuscomputacion@gmail.com | 19 |
+| adrianaavila131969@gmail.com | 19 |
+| fernando1141967@gmail.com | 19 |
+| selvaggiesteban9@gmail.com | 19 |
+| selvaggiesteban4@gmail.com | 19 |
+| selvaggiesteban11@gmail.com | 19 |
+| marketing1a1oficial@gmail.com | 19 |
+| selvaggiconsultores@gmail.com | 19 |
+| estebanmfwd@gmail.com | 19 |
+| selvaggiesteban1@gmail.com | 19 |
+| selvaggiesteban2@gmail.com | 19 |
+| marcelagomez7799@gmail.com | 19 |
+
+---
+
+## 18. Enrichment Campaign BA/CABA-03082026
+
+### 18.1 Campaign Data
+
+| Field | Value |
+|-------|-------|
+| `list_val` | `BA-CABA-03082026` |
+| `subject` | Computer Technical Service and Technology Products |
+| `type` | `ba_caba_servicio_tecnico` |
+| `message` | Hello, good morning. How are you? I hope very well. I am contacting you to provide technical service for computers and technology products. We provide solutions for both individuals and shops and companies in the area. If you need repair, maintenance or equipment, you can contact us. I remain at your disposal for whatever you need. Kind regards |
+
+### 18.2 Results
+
+| Metric | Value |
+|---------|-------|
+| Execution Date | 2026-08-03 |
+| Duration | 1:37:39 |
+| Emails sent | 196 |
+| Contacts reached | 9,800 (50 BCC $\times$ 196 emails) |
+| Entries in campaign | 9,166 |
+| Skipped (not found/duplicates) | 13 |
+| Accounts used | 12 |
+| Structure | TO=self, BCC=50 contacts |
+| Logs | `log_ba_ciclo_20260803_135251.txt` |
+
+### 18.3 Distribution by Account
+
+| Account | Contacts |
+|--------|----------------|
+| fernando1141967@gmail.com | 850 contacts |
+| adrianaavila131969@gmail.com | 850 contacts |
+| wwwlanuscomputacion@gmail.com | 849 contacts |
+| selvaggiesteban9@gmail.com | 828 contacts |
+| selvaggiesteban4@gmail.com | 799 contacts |
+| selvaggiesteban2@gmail.com | 799 contacts |
+| selvaggiesteban11@gmail.com | 799 contacts |
+| selvaggiconsultores@gmail.com | 799 contacts |
+| marketing1a1oficial@gmail.com | 799 contacts |
+| marketing1a1oficial@gmail.com | 798 contacts |
+| estebanmfwd@gmail.com | 796 contacts |
+| selvaggiesteban1@gmail.com | 200 contacts |
+
+---
+
+## 19. Data Sources — Work Directory CSVs
+
+### 19.1 CSV Files
+
+| File | Records | Description |
+|---------|-----------|-------------|
+| `WORK - CAMPAIGNS.csv` | 18 | Email marketing campaigns sent |
+| `WORK - CHAT.csv` | 0 | Chat history (empty) |
+| `WORK - GEOGRAPHIC COVERAGE.csv` | 12,045 | Geographic zones with coordinates |
+| `WORK - TIME CONTROL.csv` | 153 | Hourly availability by service/date |
+| `WORK - EMAILS.csv` | 17 | Email accounts (Gmail, Hostinger, Hotmail, iCloud) |
+| `WORK - AI.csv` | 23 | OLLAMA/GROQ agent usage per week |
+| `WORK - KEYWORDS.csv` | 1,747 | Search keyword list |
+| `WORK - OBJECTIVES.csv` | 12 | 2026 monthly objectives |
+| `WORK - WEB PAGES.csv` | 50 | Web pages with keywords and URLs |
+| `WORK - SCRAP.csv` | 58 | Scraping results by zone |
+
+### 19.2 Generated JSON
+
+**File:** `Work/work_data.json` (3.5 MB)
+
+**Script:** `scripts/csv_to_json.py`
+
+**Usage:**
+```bash
+python scripts/csv_to_json.py
+```
+
+### 19.3 JSON Structure
+
+```json
+{
+  "metadata": { ... },
+  "campanas": [ ... ],
+  "chat": [ ... ],
+  "cobertura_geografica": [ ... ],
+  "control_horario": [ ... ],
+  "emails_cuentas": [ ... ],
+  "agentes_ia": [ ... ],
+  "keywords": [ ... ],
+  "objetivos": [ ... ],
+  "paginas_web": [ ... ],
+  "scraping": [ ... ]
+}
+```
+
+### 19.4 Field Mapping — CAMPAIGNS
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Title` | `titulo` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
+| `List` | `lista` | string |
+| `Subject` | `asunto` | string |
+| `Date` | `fecha` | string |
+| `Message` | `mensaje` | string |
+| `Status` | `estado` | string |
+| `Emails sent` | `emails_enviados` | int |
+| `Unique contacts` | `contactos_unicos` | int |
+| `Failures` | `fallos` | int |
+| `Duration` | `duracion` | string |
+| `Accounts used` | `cuentas_usadas` | int |
+| `Enriched` | `enriched` | string |
+| `Log file` | `log_file` | string |
+
+### 19.5 Field Mapping — EMAILS
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Provider` | `proveedor` | string |
+| `User` | `usuario` | string |
+| `Password` | `contraseña` | string |
+| `Application Password` | `contraseña_aplicacion` | string |
+| `OAuth Client ID` | `oauth_client_id` | string |
+
+### 19.6 Field Mapping — GEOGRAPHIC COVERAGE
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `order` | `order` | int |
+| `id` | `id` | string |
+| `desc` | `desc` | string |
+| `north` | `north` | float |
+| `west` | `west` | float |
+| `south` | `south` | float |
+| `east` | `east` | float |
+| `cells` | `cells` | int |
+| `queries` | `queries` | string |
+| `density` | `density` | int |
+
+### 19.7 Field Mapping — TIME CONTROL
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Price` | `precio` | int |
+| `Service` | `servicio` | string |
+| `Date` | `fecha` | string |
+| `9:00` - `16:00` | `horas.9:00` - `horas.16:00` | bool |
+
+### 19.8 Field Mapping — AI
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `AI_Agent` (part 1) | `agente` | string |
+| `AI_Agent` (part 2) | `email` | string |
+| `Week X` | `semanas.Week X` | bool |
+
+### 19.9 Field Mapping — OBJECTIVES
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Month / Year` | `mes_anio` | string |
+| `Working Days` | `dias_habiles` | int |
+| `CPI` | `ipc` | string |
+| `Price per Session` | `precio_sesion` | int |
+| `Available Sessions` | `sesiones_disponibles` | int |
+| `Sold Sessions (Target)` | `sesiones_vendidas_objetivo` | int |
+| `Earnings` | `ganancias` | string |
+
+### 19.10 Field Mapping — WEB PAGES
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Site` | `sitio` | string |
+| `Keyword` | `keyword` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
+| `Campaign` | `campana` | string |
+| `URL_ES` | `url_es` | string |
+| `URL_EN` | `url_en` | string |
+| `Links sent` | `links_enviados` | string |
+| `Sold Sessions (Target)` | `sesiones_vendidas_objetivo` | string |
+| `Date / Time` | `fecha_hora` | string |
+
+### 19.11 Field Mapping — SCRAPING
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Title` | `titulo` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
+| `Keywords` | `keywords` | string |
+| `Date` | `fecha` | string |
+| `Status` | `estado` | string |
+| `Rows` | `rows` | int |
+| `Unique Emails` | `emails_unicos` | int |
+| `Location` | `ubicacion` | string |
+| `Duration` | `duracion` | string |
+| `Log File` | `log_file` | string |
+
+### 19.12 Notes
+
+- Numbers with thousands separators (e.g., `10,800`) are converted to `10800`.
+- Geographic coordinates are stored as float (e.g., `-347.100` $\rightarrow$ `-347.1`).
+- The CSV `WORK - CHAT.csv` is empty (headers only).
+- The script `csv_to_json.py` handles UTF-8 and cp1252 encoding.
+
+---
+
+## 20. Deduplication
+
+### 20.1 Deduplication Key
+
+**Primary:** `main.title` + `main.city` (both normalized, lowercase, no extra spaces).
+
+### 20.2 Handling Duplicates
+
+Print to console:
+```
+DUPLICATE FOUND:
+  Existing: ROWID=X | title="..." | city="..." | email="..."
+  New:     title="..." | city="..." | email="..."
+  Options: [S]kip / [U]pdate / [M]erge
+```
+
+Pause and wait for user input.
+
+- **Skip**: ignore the new one, keep existing.
+- **Update**: overwrite empty fields of existing with new values.
+- **Merge**: combine fields (do not overwrite existing data).
+
+---
+
+## 21. Implementation Notes
+
+- Enrichment scripts must import these rules as a reference.
+- Regex and blacklist lists must be maintained in a single place (this file or a Python module).
+- Any rule change is documented here with a date.
+
+---
+
+## 22. Data Enrichment — Results (2026-07-20)
+
+### 22.1 Data Sources — Import Status
+
+| Source | Files | Unique Emails | Imported | Status |
+|--------|----------|---------------|------------|--------|
+| Brevo CSV (base_tvmas.csv) | 1 | 9,310 | 9,310 | ✅ 99.96% coverage |
+| Brevo CSV (brevo_10042026.csv) | 1 | 12,763 | ~12,763 | ✅ Derived from base_tvmas |
+| Brevo CSV (brevo_consolidada_total.csv) | 1 | 12,763 | ~12,763 | ✅ Derived from base_tvmas |
+| Gosom General | 1 | 5,347 | 5,347 | ✅ import_gosom_general.py |
+| Gosom RRHH | 1 | 5,434 | 5,434 | ✅ import_rrhh_gosom.py |
+| Gosom Root (44 CSVs) | 44 | ~4,500 | 303 | ✅ import_gosom_root.py |
+| WhatsApp VCFs | 13 | 92 | 92 | ✅ import_vcf.py (phone-only) |
+| XLSX Trade Fairs (62 files) | 62 | ~34,000 | 0 | ✅ Already in DB (duplicates) |
+| Blacklist (REJECTED CONTACTS) | 1 | 198 | 198 | ✅ Marked BLACKLISTED |
+| Google Contacts (7 CSVs) | 7 | ~6,600 | 0 | ✅ Already in DB (duplicates) |
+| Pre-existing (date_added=NULL) | — | 99,261 | 99,261 | ✅ Brevo legacy import |
+
+### 22.2 Verified Sources (Gap Closed)
+
+| Source | Files | Unique Emails | Result |
+|--------|----------|---------------|-----------|
+| Gosom webdata/ (36 UUID CSVs) | 36 | 792 | ✅ Already in DB (import_gosom_root.py) |
+| Gosom web_marketing_caba.csv | 1 | 231 | ✅ Already in DB (import_gosom_root.py) |
+| contacts Mailrelay | 1 | 71 | ✅ Already in DB (import_mailrelay.py created) |
+| contacts selvaggiesteban (phone-only) | 1 | 2,643 | ✅ import_phone_contacts.py (dedup 15K $\rightarrow$ 2.6K) |
+| LinkedIn people/authors CSVs | 2 | 118 | ✅ import_linkedin_profiles.py (no email/tel) |
+| YOLANDA.csv | 1 | ~500 | ⏳ Non-standard format (pending) |
+
+### 22.3 DB Current State
+
+| Metric | Value |
+|---------|-------|
+| Total contacts | 123,763 |
+| With valid email | 116,747 |
+| With phones | 59,739 |
+| With LinkedIn | 114 |
+| Phone-only (no email) | 5,738 |
+| With social networks | 0 (8 columns 100% NULL) |
+| With sector | ~92,000 |
+| With website | ~121,000 |
+| BLACKLISTED | 198 |
+| Pre-existing (no date) | 99,261 |
+| Imported by scripts | ~24,500 |
+
+### 22.4 Import Scripts and Utilities Created
+
+| Script | Source | Status |
+|--------|--------|--------|
+| `config.py` | Centralized configuration | ✅ Active |
+| `utils.py` | Shared utilities | ✅ Active |
+| `verify_imported.py` | Source verification | ✅ Executed |
+| `import_vcf.py` | WhatsApp VCFs | ✅ Completed (92 contacts) |
+| `import_gosom_root.py` | Gosom root CSVs | ✅ Completed (303 contacts) |
+| `import_gosom_general.py` | Gosom General CSV | ✅ Completed (5,347 contacts) |
+| `import_rrhh_gosom.py` | Gosom RRHH CSV | ✅ Completed (5,434 contacts) |
+| `import_xlsx.py` | XLSX trade fairs | ✅ Executed (0 new, all duplicates) |
+| `import_blacklist.py` | REJECTED CONTACTS.docx | ✅ Completed (198 blacklisted) |
+| `import_google_contacts.py` | Google Contacts CSVs | ✅ Executed (0 new, 2 tel updated) |
+| `import_gosom_webdata.py` | Gosom webdata/ + web_marketing_caba | ✅ Executed (0 new, all already in DB) |
+| `import_mailrelay.py` | Mailrelay CSV | ✅ Executed (0 new, all already in DB) |
+| `import_phone_contacts.py` | contacts selvaggiesteban (phone-only) | ✅ 2,643 contacts imported |
+| `import_linkedin_profiles.py` | LinkedIn people/authors CSVs | ✅ 118 profiles imported |
+| `cleanup_duplicate_emails.py` | Duplicate email dedup | ✅ Active |
+| `remove_duplicates.py` | CSV dedup | ✅ Active |
+| `remove_duplicates_xlsx.py` | XLSX dedup | ✅ Active |
+| `enrich_abogados.py` | Lawyer enrichment via web scraping | ✅ Active |
+| `enumerate_prefixes.py` | Email prefix analysis | ✅ Active |
+| `archive/cleanup_phase3.py` | Archived cleanup (encoding) | 📦 Archived |
+| `archive/cleanup_phase4.py` | Archived cleanup (junk emails) | 📦 Archived |
+| `archive/cleanup_phase7.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase8.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase9.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase10.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase11.py` | Archived cleanup | 📦 Archived |
+| `archive/migrate_v4.py` | Archived DB v4 migration | 📦 Archived |
+
+---
+
+## 15. Schema Update — campaign.email_used
+
+### 15.1 New Column
+
+```sql
+ALTER TABLE campaign ADD COLUMN email_used TEXT;
+```
+
+Records the exact email of the recipient to whom each campaign was sent. Allows a contact with multiple emails to receive multiple campaigns (one per email).
+
+### 15.2 Usage
+
+- When sending a campaign: `campaign.email_used = recipient_email`
+- When querying campaigns: filter by `email_used` to know which email was used
+- Backward compatibility: existing rows remain with `email_used = NULL`
+
+---
+
+## 16. Schema Update — campaign.message
+
+### 16.1 New Column
+
+```sql
+ALTER TABLE campaign ADD COLUMN message TEXT;
+```
+
+Records the body of the message sent in each campaign. Allows querying the exact content received by each contact.
+
+### 16.2 Usage
+
+- When sending a campaign: `campaign.message = message_body`
+- When querying campaigns: filter by `message` to know what content was sent
+- Backward compatibility: existing rows remain with `message = NULL`
+
+---
+
+## 17. Enrichment Campaign LANÚS-03082026
+
+### 17.1 Campaign Data
+
+| Field | Value |
+|-------|-------|
+| `list_val` | `LANÚS-03082026` |
+| `subject` | Computer Technical Service and Technology Products |
+| `type` | `lanus_servicio_tecnico` |
+| `message` | Hello, good morning. How are you? I hope very well. I am contacting you to provide technical service for computers and technology products. We provide solutions for both individuals and shops and companies in the area. If you need repair, maintenance or equipment, you can contact us. I remain at your disposal for whatever you need. Kind regards |
+
+### 17.2 Results
+
+| Metric | Value |
+|---------|-------|
+| Execution Date | 2026-08-03 |
+| Contacts inserted | 228 |
+| Accounts used | 12 (19 emails each) |
+| Logs parsed | `log_lanus_cycle_20260803_112153.txt` (12) + `log_lanus_cycle_20260803_112606.txt` (216) |
+| Script | `scripts/database_manager/enrich_lanus_campaign.py` |
+| Backup | `data/inputs/contacts_backup_before_lanus_enrich.db` |
+
+### 17.3 Accounts and Distribution
+
+| Account | Emails sent |
+|--------|----------------|
+| wwwlanuscomputacion@gmail.com | 19 |
+| adrianaavila131969@gmail.com | 19 |
+| fernando1141967@gmail.com | 19 |
+| selvaggiesteban9@gmail.com | 19 |
+| selvaggiesteban4@gmail.com | 19 |
+| selvaggiesteban11@gmail.com | 19 |
+| marketing1a1oficial@gmail.com | 19 |
+| selvaggiconsultores@gmail.com | 19 |
+| estebanmfwd@gmail.com | 19 |
+| selvaggiesteban1@gmail.com | 19 |
+| selvaggiesteban2@gmail.com | 19 |
+| marcelagomez7799@gmail.com | 19 |
+
+---
+
+## 18. Enrichment Campaign BA/CABA-03082026
+
+### 18.1 Campaign Data
+
+| Field | Value |
+|-------|-------|
+| `list_val` | `BA-CABA-03082026` |
+| `subject` | Computer Technical Service and Technology Products |
+| `type` | `ba_caba_servicio_tecnico` |
+| `message` | Hello, good morning. How are you? I hope very well. I am contacting you to provide technical service for computers and technology products. We provide solutions for both individuals and shops and companies in the area. If you need repair, maintenance or equipment, you can contact us. I remain at your disposal for whatever you need. Kind regards |
+
+### 18.2 Results
+
+| Metric | Value |
+|---------|-------|
+| Execution Date | 2026-08-03 |
+| Duration | 1:37:39 |
+| Emails sent | 196 |
+| Contacts reached | 9,800 (50 BCC $\times$ 196 emails) |
+| Entries in campaign | 9,166 |
+| Skipped (not found/duplicates) | 13 |
+| Accounts used | 12 |
+| Structure | TO=self, BCC=50 contacts |
+| Logs | `log_ba_ciclo_20260803_135251.txt` |
+
+### 18.3 Distribution by Account
+
+| Account | Contacts |
+|--------|----------------|
+| fernando1141967@gmail.com | 850 contacts |
+| adrianaavila131969@gmail.com | 850 contacts |
+| wwwlanuscomputacion@gmail.com | 849 contacts |
+| selvaggiesteban9@gmail.com | 828 contacts |
+| selvaggiesteban4@gmail.com | 799 contacts |
+| selvaggiesteban2@gmail.com | 799 contacts |
+| selvaggiesteban11@gmail.com | 799 contacts |
+| selvaggiconsultores@gmail.com | 799 contacts |
+| marketing1a1oficial@gmail.com | 799 contacts |
+| marketing1a1oficial@gmail.com | 798 contacts |
+| estebanmfwd@gmail.com | 796 contacts |
+| selvaggiesteban1@gmail.com | 200 contacts |
+
+---
+
+## 19. Data Sources — Work Directory CSVs
+
+### 19.1 CSV Files
+
+| File | Records | Description |
+|---------|-----------|-------------|
+| `WORK - CAMPAIGNS.csv` | 18 | Email marketing campaigns sent |
+| `WORK - CHAT.csv` | 0 | Chat history (empty) |
+| `WORK - GEOGRAPHIC COVERAGE.csv` | 12,045 | Geographic zones with coordinates |
+| `WORK - TIME CONTROL.csv` | 153 | Hourly availability by service/date |
+| `WORK - EMAILS.csv` | 17 | Email accounts (Gmail, Hostinger, Hotmail, iCloud) |
+| `WORK - AI.csv` | 23 | OLLAMA/GROQ agent usage per week |
+| `WORK - KEYWORDS.csv` | 1,747 | Search keyword list |
+| `WORK - OBJECTIVES.csv` | 12 | 2026 monthly objectives |
+| `WORK - WEB PAGES.csv` | 50 | Web pages with keywords and URLs |
+| `WORK - SCRAP.csv` | 58 | Scraping results by zone |
+
+### 19.2 Generated JSON
+
+**File:** `Work/work_data.json` (3.5 MB)
+
+**Script:** `scripts/csv_to_json.py`
+
+**Usage:**
+```bash
+python scripts/csv_to_json.py
+```
+
+### 19.3 JSON Structure
+
+```json
+{
+  "metadata": { ... },
+  "campanas": [ ... ],
+  "chat": [ ... ],
+  "cobertura_geografica": [ ... ],
+  "control_horario": [ ... ],
+  "emails_cuentas": [ ... ],
+  "agentes_ia": [ ... ],
+  "keywords": [ ... ],
+  "objetivos": [ ... ],
+  "paginas_web": [ ... ],
+  "scraping": [ ... ]
+}
+```
+
+### 19.4 Field Mapping — CAMPAIGNS
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Title` | `titulo` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
+| `List` | `lista` | string |
+| `Subject` | `asunto` | string |
+| `Date` | `fecha` | string |
+| `Message` | `mensaje` | string |
+| `Status` | `estado` | string |
+| `Emails sent` | `emails_enviados` | int |
+| `Unique contacts` | `contactos_unicos` | int |
+| `Failures` | `fallos` | int |
+| `Duration` | `duracion` | string |
+| `Accounts used` | `cuentas_usadas` | int |
+| `Enriched` | `enriched` | string |
+| `Log file` | `log_file` | string |
+
+### 19.5 Field Mapping — EMAILS
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Provider` | `proveedor` | string |
+| `User` | `usuario` | string |
+| `Password` | `contraseña` | string |
+| `Application Password` | `contraseña_aplicacion` | string |
+| `OAuth Client ID` | `oauth_client_id` | string |
+
+### 19.6 Field Mapping — GEOGRAPHIC COVERAGE
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `order` | `order` | int |
+| `id` | `id` | string |
+| `desc` | `desc` | string |
+| `north` | `north` | float |
+| `west` | `west` | float |
+| `south` | `south` | float |
+| `east` | `east` | float |
+| `cells` | `cells` | int |
+| `queries` | `queries` | string |
+| `density` | `density` | int |
+
+### 19.7 Field Mapping — TIME CONTROL
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Price` | `precio` | int |
+| `Service` | `servicio` | string |
+| `Date` | `fecha` | string |
+| `9:00` - `16:00` | `horas.9:00` - `horas.16:00` | bool |
+
+### 19.8 Field Mapping — AI
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `AI_Agent` (part 1) | `agente` | string |
+| `AI_Agent` (part 2) | `email` | string |
+| `Week X` | `semanas.Week X` | bool |
+
+### 19.9 Field Mapping — OBJECTIVES
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Month / Year` | `mes_anio` | string |
+| `Working Days` | `dias_habiles` | int |
+| `CPI` | `ipc` | string |
+| `Price per Session` | `precio_sesion` | int |
+| `Available Sessions` | `sesiones_disponibles` | int |
+| `Sold Sessions (Target)` | `sesiones_vendidas_objetivo` | int |
+| `Earnings` | `ganancias` | string |
+
+### 19.10 Field Mapping — WEB PAGES
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Site` | `sitio` | string |
+| `Keyword` | `keyword` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
+| `Campaign` | `campana` | string |
+| `URL_ES` | `url_es` | string |
+| `URL_EN` | `url_en` | string |
+| `Links sent` | `links_enviados` | string |
+| `Sold Sessions (Target)` | `sesiones_vendidas_objetivo` | string |
+| `Date / Time` | `fecha_hora` | string |
+
+### 19.11 Field Mapping — SCRAPING
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Title` | `titulo` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
+| `Keywords` | `keywords` | string |
+| `Date` | `fecha` | string |
+| `Status` | `estado` | string |
+| `Rows` | `rows` | int |
+| `Unique Emails` | `emails_unicos` | int |
+| `Location` | `ubicacion` | string |
+| `Duration` | `duracion` | string |
+| `Log File` | `log_file` | string |
+
+### 19.12 Notes
+
+- Numbers with thousands separators (e.g., `10,800`) are converted to `10800`.
+- Geographic coordinates are stored as float (e.g., `-347.100` $\rightarrow$ `-347.1`).
+- The CSV `WORK - CHAT.csv` is empty (headers only).
+- The script `csv_to_json.py` handles UTF-8 and cp1252 encoding.
+
+---
+
+## 20. Deduplication
+
+### 20.1 Deduplication Key
+
+**Primary:** `main.title` + `main.city` (both normalized, lowercase, no extra spaces).
+
+### 20.2 Handling Duplicates
+
+Print to console:
+```
+DUPLICATE FOUND:
+  Existing: ROWID=X | title="..." | city="..." | email="..."
+  New:     title="..." | city="..." | email="..."
+  Options: [S]kip / [U]pdate / [M]erge
+```
+
+Pause and wait for user input.
+
+- **Skip**: ignore the new one, keep existing.
+- **Update**: overwrite empty fields of existing with new values.
+- **Merge**: combine fields (do not overwrite existing data).
+
+---
+
+## 21. Implementation Notes
+
+- Enrichment scripts must import these rules as a reference.
+- Regex and blacklist lists must be maintained in a single place (this file or a Python module).
+- Any rule change is documented here with a date.
+
+---
+
+## 22. Data Enrichment — Results (2026-07-20)
+
+### 22.1 Data Sources — Import Status
+
+| Source | Files | Unique Emails | Imported | Status |
+|--------|----------|---------------|------------|--------|
+| Brevo CSV (base_tvmas.csv) | 1 | 9,310 | 9,310 | ✅ 99.96% coverage |
+| Brevo CSV (brevo_10042026.csv) | 1 | 12,763 | ~12,763 | ✅ Derived from base_tvmas |
+| Brevo CSV (brevo_consolidada_total.csv) | 1 | 12,763 | ~12,763 | ✅ Derived from base_tvmas |
+| Gosom General | 1 | 5,347 | 5,347 | ✅ import_gosom_general.py |
+| Gosom RRHH | 1 | 5,434 | 5,434 | ✅ import_rrhh_gosom.py |
+| Gosom Root (44 CSVs) | 44 | ~4,500 | 303 | ✅ import_gosom_root.py |
+| WhatsApp VCFs | 13 | 92 | 92 | ✅ import_vcf.py (phone-only) |
+| XLSX Trade Fairs (62 files) | 62 | ~34,000 | 0 | ✅ Already in DB (duplicates) |
+| Blacklist (REJECTED CONTACTS) | 1 | 198 | 198 | ✅ Marked BLACKLISTED |
+| Google Contacts (7 CSVs) | 7 | ~6,600 | 0 | ✅ Already in DB (duplicates) |
+| Pre-existing (date_added=NULL) | — | 99,261 | 99,261 | ✅ Brevo legacy import |
+
+### 22.2 Verified Sources (Gap Closed)
+
+| Source | Files | Unique Emails | Result |
+|--------|----------|---------------|-----------|
+| Gosom webdata/ (36 UUID CSVs) | 36 | 792 | ✅ Already in DB (import_gosom_root.py) |
+| Gosom web_marketing_caba.csv | 1 | 231 | ✅ Already in DB (import_gosom_root.py) |
+| contacts Mailrelay | 1 | 71 | ✅ Already in DB (import_mailrelay.py created) |
+| contacts selvaggiesteban (phone-only) | 1 | 2,643 | ✅ import_phone_contacts.py (dedup 15K $\rightarrow$ 2.6K) |
+| LinkedIn people/authors CSVs | 2 | 118 | ✅ import_linkedin_profiles.py (no email/tel) |
+| YOLANDA.csv | 1 | ~500 | ⏳ Non-standard format (pending) |
+
+### 22.3 DB Current State
+
+| Metric | Value |
+|---------|-------|
+| Total contacts | 123,763 |
+| With valid email | 116,747 |
+| With phones | 59,739 |
+| With LinkedIn | 114 |
+| Phone-only (no email) | 5,738 |
+| With social networks | 0 (8 columns 100% NULL) |
+| With sector | ~92,000 |
+| With website | ~121,000 |
+| BLACKLISTED | 198 |
+| Pre-existing (no date) | 99,261 |
+| Imported by scripts | ~24,500 |
+
+### 22.4 Import Scripts and Utilities Created
+
+| Script | Source | Status |
+|--------|--------|--------|
+| `config.py` | Centralized configuration | ✅ Active |
+| `utils.py` | Shared utilities | ✅ Active |
+| `verify_imported.py` | Source verification | ✅ Executed |
+| `import_vcf.py` | WhatsApp VCFs | ✅ Completed (92 contacts) |
+| `import_gosom_root.py` | Gosom root CSVs | ✅ Completed (303 contacts) |
+| `import_gosom_general.py` | Gosom General CSV | ✅ Completed (5,347 contacts) |
+| `import_rrhh_gosom.py` | Gosom RRHH CSV | ✅ Completed (5,434 contacts) |
+| `import_xlsx.py` | XLSX trade fairs | ✅ Executed (0 new, all duplicates) |
+| `import_blacklist.py` | REJECTED CONTACTS.docx | ✅ Completed (198 blacklisted) |
+| `import_google_contacts.py` | Google Contacts CSVs | ✅ Executed (0 new, 2 tel updated) |
+| `import_gosom_webdata.py` | Gosom webdata/ + web_marketing_caba | ✅ Executed (0 new, all already in DB) |
+| `import_mailrelay.py` | Mailrelay CSV | ✅ Executed (0 new, all already in DB) |
+| `import_phone_contacts.py` | contacts selvaggiesteban (phone-only) | ✅ 2,643 contacts imported |
+| `import_linkedin_profiles.py` | LinkedIn people/authors CSVs | ✅ 118 profiles imported |
+| `cleanup_duplicate_emails.py` | Duplicate email dedup | ✅ Active |
+| `remove_duplicates.py` | CSV dedup | ✅ Active |
+| `remove_duplicates_xlsx.py` | XLSX dedup | ✅ Active |
+| `enrich_abogados.py` | Lawyer enrichment via web scraping | ✅ Active |
+| `enumerate_prefixes.py` | Email prefix analysis | ✅ Active |
+| `archive/cleanup_phase3.py` | Archived cleanup (encoding) | 📦 Archived |
+| `archive/cleanup_phase4.py` | Archived cleanup (junk emails) | 📦 Archived |
+| `archive/cleanup_phase7.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase8.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase9.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase10.py` | Archived cleanup | 📦 Archived |
+| `archive/cleanup_phase11.py` | Archived cleanup | 📦 Archived |
+| `archive/migrate_v4.py` | Archived DB v4 migration | 📦 Archived |
+
+---
+
+## 15. Schema Update — campaign.email_used
+
+### 15.1 New Column
+
+```sql
+ALTER TABLE campaign ADD COLUMN email_used TEXT;
+```
+
+Records the exact email of the recipient to whom each campaign was sent. Allows a contact with multiple emails to receive multiple campaigns (one per email).
+
+### 15.2 Usage
+
+- When sending a campaign: `campaign.email_used = recipient_email`
+- When querying campaigns: filter by `email_used` to know which email was used
+- Backward compatibility: existing rows remain with `email_used = NULL`
+
+---
+
+## 16. Schema Update — campaign.message
+
+### 16.1 New Column
+
+```sql
+ALTER TABLE campaign ADD COLUMN message TEXT;
+```
+
+Records the body of the message sent in each campaign. Allows querying the exact content received by each contact.
+
+### 16.2 Usage
+
+- When sending a campaign: `campaign.message = message_body`
+- When querying campaigns: filter by `message` to know what content was sent
+- Backward compatibility: existing rows remain with `message = NULL`
+
+---
+
+## 17. Enrichment Campaign LANÚS-03082026
+
+### 17.1 Campaign Data
+
+| Field | Value |
+|-------|-------|
+| `list_val` | `LANÚS-03082026` |
+| `subject` | Computer Technical Service and Technology Products |
+| `type` | `lanus_servicio_tecnico` |
+| `message` | Hello, good morning. How are you? I hope very well. I am contacting you to provide technical service for computers and technology products. We provide solutions for both individuals and shops and companies in the area. If you need repair, maintenance or equipment, you can contact us. I remain at your disposal for whatever you need. Kind regards |
+
+### 17.2 Results
+
+| Metric | Value |
+|---------|-------|
+| Execution Date | 2026-08-03 |
+| Contacts inserted | 228 |
+| Accounts used | 12 (19 emails each) |
+| Logs parsed | `log_lanus_cycle_20260803_112153.txt` (12) + `log_lanus_cycle_20260803_112606.txt` (216) |
+| Script | `scripts/database_manager/enrich_lanus_campaign.py` |
+| Backup | `data/inputs/contacts_backup_before_lanus_enrich.db` |
+
+### 17.3 Accounts and Distribution
+
+| Account | Emails sent |
+|--------|----------------|
+| wwwlanuscomputacion@gmail.com | 19 |
+| adrianaavila131969@gmail.com | 19 |
+| fernando1141967@gmail.com | 19 |
+| selvaggiesteban9@gmail.com | 19 |
+| selvaggiesteban4@gmail.com | 19 |
+| selvaggiesteban11@gmail.com | 19 |
+| marketing1a1oficial@gmail.com | 19 |
+| selvaggiconsultores@gmail.com | 19 |
+| estebanmfwd@gmail.com | 19 |
+| selvaggiesteban1@gmail.com | 19 |
+| selvaggiesteban2@gmail.com | 19 |
+| marcelagomez7799@gmail.com | 19 |
+
+---
+
+## 18. Enrichment Campaign BA/CABA-03082026
+
+### 18.1 Campaign Data
+
+| Field | Value |
+|-------|-------|
+| `list_val` | `BA-CABA-03082026` |
+| `subject` | Computer Technical Service and Technology Products |
+| `type` | `ba_caba_servicio_tecnico` |
+| `message` | Hello, good morning. How are you? I hope very well. I am contacting you to provide technical service for computers and technology products. We provide solutions for both individuals and shops and companies in the area. If you need repair, maintenance or equipment, you can contact us. I remain at your disposal for whatever you need. Kind regards |
+
+### 18.2 Results
+
+| Metric | Value |
+|---------|-------|
+| Execution Date | 2026-08-03 |
+| Duration | 1:37:39 |
+| Emails sent | 196 |
+| Contacts reached | 9,800 (50 BCC $\times$ 196 emails) |
+| Entries in campaign | 9,166 |
+| Skipped (not found/duplicates) | 13 |
+| Accounts used | 12 |
+| Structure | TO=self, BCC=50 contacts |
+| Logs | `log_ba_ciclo_20260803_135251.txt` |
+
+### 18.3 Distribution by Account
+
+| Account | Contacts |
+|--------|----------------|
+| fernando1141967@gmail.com | 850 contacts |
+| adrianaavila131969@gmail.com | 850 contacts |
+| wwwlanuscomputacion@gmail.com | 849 contacts |
+| selvaggiesteban9@gmail.com | 828 contacts |
+| selvaggiesteban4@gmail.com | 799 contacts |
+| selvaggiesteban2@gmail.com | 799 contacts |
+| selvaggiesteban11@gmail.com | 799 contacts |
+| selvaggiconsultores@gmail.com | 799 contacts |
+| marketing1a1oficial@gmail.com | 799 contacts |
+| marketing1a1oficial@gmail.com | 798 contacts |
+| estebanmfwd@gmail.com | 796 contacts |
+| selvaggiesteban1@gmail.com | 200 contacts |
+
+---
+
+## 19. Data Sources — Work Directory CSVs
+
+### 19.1 CSV Files
+
+| File | Records | Description |
+|---------|-----------|-------------|
+| `WORK - CAMPAIGNS.csv` | 18 | Email marketing campaigns sent |
+| `WORK - CHAT.csv` | 0 | Chat history (empty) |
+| `WORK - GEOGRAPHIC COVERAGE.csv` | 12,045 | Geographic zones with coordinates |
+| `WORK - TIME CONTROL.csv` | 153 | Hourly availability by service/date |
+| `WORK - EMAILS.csv` | 17 | Email accounts (Gmail, Hostinger, Hotmail, iCloud) |
+| `WORK - AI.csv` | 23 | OLLAMA/GROQ agent usage per week |
+| `WORK - KEYWORDS.csv` | 1,747 | Search keyword list |
+| `WORK - OBJECTIVES.csv` | 12 | 2026 monthly objectives |
+| `WORK - WEB PAGES.csv` | 50 | Web pages with keywords and URLs |
+| `WORK - SCRAP.csv` | 58 | Scraping results by zone |
+
+### 19.2 Generated JSON
+
+**File:** `Work/work_data.json` (3.5 MB)
+
+**Script:** `scripts/csv_to_json.py`
+
+**Usage:**
+```bash
+python scripts/csv_to_json.py
+```
+
+### 19.3 JSON Structure
+
+```json
+{
+  "metadata": { ... },
+  "campanas": [ ... ],
+  "chat": [ ... ],
+  "cobertura_geografica": [ ... ],
+  "control_horario": [ ... ],
+  "emails_cuentas": [ ... ],
+  "agentes_ia": [ ... ],
+  "keywords": [ ... ],
+  "objetivos": [ ... ],
+  "paginas_web": [ ... ],
+  "scraping": [ ... ]
+}
+```
+
+### 19.4 Field Mapping — CAMPAIGNS
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Title` | `titulo` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
+| `List` | `lista` | string |
+| `Subject` | `asunto` | string |
+| `Date` | `fecha` | string |
+| `Message` | `mensaje` | string |
+| `Status` | `estado` | string |
+| `Emails sent` | `emails_enviados` | int |
+| `Unique contacts` | `contactos_unicos` | int |
+| `Failures` | `fallos` | int |
+| `Duration` | `duracion` | string |
+| `Accounts used` | `cuentas_usadas` | int |
+| `Enriched` | `enriched` | string |
+| `Log file` | `log_file` | string |
+
+### 19.5 Field Mapping — EMAILS
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Provider` | `proveedor` | string |
+| `User` | `usuario` | string |
+| `Password` | `contraseña` | string |
+| `Application Password` | `contraseña_aplicacion` | string |
+| `OAuth Client ID` | `oauth_client_id` | string |
+
+### 19.6 Field Mapping — GEOGRAPHIC COVERAGE
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `order` | `order` | int |
+| `id` | `id` | string |
+| `desc` | `desc` | string |
+| `north` | `north` | float |
+| `west` | `west` | float |
+| `south` | `south` | float |
+| `east` | `east` | float |
+| `cells` | `cells` | int |
+| `queries` | `queries` | string |
+| `density` | `density` | int |
+
+### 19.7 Field Mapping — TIME CONTROL
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Price` | `precio` | int |
+| `Service` | `servicio` | string |
+| `Date` | `fecha` | string |
+| `9:00` - `16:00` | `horas.9:00` - `horas.16:00` | bool |
+
+### 19.8 Field Mapping — AI
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `AI_Agent` (part 1) | `agente` | string |
+| `AI_Agent` (part 2) | `email` | string |
+| `Week X` | `semanas.Week X` | bool |
+
+### 19.9 Field Mapping — OBJECTIVES
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Month / Year` | `mes_anio` | string |
+| `Working Days` | `dias_habiles` | int |
+| `CPI` | `ipc` | string |
+| `Price per Session` | `precio_sesion` | int |
+| `Available Sessions` | `sesiones_disponibles` | int |
+| `Sold Sessions (Target)` | `sesiones_vendidas_objetivo` | int |
+| `Earnings` | `ganancias` | string |
+
+### 19.10 Field Mapping — WEB PAGES
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Site` | `sitio` | string |
+| `Keyword` | `keyword` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
+| `Campaign` | `campana` | string |
+| `URL_ES` | `url_es` | string |
+| `URL_EN` | `url_en` | string |
+| `Links sent` | `links_enviados` | string |
+| `Sold Sessions (Target)` | `sesiones_vendidas_objetivo` | string |
+| `Date / Time` | `fecha_hora` | string |
+
+### 19.11 Field Mapping — SCRAPING
+
+| CSV Column | JSON Field | Type |
+|-------------|------------|------|
+| `Title` | `titulo` | string |
+| `Geographic Coverage` | `cobertura_geografica` | string |
+| `Keywords` | `keywords` | string |
+| `Date` | `fecha` | string |
+| `Status` | `estado` | string |
+| `Rows` | `rows` | int |
+| `Unique Emails` | `emails_unicos` | int |
+| `Location` | `ubicacion` | string |
+| `Duration` | `duracion` | string |
+| `Log File` | `log_file` | string |
+
+### 19.12 Notes
+
+- Numbers with thousands separators (e.g., `10,800`) are converted to `10800`.
+- Geographic coordinates are stored as float (e.g., `-347.100` $\rightarrow$ `-347.1`).
+- The CSV `WORK - CHAT.csv` is empty (headers only).
+- The script `csv_to_json.py` handles UTF-8 and cp1252 encoding.
+
+---
+
+## 20. Deduplication
+
+### 20.1 Deduplication Key
+
+**Primary:** `main.title` + `main.city` (both normalized, lowercase, no extra spaces).
+
+### 20.2 Handling Duplicates
+
+Print to console:
+```
+DUPLICATE FOUND:
+  Existing: ROWID=X | title="..." | city="..." | email="..."
+  New:     title="..." | city="..." | email="..."
+  Options: [S]kip / [U]pdate / [M]erge
+```
+
+Pause and wait for user input.
+
+- **Skip**: ignore the new one, keep existing.
+- **Update**: overwrite empty fields of existing with new values.
+- **Merge**: combine fields (do not overwrite existing data).
+
+---
+
+## 21. Implementation Notes
+
+- Enrichment scripts must import these rules as a reference.
+- Regex and blacklist lists must be maintained in a single place (this file or a Python module).
+- Any rule change is documented here with a date.
+
+---
+
+## 22. Data Enrichment — Results (202

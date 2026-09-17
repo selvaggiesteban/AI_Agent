@@ -6,12 +6,12 @@ from core.ai_engine import llm
 
 def run_store_catalog_campaign(conventions=""):
     """
-    Executes the 'Catálogo de Tienda Online' campaign:
+    Executes the 'Online Store Catalog' campaign:
     1. Analyzes product lists.
     2. Generates optimized product descriptions and categories.
     3. Sends the catalog plan via Gmail.
     """
-    logger.info("Starting 'Catálogo de Tienda Online' campaign...")
+    logger.info("Starting 'Online Store Catalog' campaign...")
     try:
         with open("data/campaign_config.json", "r", encoding="utf-8") as f:
             config = json.load(f).get("store_catalog", {})
@@ -43,12 +43,12 @@ def run_store_catalog_campaign(conventions=""):
         )
 
         if success:
-            logger.info("'Catálogo de Tienda Online' campaign completed successfully.")
+            logger.info("'Online Store Catalog' campaign completed successfully.")
         else:
-            logger.error("'Catálogo de Tienda Online' campaign failed to send email.")
+            logger.error("'Online Store Catalog' campaign failed to send email.")
 
     except Exception as e:
-        logger.exception(f"Critical error in 'Catálogo de Tienda Online' campaign: {e}")
+        logger.exception(f"Critical error in 'Online Store Catalog' campaign: {e}")
 
 if __name__ == "__main__":
     run_store_catalog_campaign()

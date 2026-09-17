@@ -11,10 +11,10 @@ from pathlib import Path
 
 from core.paths import INPUTS_DIR, PROJECT_ROOT
 
-# Rutas dinámicas
+# Dynamic paths
 DB_PATH = INPUTS_DIR / "contacts.db"
 ENV_PATH = PROJECT_ROOT / ".env"
-IMAP_FOLDER = "[Gmail]/Borradores"
+IMAP_FOLDER = "[Gmail]/Drafts"
 BATCH_SIZE = 100
 
 def load_gmail_accounts():

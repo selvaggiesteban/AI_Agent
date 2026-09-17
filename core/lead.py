@@ -12,9 +12,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+#
 """
-Lead Pipeline — Orquestador de prospección y adquisición de leads.
+Lead Pipeline — Orchestrator for lead prospecting and acquisition.
 """
 
 import sys
@@ -56,7 +56,7 @@ SEEDS_DIR = GOSOM_DIR / "seeds"
 CHUNKS_DIR = GOSOM_DIR / "chunks"
 OUTPUT_DIR = GOSOM_DIR / "output"
 KEYWORDS_FILE = SEEDS_DIR / "keywords.txt"
-UBICACIONES_FILE = SEEDS_DIR / "ubicaciones.txt"
+LOCATIONS_FILE = SEEDS_DIR / "locations.txt"
 
 CHUNK_SIZE = 500
 GOSOM_CONCURRENCY = 3
@@ -82,44 +82,44 @@ LEAD_SCORE_WEIGHTS = {
 }
 
 SECTOR_KEYWORDS = {
-    "Tecnología": ["informatica", "computacion", "sistemas", "soporte tecnico", "reparacion", "tecnico", "web", "hosting", "programacion", "desarrollo", "software", "app", "digital"],
-    "Salud": ["medico", "clinica", "hospital", "odontologo", "farmacia", "kinesiologo", "psicologo", "nutricionista", "veterinaria"],
-    "Comercio": ["almacen", "supermercado", "kiosco", "tienda", "comercio", "local", "venta", "negocio"],
-    "Gastronomía": ["restaurante", "bar", "cafeteria", "pizzeria", "heladeria", "rotiseria", "panaderia", "pasteleria", "hamburgueseria"],
-    "Industria": ["taller", "metalurgica", "mecanizado", "fabrica", "industrial", "portones", "calderas", "soldador", "toldos"],
-    "Servicios": ["abogado", "contador", "escribano", "seguro", "inmobiliaria", "consultora", "asesoria", "arquitecto", "ingeniero"],
-    "Educación": ["escuela", "colegio", "instituto", "profesor", "curso", "capacitacion", "universidad", "academia"],
-    "Transporte": ["motos", "bicicletas", "grua", "auxilio", "taxi", "remis", "mudanza", "flete", "logistica"],
-    "Construcción": ["construccion", "obra", "plomeria", "electricista", "carpinteria", "pintura", "cerrajero", "vidrieria"],
+    "Technology": ["informatica", "computacion", "sistemas", "soporte tecnico", "reparacion", "tecnico", "web", "hosting", "programacion", "desarrollo", "software", "app", "digital"],
+    "Health": ["medico", "clinica", "hospital", "odontologo", "farmacia", "kinesiologo", "psicologo", "nutricionista", "veterinaria"],
+    "Commerce": ["almacen", "supermercado", "kiosco", "tienda", "comercio", "local", "venta", "negocio"],
+    "Gastronomy": ["restaurante", "bar", "cafeteria", "pizzeria", "heladeria", "rotiseria", "panaderia", "pasteleria", "hamburgueseria"],
+    "Industry": ["taller", "metalurgica", "mecanizado", "fabrica", "industrial", "portones", "calderas", "soldador", "toldos"],
+    "Services": ["abogado", "contador", "escribano", "seguro", "inmobiliaria", "consultora", "asesoria", "arquitecto", "ingeniero"],
+    "Education": ["escuela", "colegio", "instituto", "profesor", "curso", "capacitacion", "universidad", "academia"],
+    "Transport": ["motos", "bicicletas", "grua", "auxilio", "taxi", "remis", "mudanza", "flete", "logistica"],
+    "Construction": ["construccion", "obra", "plomeria", "electricista", "carpinteria", "pintura", "cerrajero", "vidrieria"],
 }
 
 DEFAULT_OFFER_HOSTING = (
-    "Hola, ¿todo bien? Te escribo porque vi que tienen presencia en Google Maps "
-    "y quería saber si están conformes con su sitio web y hosting actual. En LANUS "
-    "COMPUTACION estamos ofreciendo una promo de hosting en Cloudflare con rendimiento "
-    "mejorado y seguridad incluida, a un precio muy accesible. Sin compromiso, ¿puedo "
-    "compartirte más info? Saludos!"
+    "Hello, how are you? I'm writing because I saw you have a presence on Google Maps "
+    "and I wanted to know if you are satisfied with your current website and hosting. At LANUS "
+    "COMPUTACION we are offering a Cloudflare hosting promo with improved performance "
+    "and included security, at a very affordable price. No commitment, may I "
+    "share more info with you? Regards!"
 )
 
 OFFERS = {
     "hosting": {
-        "asunto": "Promo Hosting Cloudflare - LANUS COMPUTACION",
-        "mensaje": DEFAULT_OFFER_HOSTING,
+        "subject": "Cloudflare Hosting Promo - LANUS COMPUTACION",
+        "message": DEFAULT_OFFER_HOSTING,
     },
     "web": {
-        "asunto": "Rediseño de sitio web - LANUS COMPUTACION",
-        "mensaje": (
-            "Hola, vi su comercio en Google Maps y noté que podrían "
-            "mejorar su presencia web. Ofrecemos diseños modernos y "
-            "económicos. Sin compromiso, ¿puedo enviarles info?"
+        "subject": "Website Redesign - LANUS COMPUTACION",
+        "message": (
+            "Hello, I saw your business on Google Maps and noticed that you could "
+            "improve your web presence. We offer modern and affordable designs. "
+            "No commitment, may I send you some info?"
         ),
     },
     "seo": {
-        "asunto": "Posicionamiento Web - LANUS COMPUTACION",
-        "mensaje": (
-            "Hola, ofrecemos servicios de SEO para que su negocio "
-            "aparezca primero en Google. ¿Les interesaría una "
-            "auditoría gratuita?"
+        "subject": "Web Positioning - LANUS COMPUTACION",
+        "message": (
+            "Hello, we offer SEO services so your business "
+            "appears first on Google. Would you be interested in a "
+            "free audit?"
         ),
     },
 }
@@ -133,7 +133,7 @@ class LeadPipeline(BasePipeline):
         log_dir = ROOT_DIR / "logs" / "pipeline"
         log_dir.mkdir(parents=True, exist_ok=True)
         super().__init__(name="lead", telemetry_path=str(log_dir / "lead_execution_log.json"))
-        
+
         self.logger.setLevel(logging.INFO)
         _console = logging.StreamHandler()
         _console.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s", "%H:%M:%S"))
@@ -159,36 +159,36 @@ class LeadPipeline(BasePipeline):
         path = CHUNKS_DIR / f"chunk_{num:03d}.txt"
         with open(path, "w", encoding="ascii", errors="replace") as f:
             f.write("\n".join(lines) + "\n")
-        self.logger.info("  ✓ chunk_%03d.txt (%d líneas)", num, len(lines))
+        self.logger.info("  ✓ chunk_%03d.txt (%d lines)", num, len(lines))
 
     def phase_combine(self, keywords_filter="", locations_filter="", keywords_file="", grid_mode=False, keywordless_mode=False, dry_run=False):
-        self.logger.info("=== FASE 1: Combine ===")
+        self.logger.info("=== PHASE 1: Combine ===")
         def _load_lines(filepath: Path):
             if not filepath.exists():
-                self.logger.error("Archivo no encontrado: %s", filepath)
+                self.logger.error("File not found: %s", filepath)
                 return []
             with open(filepath, "r", encoding="utf-8") as f:
                 return [line.strip() for line in f if line.strip()]
 
         kw_file = Path(keywords_file) if keywords_file else KEYWORDS_FILE
         keywords = _load_lines(kw_file)
-        
+
         if keywordless_mode:
-            ubicaciones = _load_lines(UBICACIONES_FILE)
+            locations = _load_lines(LOCATIONS_FILE)
             if locations_filter:
-                filtros = [l.strip().lower() for l in locations_filter.split(",")]
-                ubicaciones = [u for u in ubicaciones if any(f in u.lower() for f in filtros)]
-            if not ubicaciones:
-                self.logger.error("No hay ubicaciones disponibles")
+                filters = [l.strip().lower() for l in locations_filter.split(",")]
+                locations = [u for u in locations if any(f in u.lower() for f in filters)]
+            if not locations:
+                self.logger.error("No locations available")
                 return {"ok": False, "error": "empty_locations"}
             queries = []
-            for loc in ubicaciones:
+            for loc in locations:
                 for proxy in KEYWORDLESS_PROXY_CATEGORIES: queries.append(f"{proxy} {loc}")
                 queries.append(loc)
             total = len(queries)
-            self.logger.info("  Modo KEYWORDLESS activado | Ubicaciones: %d | Queries: %d | Proxys: %s", len(ubicaciones), total, ",".join(KEYWORDLESS_PROXY_CATEGORIES))
+            self.logger.info("  KEYWORDLESS mode activated | Locations: %d | Queries: %d | Proxies: %s", len(locations), total, ",".join(KEYWORDLESS_PROXY_CATEGORIES))
             if dry_run:
-                self.logger.info("  [DRY-RUN] Se generarian %d queries en chunks de %d", total, CHUNK_SIZE)
+                self.logger.info("  [DRY-RUN] %d queries would be generated in chunks of %d", total, CHUNK_SIZE)
                 return {"ok": True, "dry_run": True, "total": total}
             CHUNKS_DIR.mkdir(parents=True, exist_ok=True)
             for f in CHUNKS_DIR.glob("chunk_*.txt"): f.unlink()
@@ -199,21 +199,21 @@ class LeadPipeline(BasePipeline):
                     self._write_chunk(chunk_num, current_lines)
                     current_lines, chunk_num = [], chunk_num + 1
             if current_lines: self._write_chunk(chunk_num, current_lines)
-            self._log_event("combine", {"keywords": 0, "locations": len(ubicaciones), "chunks": chunk_num - 1, "keywordless_mode": True})
+            self._log_event("combine", {"keywords": 0, "locations": len(locations), "chunks": chunk_num - 1, "keywordless_mode": True})
             return {"ok": True, "chunks": chunk_num - 1, "total": total, "keywordless_mode": True}
-        
+
         elif grid_mode:
-            self.logger.info("  Modo GRID activado (grid-bbox maneja la ubicación)")
+            self.logger.info("  GRID mode activated (grid-bbox handles location)")
             if keywords_filter:
-                filtros = [k.strip().lower() for k in keywords_filter.split(",")]
-                keywords = [k for k in keywords if any(f in k.lower() for f in filtros)]
+                filters = [k.strip().lower() for k in keywords_filter.split(",")]
+                keywords = [k for k in keywords if any(f in k.lower() for f in filters)]
             if not keywords:
-                self.logger.error("No hay keywords disponibles")
+                self.logger.error("No keywords available")
                 return {"ok": False, "error": "empty_keywords"}
             total = len(keywords)
             self.logger.info("  Keywords: %d (grid-bbox: %s)", total, GOSOM_GRID_BBOX)
             if dry_run:
-                self.logger.info("  [DRY-RUN] Se generarían %d queries en chunks de %d", total, CHUNK_SIZE)
+                self.logger.info("  [DRY-RUN] %d queries would be generated in chunks of %d", total, CHUNK_SIZE)
                 return {"ok": True, "dry_run": True, "total": total}
             CHUNKS_DIR.mkdir(parents=True, exist_ok=True)
             for f in CHUNKS_DIR.glob("chunk_*.txt"): f.unlink()
@@ -226,38 +226,38 @@ class LeadPipeline(BasePipeline):
             if current_lines: self._write_chunk(chunk_num, current_lines)
             self._log_event("combine", {"keywords": len(keywords), "locations": 0, "chunks": chunk_num - 1, "grid_mode": True})
             return {"ok": True, "chunks": chunk_num - 1, "total": total, "grid_mode": True}
-        
+
         else:
-            ubicaciones = _load_lines(UBICACIONES_FILE)
+            locations = _load_lines(LOCATIONS_FILE)
             if keywords_filter:
-                filtros = [k.strip().lower() for k in keywords_filter.split(",")]
-                keywords = [k for k in keywords if any(f in k.lower() for f in filtros)]
+                filters = [k.strip().lower() for k in keywords_filter.split(",")]
+                keywords = [k for k in keywords if any(f in k.lower() for f in filters)]
             if locations_filter:
-                filtros = [l.strip().lower() for l in locations_filter.split(",")]
-                ubicaciones = [u for u in ubicaciones if any(f in u.lower() for f in filtros)]
-            if not keywords or not ubicaciones:
-                self.logger.error("No hay keywords o ubicaciones disponibles")
+                filters = [l.strip().lower() for l in locations_filter.split(",")]
+                locations = [u for u in locations if any(f in u.lower() for f in filters)]
+            if not keywords or not locations:
+                self.logger.error("No keywords or locations available")
                 return {"ok": False, "error": "empty_seeds"}
-            total = len(keywords) * len(ubicaciones)
-            self.logger.info("  Keywords: %d x Ubicaciones: %d = %d combinaciones", len(keywords), len(ubicaciones), total)
+            total = len(keywords) * len(locations)
+            self.logger.info("  Keywords: %d x Locations: %d = %d combinations", len(keywords), len(locations), total)
             if dry_run:
-                self.logger.info("  [DRY-RUN] Se generarían %d combinaciones en chunks de %d", total, CHUNK_SIZE)
+                self.logger.info("  [DRY-RUN] %d combinations would be generated in chunks of %d", total, CHUNK_SIZE)
                 return {"ok": True, "dry_run": True, "total": total}
             CHUNKS_DIR.mkdir(parents=True, exist_ok=True)
             for f in CHUNKS_DIR.glob("chunk_*.txt"): f.unlink()
             chunk_num, current_lines = 1, []
             for kw in keywords:
-                for loc in ubicaciones:
+                for loc in locations:
                     current_lines.append(f"{kw} {loc}")
                     if len(current_lines) >= CHUNK_SIZE:
                         self._write_chunk(chunk_num, current_lines)
                         current_lines, chunk_num = [], chunk_num + 1
             if current_lines: self._write_chunk(chunk_num, current_lines)
-            self._log_event("combine", {"keywords": len(keywords), "locations": len(ubicaciones), "chunks": chunk_num - 1})
+            self._log_event("combine", {"keywords": len(keywords), "locations": len(locations), "chunks": chunk_num - 1})
             return {"ok": True, "chunks": chunk_num - 1, "total": total}
 
     def phase_scrape(self, dry_run=False, grid_bbox="", grid_cell=0.0):
-        self.logger.info("=== FASE 2: Scrape (Gosom) ===")
+        self.logger.info("=== PHASE 2: Scrape (Gosom) ===")
         docker_ok = False
         try:
             result = subprocess.run(["docker", "--version"], capture_output=True, text=True, timeout=10)
@@ -268,17 +268,17 @@ class LeadPipeline(BasePipeline):
         else: return self._scrape_exe(dry_run, grid_bbox, grid_cell)
 
     def _scrape_docker(self, dry_run, grid_bbox="", grid_cell=0.0):
-        self.logger.info("  Usando Gosom vía Docker")
+        self.logger.info("  Using Gosom via Docker")
         if dry_run:
             self.logger.info("  [DRY-RUN] Gosom Docker would scrape chunks")
             return {"ok": True, "dry_run": True, "method": "docker"}
         chunks = list(CHUNKS_DIR.glob("chunk_*.txt"))
         if not chunks:
-            self.logger.warning("  No hay chunks para scrape — ejecutá --combine primero")
+            self.logger.warning("  No chunks to scrape — run --combine first")
             return {"ok": False, "error": "no_chunks"}
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         for chunk_file in chunks:
-            self.logger.info("  Scrapeando chunk: %s", chunk_file.name)
+            self.logger.info("  Scraping chunk: %s", chunk_file.name)
             try:
                 result = subprocess.run(
                     ["docker", "run", "--rm", "-v", f"{GOSOM_DIR}:/data", "gosom/google-maps-scraper:latest",
@@ -286,9 +286,9 @@ class LeadPipeline(BasePipeline):
                      "-depth", str(GOSOM_DEPTH), "-concurrency", str(GOSOM_CONCURRENCY)],
                     capture_output=True, text=True, timeout=1800, cwd=str(ROOT_DIR),
                 )
-                if result.returncode != 0: self.logger.warning("  Gosom error en %s: %s", chunk_file.name, result.stderr[:300])
-                else: self.logger.info("  ✓ %s completado", chunk_file.name)
-            except Exception as e: self.logger.error("  Error ejecutando Gosom Docker: %s", e)
+                if result.returncode != 0: self.logger.warning("  Gosom error in %s: %s", chunk_file.name, result.stderr[:300])
+                else: self.logger.info("  ✓ %s completed", chunk_file.name)
+            except Exception as e: self.logger.error("  Error executing Gosom Docker: %s", e)
         self._log_event("scrape", {"method": "docker", "chunks": len(chunks)})
         return {"ok": True, "method": "docker", "chunks_processed": len(chunks)}
 
@@ -325,20 +325,20 @@ class LeadPipeline(BasePipeline):
                         part_file.close()
                         checkpoint["partials"][part_path.name] = {"ts": datetime.now().isoformat(), "rows": part_row_count}
                         self._save_checkpoint(checkpoint)
-                        self.logger.info("  ✓ Partial: %s (%d filas, total %d)", part_path.name, part_row_count, row_idx)
+                        self.logger.info("  ✓ Partial: %s (%d rows, total %d)", part_path.name, part_row_count, row_idx)
                         part_num, part_row_count = part_num + 1, 0
                 if part_file and part_row_count > 0:
                     part_file.close()
                     checkpoint["partials"][part_path.name] = {"ts": datetime.now().isoformat(), "rows": part_row_count}
                     self._save_checkpoint(checkpoint)
-                    self.logger.info("  ✓ Partial: %s (%d filas, total %d)", part_path.name, part_row_count, row_idx)
+                    self.logger.info("  ✓ Partial: %s (%d rows, total %d)", part_path.name, part_row_count, row_idx)
                 return row_idx
         except Exception as e:
-            self.logger.error("  Error en split incremental %s: %s", csv_path.name, e)
+            self.logger.error("  Error in incremental split %s: %s", csv_path.name, e)
             return last_split_row
 
     def _scrape_exe(self, dry_run, grid_bbox="", grid_cell=0.0):
-        self.logger.info("  Usando Gosom vía EXE local (Popen + polling)")
+        self.logger.info("  Using Gosom via local EXE (Popen + polling)")
         exe_path = GOSOM_DIR / "google_maps_scraper-1.3.0-windows-amd64.exe"
         if not exe_path.exists():
             exes = list(GOSOM_DIR.glob("*.exe"))
@@ -375,7 +375,7 @@ class LeadPipeline(BasePipeline):
                     current_rows = self._count_csv_rows(csv_path)
                     if current_rows > last_rows_seen:
                         stale_count, last_rows_seen = 0, current_rows
-                        self.logger.info("  📊 %d filas", current_rows)
+                        self.logger.info("  📊 %d rows", current_rows)
                     else: stale_count += 1
                     if current_rows >= last_split_row + CSV_PARTIAL_ROWS:
                         last_split_row = self._split_csv_incremental(csv_path, checkpoint, last_split_row)
@@ -399,7 +399,7 @@ class LeadPipeline(BasePipeline):
                         break
                     time.sleep(POLL_INTERVAL)
             except Exception as e:
-                self.logger.error("  Error en Popen+polling para %s: %s", chunk_file.name, e)
+                self.logger.error("  Error in Popen+polling for %s: %s", chunk_file.name, e)
         self._log_event("scrape", {"method": "exe", "chunks_total": len(chunks), "chunks_processed": processed, "total_rows": total_rows})
         return {"ok": True, "method": "exe", "chunks_processed": processed, "total_rows": total_rows}
 
@@ -418,7 +418,7 @@ class LeadPipeline(BasePipeline):
         self._save_checkpoint(checkpoint)
 
     def phase_import(self, dry_run=False):
-        self.logger.info("=== FASE 3: Import (CSV -> DB) ===")
+        self.logger.info("=== PHASE 3: Import (CSV -> DB) ===")
         if not DB_PATH.exists(): return {"ok": False, "error": "db_missing"}
         existing_emails = set()
         rows = self._db_query("SELECT primary_email FROM main WHERE primary_email IS NOT NULL")
@@ -441,19 +441,19 @@ class LeadPipeline(BasePipeline):
                         if primary_email in existing_emails:
                             total_skip += 1; continue
                         if dry_run:
-                            self.logger.info("  [DRY-RUN] Nuevo: %s <%s>", row.get("title"), primary_email)
+                            self.logger.info("  [DRY-RUN] New: %s <%s>", row.get("title"), primary_email)
                             continue
                         self._db_query("INSERT INTO main (title, sector, primary_email, other_emails, phone, address, google_maps, urls, country, list, date_added) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, date('now'))",
                                       (row.get("title"), row.get("category"), primary_email, ",".join(emails[1:]), row.get("phone"), row.get("complete_address") or row.get("address", ""), row.get("link", ""), row.get("website", ""), "", "gosom_auto"), fetch=False)
                         existing_emails.add(primary_email)
                         total_new += 1
-                self.logger.info("  ✓ %s procesado", csv_file.name)
-            except Exception as e: self.logger.error("  Error con %s: %s", csv_file.name, e)
+                self.logger.info("  ✓ %s processed", csv_file.name)
+            except Exception as e: self.logger.error("  Error with %s: %s", csv_file.name, e)
         self._log_event("import", {"new": total_new, "skipped": total_skip, "csvs": len(csv_files)})
         return {"ok": True, "imported": total_new, "skipped": total_skip}
 
     def phase_sanitize(self, dry_run=False):
-        self.logger.info("=== FASE 4: Sanitize ===")
+        self.logger.info("=== PHASE 4: Sanitize ===")
         if not DB_PATH.exists(): return {"ok": False, "error": "db_missing"}
         conn = sqlite3.connect(str(DB_PATH))
         conn.row_factory = sqlite3.Row
@@ -485,7 +485,7 @@ class LeadPipeline(BasePipeline):
                 except: pass
             if new_title != title: stats["normalized"] += 1
             if new_sector != sector_orig: stats["reclassified"] += 1
-            score_label = "caliente" if score >= 50 else "tibio" if score >= 25 else "frio"
+            score_label = "hot" if score >= 50 else "warm" if score >= 25 else "cold"
             if dry_run: continue
             try:
                 cursor.execute("UPDATE main SET title = ?, sector = ?, deliverability = ? WHERE rowid = ?", (new_title, new_sector, score_label, rowid))
@@ -497,7 +497,7 @@ class LeadPipeline(BasePipeline):
         return {"ok": True, **stats}
 
     def phase_prospect(self, channel="all", limit=100, offer="hosting", dry_run=False):
-        self.logger.info("=== FASE 5: Prospect (canal=%s, oferta=%s, límite=%d) ===", channel, offer, limit)
+        self.logger.info("=== PHASE 5: Prospect (channel=%s, offer=%s, limit=%d) ===", channel, offer, limit)
         if not DB_PATH.exists(): return {"ok": False, "error": "db_missing"}
         channels = ["forms", "smtp", "whatsapp"] if channel == "all" else [channel]
         results = {}
@@ -513,7 +513,7 @@ class LeadPipeline(BasePipeline):
         return {"ok": True, **results}
 
     def _prospect_forms(self, cursor, limit, dry_run):
-        cursor.execute("SELECT rowid, title, urls, primary_email FROM main WHERE urls IS NOT NULL AND urls != '' AND (form_processed IS NULL OR form_processed == '') AND deliverability != 'rechazado' LIMIT ?", (limit,))
+        cursor.execute("SELECT rowid, title, urls, primary_email FROM main WHERE urls IS NOT NULL AND urls != '' AND (form_processed IS NULL OR form_processed == '') AND deliverability != 'rejected' LIMIT ?", (limit,))
         leads = cursor.fetchall()
         if not leads: return {"count": 0}
         domains_file = LOG_DIR / "prospect_forms_domains.txt"
@@ -523,7 +523,7 @@ class LeadPipeline(BasePipeline):
         return {"count": len(leads), "file": str(domains_file)}
 
     def _prospect_smtp(self, cursor, limit, offer, dry_run):
-        cursor.execute("SELECT rowid, title, primary_email, sector FROM main WHERE primary_email IS NOT NULL AND primary_email != '' AND (smtp_processed IS NULL OR smtp_processed == '') AND deliverability NOT IN ('rechazado', 'bounce') LIMIT ?", (limit,))
+        cursor.execute("SELECT rowid, title, primary_email, sector FROM main WHERE primary_email IS NOT NULL AND primary_email != '' AND (smtp_processed IS NULL OR smtp_processed == '') AND deliverability NOT IN ('rejected', 'bounce') LIMIT ?", (limit,))
         leads = cursor.fetchall()
         if not leads: return {"count": 0}
         offer_data = OFFERS.get(offer, OFFERS["hosting"])
@@ -580,36 +580,36 @@ class LeadPipeline(BasePipeline):
         db_stats["scrape_csvs"] = len(csvs)
         return db_stats
 
-def run_pipeline(**kwargs):
-    pipeline = LeadPipeline()
-    return pipeline.execute(**kwargs)
+    def run_pipeline(**kwargs):
+        pipeline = LeadPipeline()
+        return pipeline.execute(**kwargs)
 
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--all", action="store_true")
-    parser.add_argument("--combine", action="store_true")
-    parser.add_argument("--keywords", default="")
-    parser.add_argument("--locations", default="")
-    parser.add_argument("--keywords-file", default="")
-    parser.add_argument("--grid-mode", action="store_true")
-    parser.add_argument("--keywordless-mode", action="store_true")
-    parser.add_argument("--grid-bbox", default="")
-    parser.add_argument("--grid-cell", type=float, default=0.0)
-    parser.add_argument("--scrape", action="store_true")
-    parser.add_argument("--import", dest="do_import", action="store_true")
-    parser.add_argument("--sanitize", action="store_true")
-    parser.add_argument("--prospect", action="store_true")
-    parser.add_argument("--channel", default="all")
-    parser.add_argument("--limit", type=int, default=100)
-    parser.add_argument("--offer", default="hosting")
-    parser.add_argument("--status", action="store_true")
-    parser.add_argument("--dry-run", action="store_true")
-    args = parser.parse_args()
-    if args.status and not any([args.all, args.combine, args.scrape, args.do_import, args.sanitize, args.prospect]):
-        LeadPipeline().phase_status()
-        return
-    print(json.dumps(run_pipeline(**vars(args)), indent=2))
+    def main():
+        import argparse
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--all", action="store_true")
+        parser.add_argument("--combine", action="store_true")
+        parser.add_argument("--keywords", default="")
+        parser.add_argument("--locations", default="")
+        parser.add_argument("--keywords-file", default="")
+        parser.add_argument("--grid-mode", action="store_true")
+        parser.add_argument("--keywordless-mode", action="store_true")
+        parser.add_argument("--grid-bbox", default="")
+        parser.add_argument("--grid-cell", type=float, default=0.0)
+        parser.add_argument("--scrape", action="store_true")
+        parser.add_argument("--import", dest="do_import", action="store_true")
+        parser.add_argument("--sanitize", action="store_true")
+        parser.add_argument("--prospect", action="store_true")
+        parser.add_argument("--channel", default="all")
+        parser.add_argument("--limit", type=int, default=100)
+        parser.add_argument("--offer", default="hosting")
+        parser.add_argument("--status", action="store_true")
+        parser.add_argument("--dry-run", action="store_true")
+        args = parser.parse_args()
+        if args.status and not any([args.all, args.combine, args.scrape, args.do_import, args.sanitize, args.prospect]):
+            LeadPipeline().phase_status()
+            return
+        print(json.dumps(run_pipeline(**vars(args)), indent=2))
 
-if __name__ == "__main__":
-    main()
+    if __name__ == "__main__":
+        main()

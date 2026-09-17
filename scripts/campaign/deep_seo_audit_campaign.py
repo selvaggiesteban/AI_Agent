@@ -37,9 +37,9 @@ def perform_deep_audit(google, domain, conventions=""):
 
 def run_deep_seo_audit_campaign(conventions=""):
     """
-    Executes the 'Deep Auditoría SEO' campaign.
+    Executes the 'Deep SEO Audit' campaign.
     """
-    logger.info("Starting 'Deep Auditoría SEO' campaign...")
+    logger.info("Starting 'Deep SEO Audit' campaign...")
     try:
         with open("data/campaign_config.json", "r", encoding="utf-8") as f:
             config = json.load(f).get("deep_seo", {})
@@ -65,12 +65,12 @@ def run_deep_seo_audit_campaign(conventions=""):
         )
 
         if success:
-            logger.info("'Deep Auditoría SEO' campaign completed successfully.")
+            logger.info("'Deep SEO Audit' campaign completed successfully.")
         else:
-            logger.error("'Deep Auditoría SEO' campaign failed to send email.")
+            logger.error("'Deep SEO Audit' campaign failed to send email.")
 
     except Exception as e:
-        logger.exception(f"Critical error in 'Deep Auditoría SEO' campaign: {e}")
+        logger.exception(f"Critical error in 'Deep SEO Audit' campaign: {e}")
 
 if __name__ == "__main__":
     run_deep_seo_audit_campaign()

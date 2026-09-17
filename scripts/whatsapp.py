@@ -9,15 +9,15 @@ from playwright.async_api import async_playwright
 from core.rpa_bot import BaseBot
 
 PROMPT_WHATSAPP = """
-Analizá los siguientes mensajes de un chat de WhatsApp. 
-Extraé el Nombre y Apellido de la persona (no el mío, sino el del interlocutor).
-Respondé SOLO en formato JSON puro:
+Analyze the following messages from a WhatsApp chat.
+Extract the First and Last Name of the person (not mine, but the interlocutor's).
+Respond ONLY in pure JSON format:
 {{
-  "nombre": "Nombre Apellido"
+  "nombre": "First Name Last Name"
 }}
-Si no hay suficiente información, poné "DESCONOCIDO" en el nombre.
+If there is not enough information, put "UNKNOWN" in the name.
 
-MENSAJES:
+MESSAGES:
 {contexto}
 """
 
@@ -29,7 +29,7 @@ class WhatsAppBot(BaseBot):
 
     async def run(self):
         async with async_playwright() as p:
-            print(f"[*] Iniciando WhatsApp RPA (Perfil: {self.profile_name})")
+            print(f"[*] Starting WhatsApp RPA (Profile: {self.profile_name})")
             browser = await p.chromium.launch_persistent_context(
                 user_data_dir=self.profile_path,
                 headless=False,
@@ -37,42 +37,42 @@ class WhatsAppBot(BaseBot):
             )
             page = await browser.new_page()
             await page.goto("https://web.whatsapp.com")
-            
-            print("[!] Esperando carga de WhatsApp Web...")
+
+            print("[!] Waiting for WhatsApp Web to load...")
             try:
                 await page.wait_for_selector("div[contenteditable='true'][data-tab='3']", timeout=60000)
-                print("✅ WhatsApp Web Cargado.")
+                print("✅ WhatsApp Web Loaded.")
             except:
-                print("❌ Timeout carga WhatsApp.")
+                print("❌ WhatsApp load timeout.")
                 await browser.close()
                 return
 
             while True:
                 try:
                     chats = await page.query_selector_all("span[title^='+'], span[title^='0'], span[title^='1']")
-                    
+
                     for chat in chats:
                         title = await chat.get_attribute("title")
                         if title and re.search(r'\d', title):
-                            print(f"[*] Analizando prospecto numérico: {title}")
-                            
+                            print(f"[*] Analyzing numeric prospect: {title}")
+
                             await chat.click()
                             await asyncio.sleep(2)
 
                             bubbles = await page.query_selector_all(".message-in .copyable-text")
                             messages = [await b.inner_text() for b in bubbles[-10:]]
-                            
+
                             if messages:
                                 analysis = await self.analyze_content(messages)
-                                if analysis and analysis.get('nombre') and analysis['nombre'] != "DESCONOCIDO":
-                                    print(f"✨ IA Descubrió Nombre: {analysis['nombre']}")
+                                if analysis and analysis.get('nombre') and analysis['nombre'] != "UNKNOWN":
+                                    print(f"✨ AI Discovered Name: {analysis['nombre']}")
                                     self.update_lead(title, analysis, "WhatsApp")
                                 else:
-                                    print("🤷 IA no pudo determinar el nombre.")
-                            
+                                    print("🤷 AI could not determine the name.")
+
                     await asyncio.sleep(10)
                 except Exception as e:
-                    print(f"Error en loop WhatsApp: {e}")
+                    print(f"Error in WhatsApp loop: {e}")
                     await asyncio.sleep(5)
 
 if __name__ == "__main__":

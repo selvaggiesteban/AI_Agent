@@ -4,14 +4,14 @@ from core.integrations import GoogleIntegration, TrelloIntegration, GmailIntegra
 from core.logger import logger
 from core.ai_engine import llm
 
-def run_trabajo_campaign(conventions=""):
+def run_productivity_campaign(conventions=""):
     """
-    Executes the 'Trabajo' campaign:
+    Executes the 'Productivity' campaign:
     1. Fetches goals from Google Sheets.
-    2. Fetches Trello cards in 'En Proceso'.
+    2. Fetches Trello cards in 'In Process'.
     3. Generates a personalized report using AI and sends it.
     """
-    logger.info("Starting 'Trabajo' campaign...")
+    logger.info("Starting 'Productivity' campaign...")
 
     try:
         # Load config
@@ -26,15 +26,15 @@ def run_trabajo_campaign(conventions=""):
         # 1. Fetch Goals from Google Sheet
         sheet_data = google.get_sheet_data(config["google_sheet_id"], config["google_sheet_range"])
         # Assume structure: Row 1: Header, Row 2: Daily, Row 3: Weekly, Row 4: Monthly
-        goals = {"objetivo_diario": "N/A", "objetivo_semanal": "N/A", "objetivo_mensual": "N/A"}
+        goals = {"daily_goal": "N/A", "weekly_goal": "N/A", "monthly_goal": "N/A"}
         if len(sheet_data) >= 4:
-            goals["objetivo_diario"] = sheet_data[1][0] if len(sheet_data[1]) > 0 else "N/A"
-            goals["objetivo_semanal"] = sheet_data[2][0] if len(sheet_data[2]) > 0 else "N/A"
-            goals["objetivo_mensual"] = sheet_data[3][0] if len(sheet_data[3]) > 0 else "N/A"
+            goals["daily_goal"] = sheet_data[1][0] if len(sheet_data[1]) > 0 else "N/A"
+            goals["weekly_goal"] = sheet_data[2][0] if len(sheet_data[2]) > 0 else "N/A"
+            goals["monthly_goal"] = sheet_data[3][0] if len(sheet_data[3]) > 0 else "N/A"
 
         # 2. Fetch Trello Cards
         cards = trello.get_board_cards(config["trello_board_id"], "En Proceso")
-        cards_text = "\n".join([f"- {c['name']}" for c in cards]) if cards else "No hay tareas en proceso."
+        cards_text = "\n".join([f"- {c['name']}" for c in cards]) if cards else "No tasks in process."
 
         # 3. Generate Personalized Message with AI
         system_prompt = (
@@ -45,9 +45,9 @@ def run_trabajo_campaign(conventions=""):
 
         prompt = (
             f"Generate a daily report based on the following data:\n"
-            f"Daily Goal: {goals['objetivo_diario']}\n"
-            f"Weekly Goal: {goals['objetivo_semanal']}\n"
-            f"Monthly Goal: {goals['objetivo_mensual']}\n"
+            f"Daily Goal: {goals['daily_goal']}\n"
+            f"Weekly Goal: {goals['weekly_goal']}\n"
+            f"Monthly Goal: {goals['monthly_goal']}\n"
             f"Tasks in Process: {cards_text}\n\n"
             f"Return a JSON object with a 'body_html' key containing the formatted report in HTML."
         )
@@ -58,10 +58,10 @@ def run_trabajo_campaign(conventions=""):
                 system_instruction=system_prompt,
                 model="gemini"
             )
-            message_html = ai_result.get("body_html", f"<p>{config['email_template'].format(objetivo_diario=goals['objetivo_diario'], objetivo_semanal=goals['objetivo_semanal'], objetivo_mensual=goals['objetivo_mensual'], trello_cards=cards_text)}</p>")
+            message_html = ai_result.get("body_html", f"<p>{config['email_template'].format(daily_goal=goals['daily_goal'], weekly_goal=goals['weekly_goal'], monthly_goal=goals['monthly_goal'], trello_cards=cards_text)}</p>")
         except Exception as e:
             logger.error(f"AI report generation failed: {e}")
-            message_html = f"<p>{config['email_template'].format(objetivo_diario=goals['objetivo_diario'], objetivo_semanal=goals['objetivo_semanal'], objetivo_mensual=goals['objetivo_mensual'], trello_cards=cards_text)}</p>"
+            message_html = f"<p>{config['email_template'].format(daily_goal=goals['daily_goal'], weekly_goal=goals['weekly_goal'], monthly_goal=goals['monthly_goal'], trello_cards=cards_text)}</p>"
 
         # 4. Send via Gmail
         success = gmail.send_email(
@@ -71,12 +71,12 @@ def run_trabajo_campaign(conventions=""):
         )
 
         if success:
-            logger.info("'Trabajo' campaign completed successfully.")
+            logger.info("'Productivity' campaign completed successfully.")
         else:
-            logger.error("'Trabajo' campaign failed to send email.")
+            logger.error("'Productivity' campaign failed to send email.")
 
     except Exception as e:
-        logger.exception(f"Critical error in 'Trabajo' campaign: {e}")
+        logger.exception(f"Critical error in 'Productivity' campaign: {e}")
 
 if __name__ == "__main__":
-    run_trabajo_campaign()
+    run_productivity_campaign()

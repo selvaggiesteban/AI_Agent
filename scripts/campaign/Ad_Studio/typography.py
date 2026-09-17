@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Sistema de escala tipográfica modular para Ad Studio.
-Cuarta perfecta (ratio 1.333) — tamaños calculados proporcionalmente al canvas.
+Modular typographic scale system for Ad Studio.
+Perfect fourth (ratio 1.333) — sizes calculated proportionally to the canvas.
 """
 
 MODULAR_RATIO = 1.333

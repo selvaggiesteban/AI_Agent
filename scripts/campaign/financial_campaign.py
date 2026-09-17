@@ -27,14 +27,14 @@ def generate_progress_bar_html(current, goal):
 
     html = f"""
     <div style="margin: 20px 0; font-family: sans-serif;">
-        <div style="margin-bottom: 10px; font-weight: bold;">Progreso Financiero Mensual</div>
+        <div style="margin-bottom: 10px; font-weight: bold;">Monthly Financial Progress</div>
         <div style="width: 100%; background-color: #e0e0e0; border-radius: 10px; overflow: hidden; border: 1px solid #ccc;">
             <div style="width: {percentage:.1f}%; background-color: #4caf50; height: 25px; text-align: center; color: white; font-weight: bold; line-height: 25px;">
                 {percentage:.1f}%
             </div>
         </div>
         <div style="margin-top: 5px; font-size: 14px; color: #666;">
-            Total Actual: <b>${current:,.2f}</b> / Objetivo: <b>${goal:,.2f}</b>
+            Current Total: <b>${current:,.2f}</b> / Goal: <b>${goal:,.2f}</b>
         </div>
     </div>
     """
@@ -46,35 +46,35 @@ def generate_key_data_html(data):
     """
     return f"""
     <div style="margin: 20px 0; font-family: sans-serif; line-height: 1.6;">
-        <div style="margin-bottom: 15px; font-weight: bold; font-size: 16px;">Resumen Financiero</div>
+        <div style="margin-bottom: 15px; font-weight: bold; font-size: 16px;">Financial Summary</div>
         <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
             <tr>
-                <td style="padding: 5px 0; color: #666;">Objetivo Diario:</td>
-                <td style="padding: 5px 0; text-align: right; font-weight: bold;">{data['objetivo_diario']}</td>
+                <td style="padding: 5px 0; color: #666;">Daily Goal:</td>
+                <td style="padding: 5px 0; text-align: right; font-weight: bold;">{data['daily_goal']}</td>
             </tr>
             <tr>
-                <td style="padding: 5px 0; color: #666;">Objetivo Semanal:</td>
-                <td style="padding: 5px 0; text-align: right; font-weight: bold;">{data['objetivo_semanal']}</td>
+                <td style="padding: 5px 0; color: #666;">Weekly Goal:</td>
+                <td style="padding: 5px 0; text-align: right; font-weight: bold;">{data['weekly_goal']}</td>
             </tr>
             <tr>
-                <td style="padding: 5px 0; color: #666;">Objetivo Mensual:</td>
-                <td style="padding: 5px 0; text-align: right; font-weight: bold;">{data['objetivo_mensual']}</td>
+                <td style="padding: 5px 0; color: #666;">Monthly Goal:</td>
+                <td style="padding: 5px 0; text-align: right; font-weight: bold;">{data['monthly_goal']}</td>
             </tr>
             <tr style="border-top: 1px solid #eee;">
-                <td style="padding: 5px 0; color: #000; font-weight: bold;">Facturación Mensual:</td>
-                <td style="padding: 5px 0; text-align: right; font-weight: bold; color: #4caf50;">{data['facturacion_mensual']}</td>
+                <td style="padding: 5px 0; color: #000; font-weight: bold;">Monthly Billing:</td>
+                <td style="padding: 5px 0; text-align: right; font-weight: bold; color: #4caf50;">{data['monthly_billing']}</td>
             </tr>
         </table>
     </div>
     """
 
-def run_contable_campaign(conventions=""):
+def run_financial_campaign(conventions=""):
     """
-    Executes the 'Ejercicio contable 2026' campaign:
+    Executes the 'Financial Exercise 2026' campaign:
     1. Fetches financial data (goals, billing).
     2. Generates a simple data report and sends it.
     """
-    logger.info("Starting 'Ejercicio contable 2026' campaign...")
+    logger.info("Starting 'Financial Exercise 2026' campaign...")
 
     try:
         with open("data/campaign_config.json", "r", encoding="utf-8") as f:
@@ -88,10 +88,10 @@ def run_contable_campaign(conventions=""):
         monthly_goal = config.get("monthly_goal", 3000)
 
         financial_data = {
-            "objetivo_diario": f"${(monthly_goal/30):.2f}",
-            "objetivo_semanal": f"${(monthly_goal/4):.2f}",
-            "objetivo_mensual": f"${monthly_goal:,.2f}",
-            "facturacion_mensual": f"${current_earnings:,.2f}"
+            "daily_goal": f"${(monthly_goal/30):.2f}",
+            "weekly_goal": f"${(monthly_goal/4):.2f}",
+            "monthly_goal": f"${monthly_goal:,.2f}",
+            "monthly_billing": f"${current_earnings:,.2f}"
         }
 
         # Generate Progress Bar HTML
@@ -123,12 +123,12 @@ def run_contable_campaign(conventions=""):
         )
 
         if success:
-            logger.info("'Ejercicio contable 2026' campaign completed successfully.")
+            logger.info("'Financial Exercise 2026' campaign completed successfully.")
         else:
-            logger.error("'Ejercicio contable 2026' campaign failed to send email.")
+            logger.error("'Financial Exercise 2026' campaign failed to send email.")
 
     except Exception as e:
-        logger.exception(f"Critical error in 'Ejercicio contable 2026' campaign: {e}")
+        logger.exception(f"Critical error in 'Financial Exercise 2026' campaign: {e}")
 
 if __name__ == "__main__":
-    run_contable_campaign()
+    run_financial_campaign()

@@ -8,15 +8,15 @@ from playwright.async_api import async_playwright
 from core.rpa_bot import BaseBot
 
 PROMPT_TELEGRAM = """
-Actuá como un analista de prospección estratégica para Esteban Selvaggi. 
-Analizá los siguientes mensajes de un chat de Telegram.
-Extraé el Nombre y Apellido real del interlocutor y su alias si lo tiene.
-Determiná su interés comercial o necesidad técnica (0-100).
+Act as a strategic prospecting analyst for Esteban Selvaggi.
+Analyze the following messages from a Telegram chat.
+Extract the real First and Last Name of the interlocutor and their alias if they have one.
+Determine their commercial interest or technical need (0-100).
 
-MENSAJES:
+MESSAGES:
 {contexto}
 
-Respondé SOLO en formato JSON puro:
+Respond ONLY in pure JSON format:
 {{
   "nombre": "...",
   "alias": "...",
@@ -33,7 +33,7 @@ class TelegramBot(BaseBot):
 
     async def run(self):
         async with async_playwright() as p:
-            print(f"[*] Iniciando Telegram RPA (Perfil: {self.profile_name})")
+            print(f"[*] Starting Telegram RPA (Profile: {self.profile_name})")
             browser = await p.chromium.launch_persistent_context(
                 user_data_dir=self.profile_path,
                 headless=False,
@@ -41,13 +41,13 @@ class TelegramBot(BaseBot):
             )
             page = await browser.new_page()
             await page.goto("https://web.telegram.org/a/")
-            
-            print("[!] Esperando carga de Telegram Web...")
+
+            print("[!] Waiting for Telegram Web to load...")
             try:
                 await page.wait_for_selector(".ListItem-button", timeout=60000)
-                print("✅ Telegram Web Cargado.")
+                print("✅ Telegram Web Loaded.")
             except:
-                print("❌ Timeout carga Telegram.")
+                print("❌ Telegram load timeout.")
                 await browser.close()
                 return
 
@@ -56,28 +56,28 @@ class TelegramBot(BaseBot):
                 try:
                     name_elem = await chat.query_selector(".title > span")
                     display_name = await name_elem.inner_text() if name_elem else "Unknown"
-                    
-                    print(f"[*] Revisando chat: {display_name}")
+
+                    print(f"[*] Checking chat: {display_name}")
                     await chat.click()
                     await asyncio.sleep(4)
-                    
+
                     bubble_elements = await page.query_selector_all(".message-content-wrapper")
                     messages = []
                     for b in bubble_elements[-15:]:
                         text = await b.inner_text()
                         if len(text) > 3:
                             messages.append(text.strip())
-                    
+
                     if messages:
-                        print(f"    [+] Analizando contenido con IA...")
+                        print(f"    [+] Analyzing content with AI...")
                         analysis = await self.analyze_content(messages)
                         if analysis and analysis.get('nombre'):
                             self.update_lead(display_name, analysis, "Telegram")
                 except Exception as e:
-                    print(f"Error chat Telegram: {e}")
+                    print(f"Telegram chat error: {e}")
 
             await browser.close()
-            print("--- Ciclo Telegram Finalizado ---")
+            print("--- Telegram Cycle Finished ---")
 
 if __name__ == "__main__":
     bot = TelegramBot()

@@ -4,18 +4,18 @@
 """
 ecommerce_competitor_research.py
 
-- Scrapea productos de una tienda Tienda Nube (lanuscomputacion.mitiendanube.com)
-- Busca competidores/precios en:
-  - MercadoLibre (API Oficial)
-  - Google (API de búsqueda personalizada de JSON) -> resultados web
-  - Google Shopping (SerpApi o proveedor similar) -> precios más fiables
-  - Facebook Marketplace -> marcador de posición (sin raspado HTML)
+- Scrapes products from a Tienda Nube store (lanuscomputacion.mitiendanube.com)
+- Searches for competitors/prices in:
+  - MercadoLibre (Official API)
+  - Google (JSON Custom Search API) -> web results
+  - Google Shopping (SerpApi or similar provider) -> more reliable prices
+  - Facebook Marketplace -> placeholder (no HTML scraping)
 
-Salida:
+Output:
 - output.csv
-- consola: "{product}, {competitor}, {price}, {url}, {suggested_price}"
+- console: "{product}, {competitor}, {price}, {url}, {suggested_price}"
 
-Requisitos:
+Requirements:
 pip install requests beautifulsoup4 rapidfuzz pandas pyyaml lxml python-dotenv
 """
 
@@ -36,11 +36,11 @@ import pandas as pd
 import yaml
 from dotenv import load_dotenv
 
-# Cargar variables de entorno desde .env
+# Load environment variables from .env
 load_dotenv()
 
 # ----------------------------
-# Configuración / Modelos
+# Configuration / Models
 # ----------------------------
 
 DEFAULT_CONFIG_YAML: str = """
@@ -69,22 +69,22 @@ sources:
     max_results: 10
 
 matching:
-  # Similitud mínima (0-100) entre el título del competidor y tu producto
+  # Minimum similarity (0-100) between the competitor title and your product
   min_similarity: 65
 
 pricing:
-  # Margen como "markup": 100% => multiplicar base * (1 + 1.00) => x2
+  # Margin as "markup": 100% => multiply base * (1 + 1.00) => x2
   margin_pct: 100
-  # Cómo calcular el precio base antes del margen
-  # opciones: "min_competitor", "median_competitor", "our_current_price"
+  # How to calculate the base price before the margin
+  # options: "min_competitor", "median_competitor", "our_current_price"
   base_strategy: "min_competitor"
-  # Reglas extra:
-  round_to: 10 # redondeo al múltiplo más cercano (10, 50, 100, etc.)
-  min_price: 0 # suelo absoluto
-  max_price: 0 # 0 = sin techo
+  # Extra rules:
+  round_to: 10 # Round to the nearest multiple (10, 50, 100, etc.)
+  min_price: 0 # Absolute floor
+  max_price: 0 # 0 = no ceiling
 
 synonyms:
-  # Archivo opcional para sinónimos específicos por términos/marcas/modelos
+  # Optional file for specific synonyms by terms/brands/models
   synonyms_file: "synonyms.json"
 
 output:
@@ -102,14 +102,14 @@ DEFAULT_SYNONYMS_JSON: Dict[str, List[str]] = {
 
 @dataclass
 class StoreProduct:
-  """Representa un producto de la propia tienda"""
+  """Represents a product from the own store"""
   name: str
   url: str
   our_price_ars: Optional[float] = None
 
 @dataclass
 class CompetitorOffer:
-  """Representa una oferta de un competidor"""
+  """Represents a competitor's offer"""
   product_name: str
   competitor_name: str
   competitor_price: Optional[float]
@@ -119,26 +119,26 @@ class CompetitorOffer:
   suggested_price: Optional[float]
 
 # ----------------------------
-# Utilidades
+# Utilities
 # ----------------------------
 
 def load_or_create_config(path: str = "config.yaml") -> Dict[str, Any]:
-  """Carga o crea el archivo de configuración YAML"""
+  """Loads or creates the YAML configuration file"""
   if not os.path.exists(path):
-    # Reemplazar variables de entorno en la plantilla predeterminada
+    # Replace environment variables in the default template
     config_content = DEFAULT_CONFIG_YAML
     config_content = config_content.replace("${GOOGLE_API_KEY}", os.environ.get("GOOGLE_API_KEY", "YOUR_API_KEY"))
     config_content = config_content.replace("${GOOGLE_CX}", os.environ.get("GOOGLE_CX", "YOUR_CX"))
     config_content = config_content.replace("${SERPAPI_API_KEY}", os.environ.get("SERPAPI_API_KEY", "YOUR_SERPAPI_KEY"))
-    
+
     with open(path, "w", encoding="utf-8") as f:
       f.write(config_content)
-    print(f"[i] Creado {path}. Edítalo y ejecútalo de nuevo.")
-    
+    print(f"[i] Created {path}. Edit it and run again.")
+
   with open(path, "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)
-    # Asegurar que las claves de las variables de entorno se carguen correctamente si el archivo ya existe
-    # pero tiene los placeholders de la plantilla
+    # Ensure environment variable keys are loaded correctly if the file already exists
+    # but has template placeholders
     if config["sources"]["google_custom_search"]["api_key"] == "${GOOGLE_API_KEY}":
         config["sources"]["google_custom_search"]["api_key"] = os.environ.get("GOOGLE_API_KEY", "YOUR_API_KEY")
     if config["sources"]["google_custom_search"]["cx"] == "${GOOGLE_CX}":
@@ -148,17 +148,17 @@ def load_or_create_config(path: str = "config.yaml") -> Dict[str, Any]:
     return config
 
 def load_or_create_synonyms(path: str) -> Dict[str, List[str]]:
-  """Carga o crea el archivo de sinónimos JSON"""
+  """Loads or creates the JSON synonyms file"""
   if not os.path.exists(path):
     with open(path, "w", encoding="utf-8") as f:
       json.dump(DEFAULT_SYNONYMS_JSON, f, ensure_ascii=False, indent=2)
-    print(f"[i] Creado {path} con ejemplos. Personalízalo para obtener mejores resultados.")
+    print(f"[i] Created {path} with examples. Customize it for better results.")
   with open(path, "r", encoding="utf-8") as f:
     data = json.load(f)
     return {str(k).strip().lower(): [str(x).strip() for x in v] for k, v in data.items()}
 
 def parse_ars_money(text: str) -> Optional[float]:
-  """Convierte cadenas como "$11,505.00" o "11,505.00" a float 11505.00"""
+  """Converts strings like "$11,505.00" or "11,505.00" to float 11505.00"""
   if not text:
     return None
   t = text.strip()
@@ -173,7 +173,7 @@ def parse_ars_money(text: str) -> Optional[float]:
     return None
 
 def normalize_query(s: str) -> str:
-  """Normaliza una cadena de búsqueda"""
+  """Normalizes a search string"""
   s = s.lower().strip()
   s = re.sub(r"[()[]{}]", " ", s)
   s = re.sub(r"[^a-z0-9\s\-.]", " ", s, flags=re.IGNORECASE)
@@ -181,7 +181,7 @@ def normalize_query(s: str) -> str:
   return s
 
 def expand_queries(product_name: str, synonyms: Dict[str, List[str]]) -> List[str]:
-  """Genera variantes de búsqueda basadas en sinónimos y normalización"""
+  """Generates search variants based on synonyms and normalization"""
   base = product_name.strip()
   norm = normalize_query(base)
 
@@ -210,15 +210,15 @@ def expand_queries(product_name: str, synonyms: Dict[str, List[str]]) -> List[st
     q2 = q.strip()
     if len(q2) >= 4:
       final.append(q2)
-  
+
   return sorted(final)[:8]
 
 # ----------------------------
-# Raspador de Tienda Nube
+# Store Scraper
 # ----------------------------
 
 def http_get(session: requests.Session, url: str, timeout: int, ua: str) -> str:
-  """Realiza una petición HTTP GET con cabeceras personalizadas"""
+  """Performs an HTTP GET request with custom headers"""
   headers = {
     "User-Agent": ua,
     "Accept-Language": "en-US,en;q=0.9",
@@ -229,13 +229,13 @@ def http_get(session: requests.Session, url: str, timeout: int, ua: str) -> str:
   return r.text
 
 def build_store_page_url(base_url: str, products_path: str, page: int) -> str:
-  """Construye la URL de paginación para la tienda"""
+  """Builds the pagination URL for the store"""
   if page <= 1:
     return f"{base_url}{products_path}/"
   return f"{base_url}{products_path}/page/{page}/"
 
 def extract_products_from_listing(html: str, base_url: str) -> List[StoreProduct]:
-  """Extrae productos y precios de un listado HTML de Tienda Nube"""
+  """Extracts products and prices from a Tienda Nube HTML listing"""
   soup = BeautifulSoup(html, "lxml")
   anchors = soup.select('a.js-item-link')
   seen = set()
@@ -246,10 +246,10 @@ def extract_products_from_listing(html: str, base_url: str) -> List[StoreProduct
     name = a.get_text(" ", strip=True)
     if not href or not name:
       continue
-    
+
     if href.rstrip("/") == "/productos":
       continue
-      
+
     url = href if href.startswith("http") else (base_url.rstrip("/") + href)
     key = (name, url)
     if key in seen:
@@ -267,7 +267,7 @@ def extract_products_from_listing(html: str, base_url: str) -> List[StoreProduct
         price = parse_ars_money(m.group(0))
         break
       container = container.parent
-      
+
     products.append(StoreProduct(name=name, url=url, our_price_ars=price))
 
   dedup: Dict[str, StoreProduct] = {}
@@ -276,7 +276,7 @@ def extract_products_from_listing(html: str, base_url: str) -> List[StoreProduct
   return list(dedup.values())
 
 def scrape_store_products(cfg: Dict[str, Any]) -> List[StoreProduct]:
-  """Raspa todos los productos de la tienda según la configuración"""
+  """Scrapes all products from the store according to configuration"""
   base_url = cfg["store"]["base_url"].rstrip("/")
   products_path = cfg["store"]["products_path"].rstrip("/")
   pages = int(cfg["store"]["pages"])
@@ -288,21 +288,21 @@ def scrape_store_products(cfg: Dict[str, Any]) -> List[StoreProduct]:
 
   for page in range(1, pages + 1):
     url = build_store_page_url(base_url, products_path, page)
-    print(f"[store] Página {page}/{pages}: {url}")
+    print(f"[store] Page {page}/{pages}: {url}")
     try:
         html = http_get(session, url, timeout, ua)
         products = extract_products_from_listing(html, base_url)
-        print(f"[store] encontrados: {len(products)}")
+        print(f"[store] found: {len(products)}")
         all_products.extend(products)
     except Exception as e:
-        print(f"[error] Fallo al raspar la página {page}: {e}")
+        print(f"[error] Failed to scrape page {page}: {e}")
     time.sleep(float(cfg["output"]["sleep_between_requests_sec"]))
-  
+
   by_url = {p.url: p for p in all_products}
   return list(by_url.values())
 
 # ----------------------------
-# Fuentes de Competidores
+# Competitor Sources
 # ----------------------------
 
 def meli_search_offers(
@@ -312,7 +312,7 @@ def meli_search_offers(
   timeout: int,
   ua: str
 ) -> List[Tuple[str, Optional[float], str, str]]:
-  """Busca ofertas en MercadoLibre usando su API oficial"""
+  """Searches offers on MercadoLibre using its official API"""
   url = f"https://api.mercadolibre.com/sites/{site_id}/search"
   params = {"q": query, "limit": max_results}
   r = requests.get(url, params=params, timeout=timeout, headers={"User-Agent": ua})
@@ -337,7 +337,7 @@ def google_custom_search(
   timeout: int,
   ua: str
 ) -> List[Tuple[str, Optional[float], str, str]]:
-  """Busca en la web mediante Google Custom Search"""
+  """Searches the web using Google Custom Search"""
   if not api_key or api_key == "YOUR_API_KEY":
       return []
   url = "https://www.googleapis.com/customsearch/v1"
@@ -366,7 +366,7 @@ def serpapi_google_shopping(
   timeout: int,
   ua: str
 ) -> List[Tuple[str, Optional[float], str, str, str]]:
-  """Busca en Google Shopping mediante SerpApi"""
+  """Searches Google Shopping using SerpApi"""
   if not api_key or api_key == "YOUR_SERPAPI_KEY":
       return []
   url = "https://serpapi.com/search.json"
@@ -394,11 +394,11 @@ def serpapi_google_shopping(
   return out
 
 # ----------------------------
-# Emparejamiento + Reglas de Precios
+# Matching + Pricing Rules
 # ----------------------------
 
 def similarity_score(a: str, b: str) -> int:
-  """Calcula la puntuación de similitud entre dos títulos"""
+  """Calculates the similarity score between two titles"""
   return int(fuzz.token_set_ratio(normalize_query(a), normalize_query(b)))
 
 def compute_suggested_price(
@@ -406,7 +406,7 @@ def compute_suggested_price(
   competitor_prices: List[float],
   pricing_cfg: Dict[str, Any]
 ) -> Optional[float]:
-  """Calcula el precio sugerido basado en los precios de la competencia"""
+  """Calculates the suggested price based on competitor prices"""
   margin_pct = float(pricing_cfg.get("margin_pct", 100))
   base_strategy = pricing_cfg.get("base_strategy", "min_competitor")
   round_to = int(pricing_cfg.get("round_to", 10))
@@ -441,7 +441,7 @@ def compute_suggested_price(
   return float(suggested)
 
 # ----------------------------
-# Pipeline Principal
+# Main Pipeline
 # ----------------------------
 
 def gather_offers_for_product(
@@ -449,16 +449,16 @@ def gather_offers_for_product(
   cfg: Dict[str, Any],
   synonyms: Dict[str, List[str]]
 ) -> List[CompetitorOffer]:
-  """Recopila ofertas de diversas fuentes para un producto específico"""
+  """Collects offers from various sources for a specific product"""
   timeout = int(cfg["store"]["timeout_sec"])
   ua = str(cfg["store"]["user_agent"])
   min_sim = int(cfg["matching"]["min_similarity"])
 
   queries = expand_queries(product.name, synonyms)
-  
+
   offers_raw: List[Tuple[str, Optional[float], str, str, str]] = []
 
-  # MercadoLibre (API Oficial)
+  # MercadoLibre (Official API)
   if cfg["sources"]["mercadolibre"]["enabled"]:
     site_id = cfg["sources"]["mercadolibre"]["site_id"]
     max_results = int(cfg["sources"]["mercadolibre"]["max_results"])
@@ -467,7 +467,7 @@ def gather_offers_for_product(
         for title, price, currency, url in meli_search_offers(q, site_id, max_results, timeout, ua):
           offers_raw.append((title, price, currency, url, "MercadoLibre"))
       except Exception as e:
-        print(f"[warn] ML falló con búsqueda='{q}': {e}")
+        print(f"[warn] ML failed with query='{q}': {e}")
       time.sleep(float(cfg["output"]["sleep_between_requests_sec"]))
 
   # Google Custom Search
@@ -481,7 +481,7 @@ def gather_offers_for_product(
         for title, price, currency, url in google_custom_search(q, api_key, cx, max_results, timeout, ua):
           offers_raw.append((title, price, currency, url, "Google (Web)"))
       except Exception as e:
-        print(f"[warn] GCS falló con búsqueda='{q}': {e}")
+        print(f"[warn] GCS failed with query='{q}': {e}")
       time.sleep(float(cfg["output"]["sleep_between_requests_sec"]))
 
   # Google Shopping (SerpApi)
@@ -496,9 +496,9 @@ def gather_offers_for_product(
         for title, price, currency, url, source in serpapi_google_shopping(q, api_key, gl, hl, max_results, timeout, ua):
           offers_raw.append((title, price, currency, url, f"Google Shopping: {source}"))
       except Exception as e:
-        print(f"[warn] SerpApi falló con búsqueda='{q}': {e}")
+        print(f"[warn] SerpApi failed with query='{q}': {e}")
       time.sleep(float(cfg["output"]["sleep_between_requests_sec"]))
-      
+
   filtered: List[Tuple[str, Optional[float], str, str, str, int]] = []
   for title, price, currency, url, comp in offers_raw:
     sim = similarity_score(product.name, title)
@@ -519,33 +519,33 @@ def gather_offers_for_product(
       similarity=sim,
       suggested_price=suggested
     ))
-  
+
   out.sort(key=lambda x: (x.competitor_price is None, x.competitor_price if x.competitor_price is not None else 10**18))
   return out
 
 def main() -> None:
-  """Función principal para ejecutar el flujo de investigación"""
+  """Main function to execute the research flow"""
   cfg = load_or_create_config("config.yaml")
   synonyms = load_or_create_synonyms(cfg["synonyms"]["synonyms_file"])
 
   products = scrape_store_products(cfg)
-  print(f"[store] Total de productos únicos: {len(products)}")
-  
+  print(f"[store] Total unique products: {len(products)}")
+
   all_offers: List[CompetitorOffer] = []
 
   for idx, p in enumerate(products, 1):
     print(f"\n[{idx}/{len(products)}] {p.name}")
     offers = gather_offers_for_product(p, cfg, synonyms)
-    print(f"  ofertas coincidentes: {len(offers)}")
+    print(f"  matching offers: {len(offers)}")
     all_offers.extend(offers)
 
-  # Exportar a CSV
+  # Export to CSV
   csv_path = cfg["output"]["csv_path"]
   df = pd.DataFrame([asdict(o) for o in all_offers])
   df.to_csv(csv_path, index=False, encoding="utf-8-sig")
-  print(f"\n[ok] CSV generado: {csv_path}")
+  print(f"\n[ok] CSV generated: {csv_path}")
 
-  # Imprimir en formato de lista solicitado
+  # Print in requested list format
   for o in all_offers:
     price_str = "" if o.competitor_price is None else f"{o.competitor_price:.2f} {o.currency}"
     sugg_str = "" if o.suggested_price is None else f"{o.suggested_price:.2f} ARS"
