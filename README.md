@@ -37,13 +37,29 @@ graph TD
 
 ### 🧩 Core Modules
 
-| Module | Responsibility | Key Feature |
-| :--- | :--- | :--- |
-| **Control Plane** | `core/state.py` | Persistent memory of metrics and execution history. |
-| **Tool Registry** | `core/tools.py` | Decouples capabilities from the main loop. |
-| **Reasoning Core** | `core/ai_agent.py` | Perceive $\rightarrow$ Plan $\rightarrow$ Act $\rightarrow$ Evaluate loop. |
-| **Integrations** | `core/integrations.py` | Hardened wrappers for Google, Trello, and SMTP. |
-| **Capabilities** | `core/capabilities/` | Specialized tools for Finance, SEO, and Productivity. |
+The system is built on a modular architecture that separates intelligence from execution:
+
+- **`core/ai_agent.py`**: Implements the `AgentOrchestrator`, the engine that executes the **Perceive $\rightarrow$ Plan $\rightarrow$ Act $\rightarrow$ Evaluate** loop.
+- **`core/state.py`**: Persistent state management (`data/state.json`), allowing the agent to remember progress across sessions.
+- **`core/tools.py`**: Central tool registry for the dynamic discovery of capabilities.
+
+---
+
+## 🛠️ Capability Library (The "Muscles")
+
+The `skills/` directory serves as a massive command center:
+
+- **Quantity**: 110 specialized skills physically implemented.
+- **Distribution**: 5 thematic packs (Core Web, E-commerce, Growth, DevOps, Business Ops).
+- **Standard**: Each skill is a Markdown file with YAML frontmatter and clear execution phases, ensuring that any new skill added is fully compatible with the orchestrator.
+
+---
+
+## 🔒 Security & Configuration
+
+- **Secrets**: All tokens and API keys reside exclusively in the `.env` file (excluded from Git via `.gitignore`).
+- **References**: `LLM_PROVIDERS.md` now functions as a technical reference document without sensitive data.
+- **Stack**: Full alignment with **Astro, Tailwind CSS, Cloudflare Pages/Functions, Resend, and Cloudflare Turnstile**.
 
 ---
 
