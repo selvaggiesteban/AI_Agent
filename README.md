@@ -1,15 +1,15 @@
-# 🤖 AI Agent: Autonomous Business Orchestrator
+# AI Agent: Autonomous Business Orchestrator
 
 ![GitHub repo size](https://img.shields.io/github/repo-size/selvaggiesteban/AI_Agent?style=for-the-badge)
 ![GitHub last commit](https://img.shields.io/github/last-commit/selvaggiesteban/AI_Agent?style=for-the-badge)
 ![Python Version](https://img.shields.io/badge/python-3.10+-blue.svg?style=for-the-badge)
 
-## 🌟 Vision
+## Vision
 The **AI Agent** is not just a set of automation scripts; it is a **SOTA (State-of-the-Art) Agentic System**. It transitions from linear execution to **Goal-Oriented Orchestration**, combining perception, reasoning, and action to manage business operations, SEO positioning, and financial health autonomously.
 
 ---
 
-## 🏗️ Agentic Architecture
+## Agentic Architecture
 
 The system is built on a modular, closed-loop architecture that separates intelligence from execution.
 
@@ -35,7 +35,7 @@ graph TD
     Orchestrator -->|Final Report| User
 ```
 
-### 🧩 Core Modules
+### Core Modules
 
 The system is built on a modular architecture that separates intelligence from execution:
 
@@ -45,7 +45,7 @@ The system is built on a modular architecture that separates intelligence from e
 
 ---
 
-## 🛠️ Capability Library (The "Muscles")
+## Capability Library (The "Muscles")
 
 The `skills/` directory serves as a massive command center:
 
@@ -55,7 +55,7 @@ The `skills/` directory serves as a massive command center:
 
 ---
 
-## 🔒 Security & Configuration
+## Security & Configuration
 
 - **Secrets**: All tokens and API keys reside exclusively in the `.env` file (excluded from Git via `.gitignore`).
 - **References**: `LLM_PROVIDERS.md` now functions as a technical reference document without sensitive data.
@@ -63,26 +63,26 @@ The `skills/` directory serves as a massive command center:
 
 ---
 
-## 🚀 Key Capabilities
+## Key Capabilities
 
-### 📈 1. Financial Intelligence (Contable)
+### 1. Financial Intelligence (Contable)
 *   **Autonomous Analysis**: Reads real-time earnings from CSVs.
 *   **Goal Tracking**: Calculates daily, weekly, and monthly targets.
 *   **Visual Reporting**: Generates professional HTML reports with **dynamic progress bars**.
 
-### 🌐 2. Digital Positioning (SEO)
+### 2. Digital Positioning (SEO)
 *   **Metric Extraction**: Direct integration with Google Search Console and GA4.
 *   **Technical Audits**: Automated SEO health checks for professional domains.
 *   **Correlation**: Links traffic growth directly to business revenue.
 
-### 🎯 3. Productivity Orchestration (Trabajo)
+### 3. Productivity Orchestration (Trabajo)
 *   **Trello Sync**: Monitors "In Progress" cards to track real-time output.
 *   **Google Sheets Integration**: Syncs high-level objectives with daily execution.
 *   **Automated Briefs**: Sends personalized productivity summaries via email.
 
 ---
 
-## 🛠️ Specialized Automation Catalog
+## Specialized Automation Catalog
 Beyond the core orchestration, the system includes a vast library of specialized automated processes:
 
 1.  **Lead Prospecting Pipeline** – Scraping Google Maps $\rightarrow$ combination of keywords/locations $\rightarrow$ deduplication $\rightarrow$ import to central SQLite
@@ -115,7 +115,7 @@ Beyond the core orchestration, the system includes a vast library of specialized
 
 ---
 
-## 🛠️ Installation & Setup
+## Installation & Setup
 
 ### 1. Prerequisites
 - Python 3.10+
@@ -147,11 +147,11 @@ pip install pandas google-api-python-client google-auth-oauthlib pytrello reques
 
 ---
 
-## 📜 Project Conventions
+## Project Conventions
 The agent operates under a strict framework of professional rules:
 - **`AGENTS.md`**: Inventory of agent roles and MCP servers.
 - **`ENRICH_RULES.md`**: Data validation and lead cleaning rules.
 - **`ESTEBAN.md`**: Technical references and ecosystem utility map.
 
-## ⚖️ Legal Notice
+## Legal Notice
 This project is applicable before the **Agencia de Recaudación y Control (ARCA)** (formerly AFIP), with validity as of August 2026.
