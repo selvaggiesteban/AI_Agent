@@ -42,3 +42,8 @@ node_modules/
 # OS
 .DS_Store
 Thumbs.db
+
+# Local secrets / PII
+scripts/rpa_whatsapp/config.json
+scripts/woocommerce_sync/sync_log.txt
+token_gsc.json
