@@ -92,7 +92,9 @@ def get_credentials() -> Credentials:
 
 def list_sites(service):
     result = service.sites().list().execute()
-    return [s["siteUrl"] for s in result.get("sites", [])]
+    # La API devuelve "siteEntry" (algunas versiones documentan "sites")
+    entries = result.get("siteEntry") or result.get("sites") or []
+    return [s["siteUrl"] for s in entries]
 
 
 def list_sitemaps(service, site):
