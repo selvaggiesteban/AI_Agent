@@ -1,6 +1,6 @@
 # AGENTS.md — Inventory of Agents, Repositories, and MCP Servers
 
-> **Last Update:** 2026-09-04
+> **Last Update:** 2026-10-23
 > **Root Project:** `.`
 
 ---
@@ -19,6 +19,7 @@
 | `scripts/inbox_manager/` | `scripts/inbox_manager/` | — | (Empty module, pending development) |
 | `scripts/seo_manager/` | `scripts/seo_manager/` | `keywords.py`, `seo-content-generator/seo_content_generator.py` | Technical SEO, keywords, and content |
 | `scripts/social_media_manager/` | `scripts/social_media_manager/` | `facebook.py`, `instagram.py`, `linkedin.py`, `messenger.py`, `telegram.py`, `whatsapp.py` | Social Media RPA (Playwright) |
+| `scripts/meta_ads/` | `scripts/meta_ads/` | `client.py`, `builder.py`, `commands.py`, `campaigns/*.json` | Meta Ads Marketing API: config-driven campaign/ad set/CTWA creation (Python -m CLI) |
 | &emsp;↳ `linkedin/` | `scripts/social_media_manager/linkedin/` | `linkedin_tools.py`, `linkedin_full_scraper.py`, `linkedin_parser.py` | LinkedIn tools via MCP |
 | `scripts/web_designer/` | `scripts/web_designer/` | `landing-page-generator/landing-page-generator.py` | Landing page generator |
 | &emsp;↳ `example/` | `scripts/web_designer/example/` | Astro + TypeScript (i18n, D1, MercadoPago) | selvaggiesteban.dev site |
@@ -231,7 +232,7 @@ pip install paddleocr paddlepaddle             # pending
 
 | Category | Quantity |
 |---|---|
-| Utility scripts | 11 dirs (+ 1 root .py) |
+| Utility scripts | 12 dirs (+ 1 root .py) |
 | Auxiliary core repos/ | 1 (`free-claude-code`) |
 | Skills | 3 |
 | Core modules core/*.py | 5 (`lead`, `services`, `telemetry`, `ai_engine`, `__init__`) |
@@ -318,4 +319,4 @@ pip install paddleocr paddlepaddle             # pending
 
 ---
 
-**Version:** 2026.09.04 | **Engineering Excellence**
+**Version:** 2026.10.23 | **Engineering Excellence**

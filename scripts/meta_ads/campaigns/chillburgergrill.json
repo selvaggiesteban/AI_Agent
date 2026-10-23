@@ -1,0 +1,61 @@
+{
+  "meta_ads": {
+    "expected_currency": "ARS",
+    "page_name": "Chill Burger Grill",
+    "campaign": {
+      "name": "CBG WhatsApp | Lanus 5km | 18-45 | JueDom 15-24h",
+      "objective": "OUTCOME_ENGAGEMENT",
+      "status": "PAUSED"
+    },
+    "adset": {
+      "name": "CBG Lanus 5km 18-45 | JueDom 15:00-24:00",
+      "budget": {
+        "mode": "auto",
+        "daily_amount": 5000,
+        "flight_days": 28
+      },
+      "schedule": {
+        "enabled": true,
+        "days": ["thu", "fri", "sat", "sun"],
+        "start": "15:00",
+        "end": "00:00",
+        "timezone_type": "ADVERTISER"
+      },
+      "optimization_goal": "CONVERSATIONS",
+      "destination_type": "WHATSAPP",
+      "targeting": {
+        "geo": {
+          "mode": "coordinates",
+          "latitude": -34.9667,
+          "longitude": -58.3833,
+          "radius_km": 5,
+          "name": "Lanus, Buenos Aires"
+        },
+        "age_min": 18,
+        "age_max": 45,
+        "genders": ["m", "f"],
+        "device_platforms": ["mobile"]
+      }
+    },
+    "ads": [
+      {
+        "name": "CBG Ad1 Smash Clasica",
+        "image": "docs/chillburguergrill.pages.dev/frontend/public/images/menu/categories/hamburguesas.webp",
+        "crop": "square",
+        "crop_focus": "right",
+        "primary_text": "Hamburguesas smash hechas a la parrilla con papas caseras. Hacé tu pedido por WhatsApp y retiralas en Chaco 1512, Lanús. De jueves a domingo desde las 15:00.",
+        "headline": "Chill Burger Grill",
+        "description": "Jue a dom | 15:00 a 00:00"
+      },
+      {
+        "name": "CBG Ad2 Cheeseburger",
+        "image": "docs/chillburguergrill.pages.dev/frontend/public/images/menu/products/cheeseburger.webp",
+        "crop": "square",
+        "crop_focus": "center",
+        "primary_text": "Queso fundido, pan tostado y todo el sabor de siempre. Escribinos por WhatsApp y armá tu pedido. Retiro en Lanús.",
+        "headline": "Pedí tu burger",
+        "description": "Jue a dom | 15:00 a 00:00"
+      }
+    ]
+  }
+}

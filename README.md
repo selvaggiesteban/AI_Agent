@@ -126,18 +126,25 @@ Root helpers: `db_utils.py` (SQLite utilities), `pipeline_base.py` (base class f
 *   **Product catalog synchronization** between WooCommerce stores (light and final modes).
 *   **Diagnostics & auth debugging**: connectivity and permission checks before sync runs.
 
-### 10. Platform Integrations
+### 10. Meta Ads Campaign Manager (`scripts/meta_ads/`)
+*   **Config-driven Marketing API client**: campaigns, ad sets and click-to-WhatsApp ads are created from a JSON file; the code is business-agnostic and all credentials live only in `.env`.
+*   **Full lifecycle CLI**: `doctor` (token/ad accounts/Pages audit), `resolve-geo` (targeting search), `validate` (offline checks plus API `validate_only` preflight), `create` (PAUSED by default), `status`, `set-status` and `exchange` (long-lived token helper).
+*   **Targeting builder**: coordinates/address/city targeting (1-80 km radius), age and gender ranges, device platforms.
+*   **Ad scheduling (day-parting)**: day-of-week and hour windows with automatic daily-to-lifetime budget fallback, account currency offset handling and an expected-currency guard.
+*   **Creatives**: local images converted to 1:1 JPEG via Pillow and uploaded through the API, with the WhatsApp call-to-action wired to the number linked to the Page.
+
+### 11. Platform Integrations
 *   **Google**: Sheets, Gmail (SMTP + IMAP drafts), Search Console, GA4, Calendar.
 *   **Trello**: board/list/card reading for project tracking.
 *   **Telegram**: 24/7 bot listener and reporting channel.
 *   **Cloudflare / Astro stack**: alignment with Cloudflare Pages/Functions, Resend and Turnstile for web delivery.
 
-### 11. Financial Intelligence (Contable)
+### 12. Financial Intelligence (Contable)
 *   **Autonomous Analysis**: reads real-time earnings from CSVs.
 *   **Goal Tracking**: calculates daily, weekly and monthly targets.
 *   **Visual Reporting**: professional HTML reports with dynamic progress bars.
 
-### 12. Productivity Orchestration (Trabajo)
+### 13. Productivity Orchestration (Trabajo)
 *   **Trello Sync**: monitors "In Progress" cards to track real-time output.
 *   **Google Sheets Integration**: syncs high-level objectives with daily execution.
 *   **Automated Briefs**: sends personalized productivity summaries via email.
@@ -171,7 +178,7 @@ cp .env-example .env
 # Edit .env with your real credentials
 
 # Install dependencies
-pip install pandas google-api-python-client google-auth-oauthlib pytrello requests google-generativeai playwright
+pip install pandas google-api-python-client google-auth-oauthlib pytrello requests google-generativeai playwright pillow
 ```
 
 ### 3. Execution Modes
@@ -182,6 +189,7 @@ pip install pandas google-api-python-client google-auth-oauthlib pytrello reques
 | **Immediate** | `python core/ai_agent.py --now` | Runs a general system health check immediately. |
 | **Scheduled** | `.\setup_windows.ps1` | Programs Windows Task Scheduler (Mon, Wed, Fri). |
 | **GSC Indexing Fix** | `python scripts/seo/gsc_indexing_fixer.py` | Audits all Search Console sites and fixes indexing (use `--dry-run` first). |
+| **Meta Ads** | `python -m scripts.meta_ads doctor` | Health check for the Marketing API token, ad accounts and Pages (see `scripts/meta_ads/README.md`). |
 
 ---
 
